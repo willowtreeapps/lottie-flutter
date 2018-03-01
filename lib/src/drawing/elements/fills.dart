@@ -33,9 +33,7 @@ abstract class FillDrawable extends AnimationDrawable {
   @override
   Rect getBounds(Matrix4 parentMatrix) {
     Path path = _createPathFromSection(parentMatrix);
-    Rect outBounds = new Rect.fromLTRB(0.0, 0.0, 0.0, 0.0);
-    //TODO: computeBounds method is not expose
-    //path.computeBounds(outBounds, false);
+    Rect outBounds = path.getBounds();
     return new Rect.fromLTRB(outBounds.left - 1, outBounds.top - 1,
         outBounds.right + 1, outBounds.bottom + 1);
   }
@@ -110,10 +108,7 @@ class GradientFillDrawable extends FillDrawable {
     final path = _createPathFromSection(parentMatrix);
     path.fillType = _fillType;
 
-
-    // TODO computeBounds
-    final bounds = new Rect.fromLTRB(0.0, 0.0, 0.0, 0.0);
-    //path.computeBounds(boundsRect, false);
+    final bounds = path.getBounds();
 
     _paint
       ..shader = createGradientShader(_gradientColorAnimation.value,

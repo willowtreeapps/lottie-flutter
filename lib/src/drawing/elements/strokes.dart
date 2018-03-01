@@ -17,8 +17,7 @@ class PathGroup {
 }
 
 class StrokeDrawable extends AnimationDrawable {
-  //TODO: PathMeasure https://github.com/flutter/flutter/issues/10428
-  //final PathMeasure pm = new PathMeasure();
+  final PathMeasure pm = new PathMeasure();
   final List<PathGroup> _pathGroups = [];
   final Paint _paint = new Paint();
   final Repaint _repaint;
@@ -40,8 +39,8 @@ class StrokeDrawable extends AnimationDrawable {
         super(name, _repaint) {
     _paint
       ..style = PaintingStyle.stroke
-      ..strokeCap = strokeCap;
-    //..strokeJoin = strokeJoin; //TODO
+      ..strokeCap = strokeCap
+      ..strokeJoin = strokeJoin;
 
     addAnimation(_opacityAnimation);
     addAnimation(_widthAnimation);
@@ -136,13 +135,11 @@ class StrokeDrawable extends AnimationDrawable {
       addPathToPath(path, pathGroup._paths[i].path, parentMatrix);
     }
 
-    //TODO: PathMeasure https://github.com/flutter/flutter/issues/10428
-    var totalLength;
-//    pm.setPath(path, false);
-//    double totalLength = pm.getLength();
-//    while (pm.nextContour()) {
-//      totalLength += pm.getLength();
-//    }
+    pm.setPath(path, false);
+    double totalLength = pm.getLength();
+    while (pm.nextContour()) {
+      totalLength += pm.getLength();
+    }
 
     final trimPath = pathGroup._trimPath;
     final offsetLength = totalLength * trimPath.offset / 360.0;
@@ -154,10 +151,8 @@ class StrokeDrawable extends AnimationDrawable {
       final trimPath = pathGroup._paths[j].path;
       trimPath.transform(parentMatrix.storage);
 
-      //TODO: PathMeasure https://github.com/flutter/flutter/issues/10428
-      var length = 0.0;
-      //pm.setPath(trimPathPath, false);
-      //double length = pm.getLength();
+      pm.setPath(trimPath, false);
+      double length = pm.getLength();
 
       if (endLength > totalLength &&
           endLength - totalLength < currentLength + length &&
@@ -211,9 +206,7 @@ class StrokeDrawable extends AnimationDrawable {
       }
     }
 
-    Rect outBounds = new Rect.fromLTRB(0.0, 0.0, 0.0, 0.0);
-    //TODO: computeBounds method is not expose
-    //path.computeBounds(outBounds, false);
+    Rect outBounds = path.getBounds();
 
     final width = _widthAnimation.value;
     return new Rect.fromLTRB(
@@ -315,8 +308,8 @@ class GradientStrokeDrawable extends StrokeDrawable {
   @override
   void draw(Canvas canvas, Size size, Matrix4 parentMatrix, int parentAlpha) {
     final bounds = getBounds(parentMatrix);
-    _paint.shader =  createGradientShader(_colorAnimation.value,
-        _type , _startPointAnimation.value, _endPointAnimation.value, bounds);
+    _paint.shader = createGradientShader(_colorAnimation.value, _type,
+        _startPointAnimation.value, _endPointAnimation.value, bounds);
 
     super.draw(canvas, size, parentMatrix, parentAlpha);
   }

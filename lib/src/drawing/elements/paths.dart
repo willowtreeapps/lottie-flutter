@@ -69,16 +69,16 @@ class MergePathsDrawable extends AnimationDrawable implements PathContent {
         addPaths(path);
         break;
       case MergePathsMode.Add:
-        opFirstPathWithRest(path, /*Path.Op.UNION*/);
+        opFirstPathWithRest(path, PathOp.union);
         break;
       case MergePathsMode.Subtract:
-        opFirstPathWithRest(path, /*Path.Op.REVERSE_DIFFERENCE*/);
+        opFirstPathWithRest(path, PathOp.reverseDifference);
         break;
       case MergePathsMode.Intersect:
-        opFirstPathWithRest(path, /*Path.Op.INTERSECT*/);
+        opFirstPathWithRest(path, PathOp.intersect);
         break;
       case MergePathsMode.ExcludeIntersections:
-        opFirstPathWithRest(path, /*Path.Op.XOR*/);
+        opFirstPathWithRest(path, PathOp.xor);
         break;
     }
 
@@ -91,8 +91,7 @@ class MergePathsDrawable extends AnimationDrawable implements PathContent {
     }
   }
 
-  // TODO: Open issue about Path operations
-  void opFirstPathWithRest(Path path, /*Path.Op op*/) {
+  void opFirstPathWithRest(Path path, PathOp op) {
     var firstPath = new Path();
     final remainderPath = new Path();
 
@@ -124,7 +123,6 @@ class MergePathsDrawable extends AnimationDrawable implements PathContent {
       firstPath = lastContent.path;
     }
 
-    // TODO: Path operations
-    //path.op(firstPath, remainderPath, op);
+    path.op(op, firstPath, remainderPath);
   }
 }

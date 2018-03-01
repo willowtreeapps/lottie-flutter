@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 import 'package:lottie_flutter/src/mathutils.dart';
 import 'package:lottie_flutter/src/painting.dart' show Mask;
 import 'package:lottie_flutter/src/parsers/parsers.dart';
@@ -242,9 +243,7 @@ class ShapeKeyframeAnimation extends BaseKeyframeAnimation<ShapeData, Path> {
 class PathKeyframeAnimation extends KeyframeAnimation<Offset> {
 
   PathKeyframe _pathMeasureKeyframe;
-
-  // TODO: SkPathMeasure https://github.com/flutter/flutter/issues/10428
-  //PathMeasure _pathMeasure;
+  PathMeasure _pathMeasure;
 
   PathKeyframeAnimation(Scene<Offset> scene) : super(scene);
 
@@ -256,18 +255,13 @@ class PathKeyframeAnimation extends KeyframeAnimation<Offset> {
       return keyframe.startValue;
     }
 
-
-    //TODO: No PathMeasure in flutter sdk :(
     if (_pathMeasureKeyframe != pathKeyframe) {
-      // _pathMeasure = new PathMeasure(_pathKeyframe._path, false);
+      _pathMeasure = new PathMeasure(path: pathKeyframe.path, forceClosed: false);
       _pathMeasureKeyframe = keyframe;
     }
 
-    //pathMeasure.getPosTan(keyframeProgress * pathMeasure.length, pos, null);
-    //point.set(pos[0],pos[1]);
-    //return point;
-    //return const Offset(0.0, 0.0);
-    return keyframe.startValue;
+    var posTan = _pathMeasure.getPosTan(keyframeProgress * _pathMeasure.getLength());
+    return posTan.position;
   }
 }
 
