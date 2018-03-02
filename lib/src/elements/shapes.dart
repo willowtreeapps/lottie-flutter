@@ -19,16 +19,18 @@ abstract class Shape {
 class CircleShape extends Shape {
   final AnimatableValue<Offset> _position;
   final AnimatablePointValue _size;
+  final bool _reversed;
 
   CircleShape.fromMap(dynamic map, double scale, double durationFrames)
       : _position = parsePathOrSplitDimensionPath(map, scale, durationFrames),
         _size = parseSize(map, scale, durationFrames),
+        _reversed = parseReversed(map),
         super.fromMap(map);
 
   @override
   AnimationDrawable toDrawable(Repaint repaint) =>
       new EllipseDrawable(name, repaint,
-          _size.createAnimation(), _position.createAnimation());
+          _size.createAnimation(), _position.createAnimation(), _reversed);
 }
 
 class RectangleShape extends Shape {

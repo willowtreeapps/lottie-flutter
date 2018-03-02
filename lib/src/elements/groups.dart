@@ -55,7 +55,10 @@ Shape shapeFromMap(dynamic rawShape, double scale, double durationFrames) {
       return new PolystarShape.fromMap(rawShape, scale, durationFrames);
     case 'mm':
       return new MergePaths.fromMap(rawShape, scale);
+    // case 'rp':
+    //   return new RepeaterParser.fromMap(rawShape);
     default:
+      print('Unknown shape ${rawShape["ty"]}');
       return new UnknownShape();
   }
 }

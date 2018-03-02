@@ -6,7 +6,7 @@ import 'package:flutter/painting.dart' show hashValues, hashList;
 
 enum GradientType { Linear, Radial }
 enum ShapeTrimPathType { Simultaneously, Individually }
-enum MergePathsMode {Merge, Add, Subtract, Intersect, ExcludeIntersections }
+enum MergePathsMode { Merge, Add, Subtract, Intersect, ExcludeIntersections }
 enum PolystarShapeType { Star, Polygon }
 
 class CubicCurveData {
@@ -20,13 +20,11 @@ class CubicCurveData {
 
   paint.Offset get vertex => _vertex;
 
-
   const CubicCurveData(this._controlPoint1, this._controlPoint2, this._vertex);
 
   @override
   bool operator ==(dynamic other) {
-    if (other is! CubicCurveData)
-      return false;
+    if (other is! CubicCurveData) return false;
     final CubicCurveData typedOther = other;
     return _controlPoint1 == typedOther.controlPoint1 &&
         _controlPoint2 == typedOther.controlPoint2 &&
@@ -41,10 +39,7 @@ class CubicCurveData {
     return 'CubicCurveData{controlPoint1: $_controlPoint1, '
         'controlPoint2: $_controlPoint2, vertex: $_vertex}';
   }
-
-
 }
-
 
 class ShapeData {
   List<CubicCurveData> _curves;
@@ -61,57 +56,57 @@ class ShapeData {
 
   ShapeData(this._curves, this._initialPoint, this._isClosed);
 
-  ShapeData.fromInterpolateBetween(ShapeData shapeData1, ShapeData shapeData2,
-      double percentage) {
+  ShapeData.fromInterpolateBetween(
+      ShapeData shapeData1, ShapeData shapeData2, double percentage) {
     _curves ??= new List<CubicCurveData>();
 
-    if (_curves.isNotEmpty && curves.length != shapeData1.length &&
+    if (_curves.isNotEmpty &&
+        curves.length != shapeData1.length &&
         _curves.length != shapeData2.length) {
       throw new StateError("Curves must have the same number of control point."
           "This: $length, Shape1: ${shapeData1.length}, Shape2: ${shapeData1
           .length}");
+    } else if (curves.isEmpty) {
+      _curves = new List<CubicCurveData>(shapeData1.length);
     }
 
     _isClosed = shapeData1.isClosed || shapeData2.isClosed;
     double x = lerp(
-        shapeData1.initialPoint.dx, shapeData2.initialPoint.dy, percentage);
+        shapeData1.initialPoint.dx, shapeData2.initialPoint.dx, percentage);
     double y = lerp(
         shapeData1.initialPoint.dy, shapeData2.initialPoint.dy, percentage);
     _initialPoint = new paint.Offset(x, y);
 
-    for (int i = 0; i < shapeData1.length; i++) {
+    for (int i = shapeData1.length - 1; i >= 0; i--) {
       CubicCurveData curve1 = shapeData1.curves[i];
       CubicCurveData curve2 = shapeData2.curves[i];
 
-      double x1 = lerp(
-          curve1.controlPoint1.dx, curve2.controlPoint1.dx, percentage);
-      double y1 = lerp(
-          curve1.controlPoint1.dy, curve2.controlPoint1.dy, percentage);
+      double x1 =
+          lerp(curve1.controlPoint1.dx, curve2.controlPoint1.dx, percentage);
+      double y1 =
+          lerp(curve1.controlPoint1.dy, curve2.controlPoint1.dy, percentage);
 
-      double x2 = lerp(
-          curve1.controlPoint2.dx, curve2.controlPoint2.dx, percentage);
-      double y2 = lerp(
-          curve1.controlPoint2.dy, curve2.controlPoint2.dy, percentage);
+      double x2 =
+          lerp(curve1.controlPoint2.dx, curve2.controlPoint2.dx, percentage);
+      double y2 =
+          lerp(curve1.controlPoint2.dy, curve2.controlPoint2.dy, percentage);
 
       double vertexX = lerp(curve1.vertex.dx, curve2.vertex.dx, percentage);
       double vertexY = lerp(curve1.vertex.dy, curve2.vertex.dy, percentage);
 
-      CubicCurveData curve = new CubicCurveData(
-          new paint.Offset(x1, y1), new paint.Offset(x2, y2),
-          new paint.Offset(vertexX, vertexY));
-      _curves.add(curve);
+      _curves[i] = new CubicCurveData(new paint.Offset(x1, y1),
+          new paint.Offset(x2, y2), new paint.Offset(vertexX, vertexY));
     }
   }
 
   @override
   bool operator ==(dynamic other) {
-    if (other is! ShapeData)
-      return false;
+    if (other is! ShapeData) return false;
     final ShapeData typedOther = other;
 
     return _initialPoint == typedOther.initialPoint &&
         _isClosed == typedOther.isClosed &&
-        const IterableEquality().equals(_curves,typedOther._curves);
+        const IterableEquality().equals(_curves, typedOther._curves);
   }
 
   @override
@@ -122,9 +117,7 @@ class ShapeData {
     return 'ShapeData{_isClosed: $_isClosed, _initialPoint: $_initialPoint,'
         'curves: $_curves}';
   }
-
 }
-
 
 class GradientColor {
   final List<double> _positions;
@@ -154,12 +147,11 @@ class GradientColor {
 
   @override
   bool operator ==(dynamic other) {
-    if (other is! GradientColor)
-      return false;
+    if (other is! GradientColor) return false;
     final GradientColor typedOther = other;
 
-    return const IterableEquality().equals(_colors,typedOther.colors) &&
-        const IterableEquality().equals(_positions,typedOther.positions);
+    return const IterableEquality().equals(_colors, typedOther.colors) &&
+        const IterableEquality().equals(_positions, typedOther.positions);
   }
 
   @override
@@ -169,6 +161,4 @@ class GradientColor {
   String toString() {
     return 'GradientColor{_positions: $_positions, _colors: $_colors}';
   }
-
-
 }

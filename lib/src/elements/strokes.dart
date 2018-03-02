@@ -41,7 +41,7 @@ class ShapeStroke extends Stroke {
       repaint,
       _opacity.createAnimation(),
       _width.createAnimation(),
-      _lineDashGroup.offset.createAnimation(),
+      _lineDashGroup?.offset?.createAnimation(),
       _color.createAnimation());
 }
 

@@ -1,4 +1,3 @@
-
 import 'dart:ui';
 import 'package:lottie_flutter/src/parsers/parsers.dart';
 import 'package:flutter/animation.dart' show Curve, Curves, Cubic;
@@ -6,23 +5,26 @@ import 'package:flutter/animation.dart' show Curve, Curves, Cubic;
 class Keyframe<T> {
   static const double MAX_CP_VALUE = 100.0;
 
-  int _startFrame;
-  int _endFrame;
+  double _startFrame;
+  double _endFrame;
   double _durationFrames;
   T _startValue;
   T _endValue;
   Curve _curve;
 
   double get startProgress {
-    return _startFrame / _durationFrames; }
+    return _startFrame / _durationFrames;
+  }
 
-  double get endProgress => _endFrame == null ? 1 : _endFrame / _durationFrames;
+  double get endProgress => _endFrame == null
+      ? 1
+      : ((_endFrame - _startFrame) / _durationFrames) + startProgress;
 
   bool get isStatic => _curve == null;
 
-  int get startFrame => _startFrame;
+  double get startFrame => _startFrame;
 
-  int get endFrame => _endFrame;
+  double get endFrame => _endFrame;
 
   T get startValue => _startValue;
 
@@ -33,9 +35,12 @@ class Keyframe<T> {
   bool containsProgress(double progress) =>
       progress >= startProgress && progress <= endProgress;
 
-
-  Keyframe([this._startFrame, this._endFrame, this._durationFrames,
-    this._startValue, this._endValue]);
+  Keyframe(
+      [this._startFrame,
+      this._endFrame,
+      this._durationFrames,
+      this._startValue,
+      this._endValue]);
 
   Keyframe.fromMap(Map<String, dynamic> map, Parser<T> parser, double scale,
       this._durationFrames) {
@@ -45,7 +50,7 @@ class Keyframe<T> {
       return;
     }
 
-    _startFrame = map['t'] ?? 0.0;
+    _startFrame = map['t']?.toDouble() ?? 0.0;
     _startValue = map.containsKey('s') ? parser.parse(map['s'], scale) : null;
     _endValue = map.containsKey('e') ? parser.parse(map['e'], scale) : null;
 
@@ -54,11 +59,11 @@ class Keyframe<T> {
       _curve = Curves.linear;
     } else if (map.containsKey('o')) {
       final double x1 = _clamp(map['o']['x'], -scale, scale) / scale;
-      final double y1 = _clamp(map['o']['y'], -MAX_CP_VALUE, MAX_CP_VALUE) /
-          scale;
+      final double y1 =
+          _clamp(map['o']['y'], -MAX_CP_VALUE, MAX_CP_VALUE) / scale;
       final double x2 = _clamp(map['i']['x'], -scale, scale) / scale;
-      final double y2 = _clamp(map['i']['y'], -MAX_CP_VALUE, MAX_CP_VALUE) /
-          scale;
+      final double y2 =
+          _clamp(map['i']['y'], -MAX_CP_VALUE, MAX_CP_VALUE) / scale;
       _curve = new Cubic(x1, y1, x2, y2);
     } else {
       _curve = Curves.linear;
@@ -75,27 +80,24 @@ class Keyframe<T> {
         ' _startValue: $_startValue, _endValue: $_endValue,'
         ' _curve: $_curve}';
   }
-
 }
 
-
 class PathKeyframe extends Keyframe<Offset> {
-
   Path _path;
 
   Path get path => _path;
 
-  PathKeyframe(int startFrame, int endFrame, double durationFrames,
+  PathKeyframe(double startFrame, double endFrame, double durationFrames,
       Offset startValue, Offset endValue)
       : super(startFrame, endFrame, durationFrames, startValue, endValue);
 
   PathKeyframe.fromMap(dynamic map, double scale, double durationFrames)
-      : super.fromMap(map, Parsers.pointFParser, scale, durationFrames){
+      : super.fromMap(map, Parsers.pointFParser, scale, durationFrames) {
     Offset cp1 = Parsers.pointFParser.parse(map['ti'], scale);
     Offset cp2 = Parsers.pointFParser.parse(map['to'], scale);
 
-    bool equals = _endValue != null && _startValue != null &&
-        _startValue == _endValue;
+    bool equals =
+        _endValue != null && _startValue != null && _startValue == _endValue;
 
     if (_endValue != null && !equals) {
       _path = createPath(_startValue, _endValue, cp1, cp2);
@@ -106,23 +108,20 @@ class PathKeyframe extends Keyframe<Offset> {
     Path path = new Path();
     path.moveTo(start.dx, start.dy);
 
-    if (cp1 != null && cp2 != null &&
+    if (cp1 != null &&
+        cp2 != null &&
         (cp1.distance != 0 || cp2.distance != 0)) {
-      path.cubicTo(start.dx + cp1.dx, start.dy + cp1.dy,
-          end.dx + cp2.dx, end.dy + cp2.dy,
-          end.dx, end.dy);
+      path.cubicTo(start.dx + cp1.dx, start.dy + cp1.dy, end.dx + cp2.dx,
+          end.dy + cp2.dy, end.dx, end.dy);
     } else {
       path.lineTo(end.dx, end.dy);
     }
 
     return path;
   }
-
 }
 
-
 class Scene<T> {
-
   final List<Keyframe<T>> _keyframes;
 
   List<Keyframe<T>> get keyframes => _keyframes;
@@ -135,7 +134,6 @@ class Scene<T> {
 
   bool get hasAnimation => _keyframes.isNotEmpty;
 
-
   Scene(this._keyframes, [bool join = true]) {
     if (join) {
       _joinKeyframes();
@@ -144,28 +142,27 @@ class Scene<T> {
 
   const Scene.empty() : this._keyframes = const [];
 
-  Scene.fromMap(dynamic map, Parser<T> parser, double scale,
-      double durationFrames)
-      : _keyframes = parseKeyframes(map, parser, scale, durationFrames){
+  Scene.fromMap(
+      dynamic map, Parser<T> parser, double scale, double durationFrames)
+      : _keyframes = parseKeyframes(map, parser, scale, durationFrames) {
     if (_keyframes.isNotEmpty) {
       _joinKeyframes();
     }
   }
 
-  static List<Keyframe> parseKeyframes(dynamic map, Parser parser,
-      double scale, double durationFrames) {
+  static List<Keyframe> parseKeyframes(
+      dynamic map, Parser parser, double scale, double durationFrames) {
     if (map == null) {
       return const [];
     }
 
-    var rawKeyframes = map['k'];
-    if (!hasKeyframes(rawKeyframes)) {
-      return const [];
-    }
+    var rawKeyframes = tryGetKeyframes(map['k']);
 
-    return rawKeyframes.map((rawKeyframe) =>
-    new Keyframe.fromMap(rawKeyframe, parser, scale, durationFrames))
-        .toList();
+    return rawKeyframes
+            ?.map((rawKeyframe) => new Keyframe.fromMap(
+                rawKeyframe, parser, scale, durationFrames))
+            ?.toList() ??
+        const [];
   }
 
   //
@@ -189,9 +186,7 @@ class Scene<T> {
   String toString() {
     return 'Scene{keyframes: $_keyframes}';
   }
-
 }
-
 
 class KeyframeGroup<T> {
   final Scene scene;
@@ -200,14 +195,14 @@ class KeyframeGroup<T> {
   KeyframeGroup(this.initialValue, this.scene);
 }
 
-bool hasKeyframes(dynamic json) {
-  if (json == null || !(json is List)) {
-    return false;
-  }
-
-  var first = json[0];
-
-  return first is Map && first.containsKey('t');
+// this should involve fewer casts/repeated code
+/// Returns a list of raw keyframes from json if json is list of keyframes
+///
+/// Otherwise, returns null
+List tryGetKeyframes(dynamic json) {
+  return (json is List &&
+          json?.first is Map &&
+          json?.first?.containsKey('t') == true)
+      ? json
+      : null;
 }
-
-

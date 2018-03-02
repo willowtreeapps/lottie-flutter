@@ -5,6 +5,15 @@ import 'package:lottie_flutter/src/lottie.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+const assetNames = const [
+  'assets/muzli.json',
+  'assets/emoji_shock.json',
+  'assets/checked_done_.json',
+  'assets/favourite_app_icon.json',
+  'assets/preloader.json',
+  'assets/walkthrough.json',
+];
+
 void main() {
   runApp(new DemoApp());
 }
@@ -31,11 +40,13 @@ class LottieDemo extends StatefulWidget {
 
 class _LottieDemoState extends State<LottieDemo> {
   LottieComposition _composition;
+  String _assetName;
 
-  void _loadButtonPressed() {
-    loadAsset().then((composition) {
+  void _loadButtonPressed(String assetName) {
+    loadAsset(assetName).then((composition) {
       setState(() {
-      _composition = composition;
+        _assetName = assetName;
+        _composition = composition;
       });
     });
   }
@@ -46,21 +57,44 @@ class _LottieDemoState extends State<LottieDemo> {
       appBar: new AppBar(
         title: new Text('Lottie Demo'),
       ),
-      body: new Container(
-          child: _composition == null ? new Text("Click button to load.") : new Lottie(composition: _composition)
+      body: new Center(
+        child: new SingleChildScrollView(
+          child: new Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              new DropdownButton(
+                items: assetNames
+                    .map((assetName) => new DropdownMenuItem(
+                          child: new Text(assetName),
+                          value: assetName,
+                        ))
+                    .toList(),
+                hint: new Text('Choose an asset'),
+                value: _assetName,
+                onChanged: (val) => _loadButtonPressed(val),
+              ),
+              new Text(_composition?.bounds?.size?.toString() ?? ''),
+              _composition == null
+                  ? new LimitedBox()
+                  : new Lottie(composition: _composition),
+            ],
+          ),
+        ),
       ),
-      floatingActionButton: new FloatingActionButton(
-        onPressed: _loadButtonPressed,
-        tooltip: 'Increment',
-        child: new Icon(Icons.add),
-      ),
+      // floatingActionButton: new FloatingActionButton(
+      //   onPressed: _loadButtonPressed,
+      //   tooltip: 'Increment',
+      //   child: new Icon(Icons.add),
+      // ),
     );
   }
 }
 
-Future<LottieComposition> loadAsset() async {
+Future<LottieComposition> loadAsset(String assetName) async {
   return await rootBundle
-      .loadString('assets/emoji_shock.json')
-      .then((json) => JSON.decode(json))
+      .loadString(assetName)
+      .then((data) => json.decode(data))
       .then((map) => new LottieComposition.fromMap(map));
 }

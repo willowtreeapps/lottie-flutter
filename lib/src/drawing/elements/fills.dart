@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui';
 import 'package:lottie_flutter/src/animations.dart';
 import 'package:lottie_flutter/src/drawing/drawing.dart';

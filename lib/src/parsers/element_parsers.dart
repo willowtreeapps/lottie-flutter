@@ -5,15 +5,17 @@ import 'package:lottie_flutter/src/values.dart';
 String parseName(dynamic map) => map['nm'];
 
 AnimatableColorValue parseColor(dynamic map, double durationFrames) =>
-    map['c'] == null ? null : new AnimatableColorValue.fromMap(
-        map['c'], durationFrames);
+    map['c'] == null
+        ? null
+        : new AnimatableColorValue.fromMap(map['c'], durationFrames);
 
 AnimatableIntegerValue parseOpacity(dynamic map, double durationFrames) =>
-    map['o'] == null ? null : new AnimatableIntegerValue.fromMap(
-        map['o'], durationFrames);
+    map['o'] == null
+        ? null
+        : new AnimatableIntegerValue.fromMap(map['o'], durationFrames);
 
-AnimatableDoubleValue parseWidth(dynamic map, double scale,
-    double durationFrames) =>
+AnimatableDoubleValue parseWidth(
+        dynamic map, double scale, double durationFrames) =>
     new AnimatableDoubleValue.fromMap(map['w'], scale, durationFrames);
 
 AnimatableGradientColorValue parseGradient(dynamic map, double durationFrames) {
@@ -27,47 +29,53 @@ AnimatableGradientColorValue parseGradient(dynamic map, double durationFrames) {
     }
   }
 
-  return rawColor == null ? null : new AnimatableGradientColorValue.fromMap(
-      rawColor, durationFrames);
+  return rawColor == null
+      ? null
+      : new AnimatableGradientColorValue.fromMap(rawColor, durationFrames);
 }
 
-AnimatablePointValue parseStartPoint(dynamic map, double scale,
-    double durationFrames) =>
+AnimatablePointValue parseStartPoint(
+        dynamic map, double scale, double durationFrames) =>
     parsePoint(map['s'], scale, durationFrames);
 
-AnimatablePointValue parseEndPoint(dynamic map, double scale,
-    double durationFrames) =>
+AnimatablePointValue parseEndPoint(
+        dynamic map, double scale, double durationFrames) =>
     parsePoint(map['e'], scale, durationFrames);
 
-AnimatablePointValue parsePoint(dynamic map, double scale,
-    double durationFrames) =>
-    map == null ? null : new AnimatablePointValue.fromMap(
-        map, scale, durationFrames);
+AnimatablePointValue parsePoint(
+        dynamic map, double scale, double durationFrames) =>
+    map == null
+        ? null
+        : new AnimatablePointValue.fromMap(map, scale, durationFrames);
 
-AnimatablePointValue parseSize(dynamic map, double scale,
-    double durationFrames) =>
+AnimatablePointValue parseSize(
+        dynamic map, double scale, double durationFrames) =>
     new AnimatablePointValue.fromMap(map['s'], scale, durationFrames);
 
-AnimatableDoubleValue parseinnerRadius(dynamic map, scale,
-    double durationFrames) =>
-    map['ir'] == null ? null
+bool parseReversed(dynamic map) => map['d'] == 3;
+
+AnimatableDoubleValue parseinnerRadius(
+        dynamic map, scale, double durationFrames) =>
+    map['ir'] == null
+        ? null
         : new AnimatableDoubleValue.fromMap(map['ir'], scale, durationFrames);
 
 AnimatableDoubleValue parseInnerRoundness(dynamic map, double durationFrames) =>
-    map['is'] == null ? null
+    map['is'] == null
+        ? null
         : new AnimatableDoubleValue.fromMap(map['is'], 1.0, durationFrames);
 
 parseCapType(dynamic map) => StrokeCap.values[map['lc'] - 1];
 
 StrokeJoin parseJoinType(dynamic map) => StrokeJoin.values[map['lj'] - 1];
 
-GradientType parseGradientType(dynamic map) =>
-    map['t'] == null || map['t'] == 1
-        ? GradientType.Linear : GradientType.Radial;
+GradientType parseGradientType(dynamic map) => map['t'] == null || map['t'] == 1
+    ? GradientType.Linear
+    : GradientType.Radial;
 
-PathFillType parseFillType(dynamic map) =>
-    map['r'] == null || map['r'] == 1
-        ? PathFillType.nonZero : PathFillType.evenOdd;
+PathFillType parseFillType(dynamic map) => map['r'] == null || map['r'] == 1
+    ? PathFillType.nonZero
+    : PathFillType.evenOdd;
 
 ShapeTrimPathType parseShapeTrimPathType(dynamic map) {
   int rawType = map['m'] ?? 1;
@@ -112,22 +120,20 @@ MergePathsMode parseMergePathsMode(dynamic map) {
   }
 }
 
-
 LineDashGroup parseLineDash(dynamic map, double scale, double durationFrames) {
   AnimatableDoubleValue offset;
   final lineDashPattern = new List<AnimatableDoubleValue>();
 
-  if (map.contains('d')) {
+  if (map.containsKey('d')) {
     List rawDashes = map['d'];
     for (var rawDash in rawDashes) {
       final String n = rawDash['n'];
       if (n == 'o') {
-        offset =
-        new AnimatableDoubleValue.fromMap(rawDash['v'], scale, durationFrames);
+        offset = new AnimatableDoubleValue.fromMap(
+            rawDash['v'], scale, durationFrames);
       } else if (n == 'd' || n == 'g') {
-        lineDashPattern.add(
-            new AnimatableDoubleValue.fromMap(
-                rawDash['v'], scale, durationFrames));
+        lineDashPattern.add(new AnimatableDoubleValue.fromMap(
+            rawDash['v'], scale, durationFrames));
       }
     }
 
@@ -140,17 +146,18 @@ LineDashGroup parseLineDash(dynamic map, double scale, double durationFrames) {
   return new LineDashGroup(offset, lineDashPattern);
 }
 
-
-AnimatableValue<Offset> parsePathOrSplitDimensionPath(dynamic map,
-    double scale, double durationFrames) {
+AnimatableValue<Offset> parsePathOrSplitDimensionPath(
+    dynamic map, double scale, double durationFrames) {
   final rawPosition = map['p'];
-
-  return rawPosition.containsKey('k') ? new AnimatablePathValue(rawPosition['k'], scale, durationFrames)
+  return rawPosition.containsKey('k')
+      ? new AnimatablePathValue(rawPosition['k'], scale, durationFrames)
       : new AnimatableSplitDimensionValue(
-      new AnimatableDoubleValue.fromMap(rawPosition['x'], scale, durationFrames),
-      new AnimatableDoubleValue.fromMap(rawPosition['y'], scale, durationFrames));
+          new AnimatableDoubleValue.fromMap(
+              rawPosition['x'], scale, durationFrames),
+          new AnimatableDoubleValue.fromMap(
+              rawPosition['y'], scale, durationFrames),
+        );
 }
-
 
 class LineDashGroup {
   final AnimatableDoubleValue _offset;

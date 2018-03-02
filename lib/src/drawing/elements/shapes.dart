@@ -6,28 +6,25 @@ import 'package:lottie_flutter/src/drawing/elements/paths.dart';
 import 'package:lottie_flutter/src/utils.dart';
 import 'package:lottie_flutter/src/values.dart';
 
-
 abstract class _PolygonDrawable extends AnimationDrawable
     implements PathContent {
-
   bool _isPathValid = false;
   TrimPathDrawable _trimPathDrawable;
   Path _path = new Path();
 
   _PolygonDrawable(String name, Repaint repaint) : super(name, repaint);
 
+  int _entry = 0;
   Path get path {
     if (_isPathValid) {
       return _path;
     }
 
-
-    createPath();
+    _createPath();
 
     if (_trimPathDrawable != null) {
-      applyScaleTrimIfNeeded(
-          _path, _trimPathDrawable.start, _trimPathDrawable.end,
-          _trimPathDrawable.offset);
+      applyScaleTrimIfNeeded(_path, _trimPathDrawable.start,
+          _trimPathDrawable.end, _trimPathDrawable.offset);
     }
 
     _isPathValid = true;
@@ -51,68 +48,77 @@ abstract class _PolygonDrawable extends AnimationDrawable
     }
   }
 
-  void createPath();
+  void _createPath();
 }
 
 ///
 /// CircleDrawable
 ///
 class EllipseDrawable extends _PolygonDrawable {
-
   static const double CONTROL_POINT_PERCENTAGE = 0.55228;
 
-  final BaseKeyframeAnimation _sizeAnimation;
-  final BaseKeyframeAnimation _positionAnimation;
+  final BaseKeyframeAnimation<dynamic, Offset> _sizeAnimation;
+  final BaseKeyframeAnimation<dynamic, Offset> _positionAnimation;
+
+  final bool _isReversed;
 
   EllipseDrawable(String name, Repaint repaint, this._sizeAnimation,
-      this._positionAnimation) : super(name, repaint) {
+      this._positionAnimation, this._isReversed)
+      : super(name, repaint) {
     addAnimation(_sizeAnimation);
     addAnimation(_positionAnimation);
   }
 
   @override
-  void createPath() {
+  void _createPath() {
     final size = _sizeAnimation.value;
     final halfWidth = size.dx / 2.0;
     final halfHeight = size.dy / 2.0;
     //TODO: handle bounds
 
-    final controlPointWidth = halfWidth * CONTROL_POINT_PERCENTAGE;
-    final controlPointHeight = halfHeight * CONTROL_POINT_PERCENTAGE;
+    final cpW = halfWidth * CONTROL_POINT_PERCENTAGE;
+    final cpH = halfHeight * CONTROL_POINT_PERCENTAGE;
 
     _path.reset();
-    _path.moveTo(0.0, -halfHeight);
-    _path.cubicTo(controlPointWidth, -halfHeight, halfWidth, controlPointHeight,
-        halfWidth, 0.0);
-    _path.cubicTo(
-        halfWidth, controlPointHeight, controlPointWidth, halfHeight, 0.0,
-        halfHeight);
-    _path.cubicTo(
-        -controlPointWidth, halfHeight, -halfWidth, controlPointHeight,
-        -halfWidth, 0.0);
-    _path.cubicTo(
-        -halfWidth, -controlPointHeight, -controlPointWidth, -halfHeight, 0.0,
-        -halfHeight);
+    if (_isReversed) {
+      _path.moveTo(0.0, -halfHeight);
+      _path.cubicTo(0 - cpW, -halfHeight, -halfWidth, 0 - cpH, -halfWidth, 0.0);
+      _path.cubicTo(-halfWidth, 0 + cpH, 0 - cpW, halfHeight, 0.0, halfHeight);
+      _path.cubicTo(0 + cpW, halfHeight, halfWidth, 0 + cpH, halfWidth, 0.0);
+      _path.cubicTo(halfWidth, 0 - cpH, 0 + cpW, -halfHeight, 0.0, -halfHeight);
+    } else {
+      _path.moveTo(0.0, -halfHeight);
+      _path.cubicTo(0 + cpW, -halfHeight, halfWidth, 0 - cpH, halfWidth, 0.0);
+      _path.cubicTo(halfWidth, 0 + cpH, 0 + cpW, halfHeight, 0.0, halfHeight);
+      _path.cubicTo(0 - cpW, halfHeight, -halfWidth, 0 + cpH, -halfWidth, 0.0);
+      _path.cubicTo(
+          -halfWidth, 0 - cpH, 0 - cpW, -halfHeight, 0.0, -halfHeight);
+    }
+
     _path.shift(_positionAnimation.value);
     _path.close();
   }
 }
 
-
 ///
 /// RectangleContent
 ///
 class RectangleDrawable extends _PolygonDrawable {
-
   final BaseKeyframeAnimation<dynamic, Offset> _positionAnimation;
   final BaseKeyframeAnimation<dynamic, Offset> _sizeAnimation;
   final BaseKeyframeAnimation<dynamic, double> _cornerRadiusAnimation;
 
-  RectangleDrawable(String name, Repaint repaint, this._positionAnimation,
-      this._sizeAnimation, this._cornerRadiusAnimation,) : super(name, repaint);
+  RectangleDrawable(
+    String name,
+    Repaint repaint,
+    this._positionAnimation,
+    this._sizeAnimation,
+    this._cornerRadiusAnimation,
+  )
+      : super(name, repaint);
 
   @override
-  void createPath() {
+  void _createPath() {
     final size = _sizeAnimation.value;
     final position = _positionAnimation.value;
     final halfWidth = size.dx / 2.0;
@@ -125,7 +131,8 @@ class RectangleDrawable extends _PolygonDrawable {
     _path.lineTo(position.dx + halfWidth, position.dy + halfHeight - radius);
 
     if (radius > 0) {
-      final rect = new Rect.fromLTRB(position.dx + halfWidth - 2 * radius,
+      final rect = new Rect.fromLTRB(
+          position.dx + halfWidth - 2 * radius,
           position.dy + halfHeight - 2 * radius,
           position.dx + halfWidth,
           position.dy + halfHeight);
@@ -135,7 +142,8 @@ class RectangleDrawable extends _PolygonDrawable {
     _path.lineTo(position.dx - halfWidth + radius, position.dy + halfHeight);
 
     if (radius > 0) {
-      final rect = new Rect.fromLTRB(position.dx - halfWidth,
+      final rect = new Rect.fromLTRB(
+          position.dx - halfWidth,
           position.dy + halfHeight - 2 * radius,
           position.dx - halfWidth + 2 * radius,
           position.dy + halfHeight);
@@ -145,7 +153,8 @@ class RectangleDrawable extends _PolygonDrawable {
     _path.lineTo(position.dx - halfWidth, position.dy - halfHeight + radius);
 
     if (radius > 0) {
-      final rect = new Rect.fromLTRB(position.dx - halfWidth,
+      final rect = new Rect.fromLTRB(
+          position.dx - halfWidth,
           position.dy - halfHeight,
           position.dx - halfWidth + 2 * radius,
           position.dy - halfHeight + 2 * radius);
@@ -155,7 +164,8 @@ class RectangleDrawable extends _PolygonDrawable {
     _path.lineTo(position.dx + halfWidth - radius, position.dy - halfHeight);
 
     if (radius > 0) {
-      final rect = new Rect.fromLTRB(position.dx + halfWidth - 2 * radius,
+      final rect = new Rect.fromLTRB(
+          position.dx + halfWidth - 2 * radius,
           position.dy - halfHeight,
           position.dx + halfWidth,
           position.dy - halfHeight + 2 * radius);
@@ -170,17 +180,20 @@ class RectangleDrawable extends _PolygonDrawable {
 /// ShapeDrawable
 ///
 class ShapeDrawable extends _PolygonDrawable {
-
   final BaseKeyframeAnimation<dynamic, Path> _animation;
 
-  ShapeDrawable(String name, Repaint repaint, this._animation) : super(name, repaint){
+  ShapeDrawable(String name, Repaint repaint, this._animation)
+      : super(name, repaint) {
+    if (name == "MouthAnimPath") {
+      // print(name);
+      // _animation.scene.keyframes.forEach((kf) => print(kf));
+    }
     addAnimation(_animation);
   }
 
   @override
-  void createPath() {
+  void _createPath() {
     _path = _animation.value;
     _path.fillType = PathFillType.evenOdd;
   }
-
 }

@@ -4,12 +4,11 @@ import 'dart:ui';
 import 'package:lottie_flutter/src/images.dart';
 import 'package:lottie_flutter/src/layers.dart';
 
+double parseStartFrame(dynamic map) => map['ip']?.toDouble() ?? 0.0;
 
-int parseStartFrame(dynamic map) => map['ip'] ?? 0.0;
+double parseEndFrame(dynamic map) => map['op']?.toDouble() ?? 0.0;
 
-int parseEndFrame(dynamic map) => map['op'] ?? 0.0;
-
-int parseFrameRate(dynamic map) => map['fr'] ?? 0.0;
+double parseFrameRate(dynamic map) => map['fr']?.toDouble() ?? 0.0;
 
 Rect parseBounds(dynamic map) {
   double scale = ui.window.devicePixelRatio;
@@ -32,7 +31,8 @@ Map<String, LottieImageAsset> parseImages(dynamic map) {
     return const {};
   }
 
-  return rawAssets.where((rawAsset) => rawAsset.containsKey('p'))
+  return rawAssets
+      .where((rawAsset) => rawAsset.containsKey('p'))
       .map((rawAsset) => new LottieImageAsset.fromMap(rawAsset))
       .fold({}, (assets, image) {
     assets[image.id] = image;
@@ -40,29 +40,26 @@ Map<String, LottieImageAsset> parseImages(dynamic map) {
   });
 }
 
-
 Map<String, List<Layer>> parsePreComps(dynamic map, double width, double height,
-    double scale, double durationFrames, int endFrame) {
+    double scale, double durationFrames, double endFrame) {
   List rawAssets = map["assets"];
 
   if (rawAssets == null) {
     return const {};
   }
 
-  return rawAssets.where((rawAsset) => rawAsset["layers"] != null)
-      .fold({}, (preComps, rawAsset) {
+  return rawAssets.where((rawAsset) => rawAsset["layers"] != null).fold({},
+      (preComps, rawAsset) {
     preComps[rawAsset['id']] = parseLayers(
         rawAsset["layers"], width, height, scale, durationFrames, endFrame);
     return preComps;
   });
 }
 
-
 List<Layer> parseLayers(List rawLayers, double width, double height,
-    double scale, double durationFrames, int endFrame) {
-  return rawLayers.map((rawLayer) =>
-  new Layer(rawLayer, width, height, scale,
-      durationFrames == null ? 0.0 : durationFrames, endFrame))
+    double scale, double durationFrames, double endFrame) {
+  return rawLayers
+      .map((rawLayer) => new Layer(
+          rawLayer, width, height, scale, durationFrames ?? 0.0, endFrame))
       .toList();
 }
-

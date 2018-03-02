@@ -476,7 +476,9 @@ class CompositionLayer extends BaseLayer {
   CompositionLayer(LottieComposition composition, Layer layerModel,
       Repaint repaint, double scale)
       : super(layerModel, repaint) {
-    List<Layer> layerModels = composition.preComps[layerModel.refId] ?? composition.layers;
+    assert(composition != null);
+    List<Layer> layerModels =
+        composition?.preComps[layerModel.refId] ?? composition?.layers;
     Map<int, BaseLayer> layerMap = new Map<int, BaseLayer>();
 
     for (int i = layerModels.length - 1; i >= 0; i--) {

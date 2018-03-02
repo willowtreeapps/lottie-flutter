@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:lottie_flutter/src/composition.dart';
 import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 import 'package:lottie_flutter/src/layers.dart';
@@ -13,26 +15,25 @@ class Lottie extends StatefulWidget {
         super(key: key);
 
   @override
-  _LottieState createState() => new _LottieState(_composition);
+  _LottieState createState() => new _LottieState();
 }
 
 class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
-  final LottieComposition _composition;
   CompositionLayer _compositionLayer;
   AnimationController _animation;
-
-  _LottieState(this._composition) {
-    final size = _composition.bounds.size;
-    _compositionLayer = new CompositionLayer(
-        _composition, new Layer.empty(size.width, size.height), () => {}, 1.0);
-  }
+  Size _size;
 
   @override
   void initState() {
     super.initState();
 
+    _size = widget._composition.bounds.size;
+
+    _compositionLayer = new CompositionLayer(widget._composition,
+        new Layer.empty(_size.width, _size.height), () => {}, 1.0);
+
     _animation = new AnimationController(
-      duration: new Duration(milliseconds: _composition.duration),
+      duration: new Duration(milliseconds: widget._composition.duration),
       lowerBound: 0.0,
       upperBound: 1.0,
       vsync: this,
@@ -50,8 +51,10 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     //_compositionLayer.progress = 0.0;
-    return new CustomPaint(
-        painter: new LottiePainter(_compositionLayer), size: const Size(1900.0, 700.0));
+    return new LayoutBuilder(builder: (ctx, constraints) => new CustomPaint(
+        painter: new LottiePainter(_compositionLayer),
+        size: constraints.constrain(widget._composition.bounds.size)),
+    );
   }
 
   @override
@@ -67,9 +70,9 @@ class LottiePainter extends CustomPainter {
   final double _scale;
   final int _alpha;
 
-  LottiePainter(this._compositionLayer, { double scale: 1.0, int alpha: 255 } )
-    : _scale = scale,
-      _alpha = alpha;
+  LottiePainter(this._compositionLayer, {double scale: 1.0, int alpha: 255})
+      : _scale = scale,
+        _alpha = alpha;
 
   @override
   void paint(Canvas canvas, Size size) {

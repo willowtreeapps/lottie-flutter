@@ -5,18 +5,17 @@ import 'package:flutter/painting.dart';
 import 'dart:ui' as ui;
 
 class LottieComposition {
-
   Map<String, List<Layer>> _preComps;
   Map<String, LottieImageAsset> _images;
   List<Layer> _layers;
   final Rect _bounds;
-  final int _startFrame;
-  final int _endFrame;
-  final int _frameRate;
+  final double _startFrame;
+  final double _endFrame;
+  final double _frameRate;
   final double _dpScale;
 
   int get duration {
-    int frameDuration = _endFrame - _startFrame;
+    double frameDuration = _endFrame - _startFrame;
     return (frameDuration / _frameRate * 1000).toInt();
   }
 
@@ -35,14 +34,12 @@ class LottieComposition {
         _startFrame = parseStartFrame(map),
         _endFrame = parseEndFrame(map),
         _frameRate = parseFrameRate(map),
-        _dpScale = ui.window.devicePixelRatio{
+        _dpScale = ui.window.devicePixelRatio {
     _images = parseImages(map);
-    _preComps = parsePreComps(
-        map, _bounds.width, _bounds.height, _dpScale, durationFrames,
-        _endFrame);
-    _layers = parseLayers(
-        map['layers'], _bounds.width, _bounds.height, _dpScale, durationFrames,
-        _endFrame);
+    _preComps = parsePreComps(map, _bounds.width, _bounds.height, _dpScale,
+        durationFrames, _endFrame);
+    _layers = parseLayers(map['layers'], _bounds.width, _bounds.height,
+        _dpScale, durationFrames, _endFrame);
   }
 
   @override
@@ -51,8 +48,4 @@ class LottieComposition {
         '"_layers": $_layers, "_bounds": $_bounds, "_startFrame": $_startFrame, '
         '"_endFrame": $_endFrame, "_frameRate": $_frameRate, "_dpScale": $_dpScale}';
   }
-
-
-
-
 }

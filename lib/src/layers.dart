@@ -94,12 +94,12 @@ class Layer {
       this._type, this._matteType, this._transform);
 
   factory Layer([dynamic map, double preCompWidth, double preCompHeight,
-    double scale, double durationFrames, int endFrame]) {
+    double scale, double durationFrames, double endFrame]) {
     if (map == null) {
       return new Layer.empty(preCompWidth, preCompHeight);
     }
 
-    final int rawType = map['ty'] ?? -1;
+    final int rawType = map['ty'] ?? LayerType.Unknown.index;
     final LayerType type = rawType < LayerType.Unknown.index ? LayerType
         .values[rawType]
         : LayerType.Unknown;
@@ -132,12 +132,12 @@ class Layer {
 
     List<Keyframe<double>> inOutKeyframes = [];
 
-    final int inFrame = map['ip'];
+    final double inFrame = map['ip']?.toDouble();
     if (inFrame > 0) {
-      inOutKeyframes.add(new Keyframe(0, inFrame, durationFrames, 0.0, 0.0));
+      inOutKeyframes.add(new Keyframe(0.0, inFrame, durationFrames, 0.0, 0.0));
     }
 
-    final int outFrame = map['op'] > 0 ? map['op'] : endFrame + 1;
+    final double outFrame = map['op'] > 0 ? map['op']?.toDouble() : endFrame + 1;
     inOutKeyframes.add(
         new Keyframe(inFrame, outFrame, durationFrames, 1.0, 1.0));
 

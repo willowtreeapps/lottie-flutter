@@ -184,8 +184,8 @@ class AnimatablePathValue extends BaseAnimatableValue<Offset, Offset> {
       return new AnimatablePathValue._();
     }
 
-    if (hasKeyframes(map)) {
-      List rawKeyframes = map as List;
+    List rawKeyframes = tryGetKeyframes(map);
+    if (rawKeyframes != null) {
       List<Keyframe<Offset>> keyframes = rawKeyframes
           .map((rawKeyframe) =>
               new PathKeyframe.fromMap(rawKeyframe, scale, durationFrames))

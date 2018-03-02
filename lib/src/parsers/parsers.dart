@@ -3,10 +3,7 @@ import 'package:lottie_flutter/src/mathutils.dart';
 
 import 'package:lottie_flutter/src/values.dart';
 
-
-
 class Parsers {
-
   static const ColorParser colorParser = const ColorParser();
   static const IntParser intParser = const IntParser();
   static const DoubleParser doubleParser = const DoubleParser();
@@ -15,7 +12,6 @@ class Parsers {
   static const ShapeDataParser shapeDataParser = const ShapeDataParser();
   static const PathParser pathParser = const PathParser();
 }
-
 
 abstract class Parser<V> {
   V parse(dynamic map, double scale);
@@ -51,7 +47,6 @@ class DoubleParser implements Parser<double> {
 }
 
 class PointFParser implements Parser<Offset> {
-
   const PointFParser();
 
   @override
@@ -74,7 +69,6 @@ class PointFParser implements Parser<Offset> {
 }
 
 class ScaleParser implements Parser<Offset> {
-
   const ScaleParser();
 
   @override
@@ -82,9 +76,7 @@ class ScaleParser implements Parser<Offset> {
       new Offset(list[0] / 100.0 * scale, list[1] / 100.0 * scale);
 }
 
-
 class ColorParser implements Parser<Color> {
-
   const ColorParser();
 
   Color parse(dynamic map, double scale) {
@@ -92,11 +84,9 @@ class ColorParser implements Parser<Color> {
       return const Color(0x0);
     }
 
-
-
     bool shouldUse255 = true;
     List<double> rawColors = [];
-    for(int i = 0; i < 4; i++ ) {
+    for (int i = 0; i < 4; i++) {
       double colorChannel = map[i] is int ? map[i].toDouble() : map[i];
       if (colorChannel > 1) {
         shouldUse255 = false;
@@ -114,9 +104,7 @@ class ColorParser implements Parser<Color> {
   }
 }
 
-
 class ShapeDataParser implements Parser<ShapeData> {
-
   const ShapeDataParser();
 
   @override
@@ -140,55 +128,54 @@ class ShapeDataParser implements Parser<ShapeData> {
     List outTangents = pointsData['o'];
     bool closed = pointsData['c'] ?? false;
 
-    if (points == null || inTangents == null || outTangents == null ||
-        points.length != inTangents.length ||
-        points.length != outTangents.length) {
+    if (points == null ||
+        points.length != inTangents?.length ||
+        points.length != outTangents?.length) {
       throw new StateError(
           "Unable to process points array or tangets. $pointsData");
     } else if (points.isEmpty) {
       return new ShapeData(const [], Offset.zero, false);
     }
 
-    Offset initialPoint = _vertexAtIndex(0, points).scale(scale, scale);
-    List<CubicCurveData> curves = new List<CubicCurveData>(closed ? points.length
-                                                                  : points.length - 1);
+    Offset initialPoint = _vertexAtIndex(0, points, scale);
+    List<CubicCurveData> curves =
+        new List<CubicCurveData>(closed ? points.length : points.length - 1);
 
     for (int i = 1; i < points.length; i++) {
-      Offset vertex = _vertexAtIndex(i, points);
-      Offset previousVertex = _vertexAtIndex(i - 1, points);
-      Offset cp1 = _vertexAtIndex(i - 1, outTangents);
-      Offset cp2 = _vertexAtIndex(i, inTangents);
-      Offset shapeCp1 = (previousVertex + cp1).scale(scale, scale);
-      Offset shapeCp2 = (vertex + cp2).scale(scale, scale);
-      Offset scaleVertex = vertex.scale(scale, scale);
+      Offset vertex = _vertexAtIndex(i, points, scale);
+      Offset previousVertex = _vertexAtIndex(i - 1, points, scale);
+      Offset cp1 = _vertexAtIndex(i - 1, outTangents, scale);
+      Offset cp2 = _vertexAtIndex(i, inTangents, scale);
+      Offset shapeCp1 = (previousVertex + cp1);
+      Offset shapeCp2 = (vertex + cp2);
+      Offset scaleVertex = vertex;
 
       curves[i - 1] = new CubicCurveData(shapeCp1, shapeCp2, scaleVertex);
     }
 
     if (closed) {
-      Offset vertex = _vertexAtIndex(0, points);
-      Offset previousVertex = _vertexAtIndex(points.length - 1, points);
-      Offset cp1 = _vertexAtIndex(points.length - 1, outTangents);
-      Offset cp2 = _vertexAtIndex(0, inTangents);
+      Offset vertex = _vertexAtIndex(0, points, scale);
+      Offset previousVertex = _vertexAtIndex(points.length - 1, points, scale);
+      Offset cp1 = _vertexAtIndex(points.length - 1, outTangents, scale);
+      Offset cp2 = _vertexAtIndex(0, inTangents, scale);
 
-      Offset shape1 = (previousVertex + cp1).scale(scale, scale);
-      Offset shape2 = (vertex + cp2).scale(scale, scale);
-      Offset scaleVertex = vertex.scale(scale, scale);
-      curves[curves.length - 1] = new CubicCurveData(shape1, shape2, scaleVertex);
+      Offset shape1 = (previousVertex + cp1);
+      Offset shape2 = (vertex + cp2);
+      Offset scaleVertex = vertex;
+      curves[curves.length - 1] =
+          new CubicCurveData(shape1, shape2, scaleVertex);
     }
 
-    return  new ShapeData(curves, initialPoint, closed);
+    return new ShapeData(curves, initialPoint, closed);
   }
 
-  Offset _vertexAtIndex(int index, List points) {
-    return new Offset(parseMapToDouble(points[index][0]),
-                      parseMapToDouble(points[index][1]));
+  Offset _vertexAtIndex(int index, List points, double scale) {
+    return new Offset(parseMapToDouble(points[index][0] * scale),
+        parseMapToDouble(points[index][1] * scale));
   }
 }
 
-
 class GradientColorParser extends Parser<GradientColor> {
-
   final int _colorPoints;
 
   GradientColorParser(this._colorPoints);
@@ -218,7 +205,8 @@ class GradientColorParser extends Parser<GradientColor> {
     for (int i = 0; i < rawGradientColor.length; i += 4) {
       int colorIndex = i ~/ 4;
       positions[colorIndex] = rawGradientColor[i];
-      colors[colorIndex] = new Color.fromARGB(255,
+      colors[colorIndex] = new Color.fromARGB(
+          255,
           (parseMapToDouble(rawGradientColor[i + 1]) * 255).toInt(),
           (parseMapToDouble(rawGradientColor[i + 2] * 255)).toInt(),
           (parseMapToDouble(rawGradientColor[i + 3] * 255)).toInt());
@@ -228,7 +216,6 @@ class GradientColorParser extends Parser<GradientColor> {
     return gradientColor;
   }
 
-
   // This cheats a little bit.
   // Opacity stops can be at arbitrary intervals independent of color stops.
   // This uses the existing color stops and modifies the opacity at each existing color stop
@@ -236,8 +223,8 @@ class GradientColorParser extends Parser<GradientColor> {
   //
   // This should be a good approximation is nearly all cases. However, if there are many more
   // opacity stops than color stops, information will be lost.
-  void _addOpacityStopsToGradientIfNeeded(GradientColor gradientColor,
-      List rawGradientColor) {
+  void _addOpacityStopsToGradientIfNeeded(
+      GradientColor gradientColor, List rawGradientColor) {
     final int startIndex = _colorPoints * 4;
     if (rawGradientColor.length <= startIndex) {
       return;
@@ -260,26 +247,23 @@ class GradientColorParser extends Parser<GradientColor> {
     }
   }
 
-  int _getOpacityAtPosition(double position, List<double> positions,
-      List<double> opacities) {
+  int _getOpacityAtPosition(
+      double position, List<double> positions, List<double> opacities) {
     for (int i = 1; i < positions.length; i++) {
       double lastPosition = positions[i - 1];
       double thisPosition = positions[i];
       if (positions[i] >= position) {
-        double progress = (position - lastPosition) /
-            (thisPosition - lastPosition);
+        double progress =
+            (position - lastPosition) / (thisPosition - lastPosition);
         return (255 * lerp(opacities[i - 1], opacities[i], progress)).toInt();
       }
     }
 
     return (255 * opacities[opacities.length - 1]).toInt();
   }
-
 }
 
-
 class PathParser implements Parser<Path> {
-
   const PathParser();
 
   @override
@@ -290,12 +274,23 @@ class PathParser implements Parser<Path> {
   Path parseFromShape(ShapeData shapeData) {
     Path path = new Path();
     Offset initialPoint = shapeData.initialPoint;
+    Offset currentPoint = new Offset(initialPoint.dx, initialPoint.dy);
     path.moveTo(initialPoint.dx, initialPoint.dy);
 
     for (var curve in shapeData.curves) {
-      path.cubicTo(curve.controlPoint1.dx, curve.controlPoint1.dy,
-          curve.controlPoint2.dx, curve.controlPoint2.dy,
-          curve.vertex.dx, curve.vertex.dy);
+      if (curve.controlPoint1 == currentPoint &&
+          curve.controlPoint2 == curve.vertex) {
+        path.lineTo(curve.vertex.dx, curve.vertex.dy);
+      } else {
+        path.cubicTo(
+            curve.controlPoint1.dx,
+            curve.controlPoint1.dy,
+            curve.controlPoint2.dx,
+            curve.controlPoint2.dy,
+            curve.vertex.dx,
+            curve.vertex.dy);
+      }
+      currentPoint = new Offset(curve.vertex.dx, curve.vertex.dy);
     }
 
     if (shapeData.isClosed) {
@@ -304,7 +299,4 @@ class PathParser implements Parser<Path> {
 
     return path;
   }
-
 }
-
-

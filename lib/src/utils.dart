@@ -4,6 +4,7 @@
 // Writted by Romain Guy and Francois Blavoet.
 // https://androidstudygroup.slack.com/archives/animation/p1476461064000335
 
+import 'dart:ui';
 import 'dart:math';
 import 'package:lottie_flutter/src/animations.dart';
 import 'package:lottie_flutter/src/mathutils.dart';
@@ -11,14 +12,12 @@ import 'package:lottie_flutter/src/values.dart';
 import 'package:flutter/painting.dart';
 import 'package:vector_math/vector_math_64.dart';
 
-
-
 /// Parse the color string and return the corresponding Color.
 /// Supported formatS are:
 /// #RRGGBB and #AARRGGBB
 Color parseColor(String colorString) {
   if (colorString[0] == '#') {
-    int color = int.parse(colorString.substring(0),
+    int color = int.parse(colorString.substring(1),
         radix: 16, onError: (source) => null);
     if (colorString.length == 7) {
       return new Color(color |= 0x00000000ff000000);
@@ -29,7 +28,7 @@ Color parseColor(String colorString) {
     }
   }
 
-  throw new ArgumentError.value(colorString, "colorString", "Unknown color");
+  throw new ArgumentError.value(colorString, "colorString", "Unknown color $colorString");
 }
 
 class GammaEvaluator {
@@ -91,22 +90,84 @@ class GammaEvaluator {
 int calculateAlpha(int from, BaseKeyframeAnimation<dynamic, int> opacity) =>
     ((from / 255.0 * opacity.value / 100.0) * 255.0).toInt();
 
-
 //TODO: Review this :?
 // Android version: path.add(path, parentMatrix)
 void addPathToPath(Path path, Path other, Matrix4 transform) =>
-    path.addPath(other.transform(transform.storage), const Offset(0.0, 0.0));
+    //path.addPath(other.transform(transform.storage), const Offset(0.0, 0.0));
+    path.addPathWithMatrix(other, transform.storage);
 
 Path applyScaleTrimIfNeeded(
     Path path, double start, double end, double offset) {
-  return applyTrimPathIfNeeded(path, start / 100.0, end / 100.0, offset / 100.0);
+  return applyTrimPathIfNeeded(
+      path, start / 100.0, end / 100.0, offset / 100.0);
 }
 
-// TODO: wait for SkPathMeasure https://github.com/flutter/flutter/issues/10428
 Path applyTrimPathIfNeeded(Path path, double start, double end, double offset) {
-  return path;
+  if (start == 1.0 && end == 0) {
+    return path;
+  }
+
+  final measure = new PathMeasure(path: path);
+  final length = measure.getLength();
+
+  if (length < 1.0 || (end - start - 1).abs() < .01) {
+    return path;
+  }
+
+  start *= length;
+  end *= length;
+  var newStart = min(start, end);
+  var newEnd = max(start, end);
+
+  offset *= length;
+  newStart += offset;
+  newEnd += offset;
+  if (newStart >= length && newEnd >= length) {
+    newStart = _floorMod(newStart.toInt(), length.toInt()).toDouble();
+    newEnd = _floorMod(newEnd.toInt(), length.toInt()).toDouble();
+  }
+
+  if (newStart < 0) {
+    newStart = _floorMod(newStart.toInt(), length.toInt()).toDouble();
+  }
+
+  if (newEnd < 0) {
+    newEnd = _floorMod(newEnd.toInt(), length.toInt()).toDouble();
+  }
+
+  if (newStart == newEnd) {
+    path.reset();
+    return path;
+  }
+
+  if (newStart >= newEnd) {
+    newStart -= length;
+  }
+
+  var tempPath = measure.getSegment(newStart, newEnd, true);
+
+  if (newEnd > length) {
+    var tempPath2 = measure.getSegment(0.0, newEnd % length, true);
+    tempPath.addPath(tempPath2, Offset.zero);
+  } else if (newStart < 0) {
+    var tempPath2 = measure.getSegment(length + newStart, length, true);
+    tempPath.addPath(tempPath2, Offset.zero);
+  }
+  return tempPath;
 }
 
+int _floorMod(int x, int y) {
+  return x - _floorDiv(x, y) * y;
+}
+
+int _floorDiv(int x, int y) {
+  int r = x ~/ y;
+  // if the signs are different and modulo not zero, round down
+  if ((x ^ y) < 0 && (r * y != x)) {
+    r--;
+  }
+  return r;
+}
 
 Shader createGradientShader(GradientColor gradient, GradientType type,
     Offset startPoint, Offset endPoint, Rect bounds) {
@@ -120,20 +181,22 @@ Shader createGradientShader(GradientColor gradient, GradientType type,
       : _createRadialGradientShader(gradient, x0, y0, x1, y1, bounds);
 }
 
-Shader _createLinearGradientShader(GradientColor gradient, double x0,
-    double y0, double x1, double y1, Rect bounds) =>
+Shader _createLinearGradientShader(GradientColor gradient, double x0, double y0,
+        double x1, double y1, Rect bounds) =>
     new LinearGradient(
       begin: new FractionalOffset(x0, y0),
       end: new FractionalOffset(x1, y1),
       colors: gradient.colors,
       stops: gradient.positions,
-    ).createShader(bounds);
+    )
+        .createShader(bounds);
 
-Shader _createRadialGradientShader(GradientColor gradient, double x0,
-    double y0, double x1, double y1, Rect bounds) =>
+Shader _createRadialGradientShader(GradientColor gradient, double x0, double y0,
+        double x1, double y1, Rect bounds) =>
     new RadialGradient(
       center: new FractionalOffset(x0, y0),
       radius: sqrt(hypot(x1 - x0, y1 - y0)),
       colors: gradient.colors,
       stops: gradient.positions,
-    ).createShader(bounds);
+    )
+        .createShader(bounds);
