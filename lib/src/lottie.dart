@@ -10,40 +10,27 @@ import 'package:meta/meta.dart';
 class Lottie extends StatefulWidget {
   final LottieComposition _composition;
   final Size _size;
-  final CompositionLayer _compositionLayer;
-  final double _scale;
 
   Lottie({Key key, @required LottieComposition composition, Size size})
       : _composition = composition,
         _size = size ?? composition.bounds.size,
-        _scale = _calcScale(size, composition),
-        _compositionLayer = new CompositionLayer(
-            composition,
-            new Layer.empty(size.width, size.height),
-            () => {},
-            _calcScale(size, composition)),
         super(key: key);
-
-  // TODO: should be possible to have a scale > 1.0?
-  static double _calcScale(Size size, LottieComposition composition) =>
-      math.min(
-          math.min(size.width / composition.bounds.size.width,
-              size.height / composition.bounds.size.height),
-          1.0);
 
   @override
   _LottieState createState() => new _LottieState();
 }
 
 class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
-  //CompositionLayer _compositionLayer;
+  CompositionLayer _compositionLayer;
   AnimationController _animation;
-  //double _scale = 1.0;
+  double _scale;
 
   @override
   void initState() {
     super.initState();
 
+    setScaleAndCompositionLayer();
+    
     _animation = new AnimationController(
       duration: new Duration(milliseconds: widget._composition.duration),
       lowerBound: 0.0,
@@ -54,9 +41,32 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
     _animation.addListener(_handleChange);
   }
 
+  // TODO: should be possible to have a scale > 1.0?
+  static double _calcScale(Size size, LottieComposition composition) =>
+      math.min(
+          math.min(size.width / composition.bounds.size.width,
+              size.height / composition.bounds.size.height),
+          1.0);
+
+  @override
+  void didUpdateWidget(Lottie oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print('didupdatewidget');
+    setScaleAndCompositionLayer();
+  }
+
+  void setScaleAndCompositionLayer() {
+    _scale = _calcScale(widget._size, widget._composition);
+    _compositionLayer = new CompositionLayer(
+        widget._composition,
+        new Layer.empty(widget._size.width, widget._size.height),
+        () => {},
+        _scale);
+  }
+
   void _handleChange() {
     setState(() {
-      widget._compositionLayer.progress = _animation.value;
+      _compositionLayer.progress = _animation.value;
     });
   }
 
@@ -64,8 +74,7 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     //_compositionLayer.progress = 0.0;
     return new CustomPaint(
-        painter:
-            new LottiePainter(widget._compositionLayer, scale: widget._scale),
+        painter: new LottiePainter(_compositionLayer, scale: _scale),
         size: widget._size);
   }
 
