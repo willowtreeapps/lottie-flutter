@@ -1,4 +1,4 @@
-import 'dart:ui' as ui;
+import 'dart:math' as math;
 
 import 'package:lottie_flutter/src/composition.dart';
 import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
@@ -9,28 +9,40 @@ import 'package:meta/meta.dart';
 
 class Lottie extends StatefulWidget {
   final LottieComposition _composition;
+  final Size _size;
+  final CompositionLayer _compositionLayer;
+  final double _scale;
 
-  Lottie({Key key, @required LottieComposition composition})
+  Lottie({Key key, @required LottieComposition composition, Size size})
       : _composition = composition,
+        _size = size ?? composition.bounds.size,
+        _scale = _calcScale(size, composition),
+        _compositionLayer = new CompositionLayer(
+            composition,
+            new Layer.empty(size.width, size.height),
+            () => {},
+            _calcScale(size, composition)),
         super(key: key);
+
+  // TODO: should be possible to have a scale > 1.0?
+  static double _calcScale(Size size, LottieComposition composition) =>
+      math.min(
+          math.min(size.width / composition.bounds.size.width,
+              size.height / composition.bounds.size.height),
+          1.0);
 
   @override
   _LottieState createState() => new _LottieState();
 }
 
 class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
-  CompositionLayer _compositionLayer;
+  //CompositionLayer _compositionLayer;
   AnimationController _animation;
-  Size _size;
+  //double _scale = 1.0;
 
   @override
   void initState() {
     super.initState();
-
-    _size = widget._composition.bounds.size;
-
-    _compositionLayer = new CompositionLayer(widget._composition,
-        new Layer.empty(_size.width, _size.height), () => {}, 1.0);
 
     _animation = new AnimationController(
       duration: new Duration(milliseconds: widget._composition.duration),
@@ -44,17 +56,17 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
 
   void _handleChange() {
     setState(() {
-      _compositionLayer.progress = _animation.value;
+      widget._compositionLayer.progress = _animation.value;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     //_compositionLayer.progress = 0.0;
-    return new LayoutBuilder(builder: (ctx, constraints) => new CustomPaint(
-        painter: new LottiePainter(_compositionLayer),
-        size: constraints.constrain(widget._composition.bounds.size)),
-    );
+    return new CustomPaint(
+        painter:
+            new LottiePainter(widget._compositionLayer, scale: widget._scale),
+        size: widget._size);
   }
 
   @override

@@ -30,6 +30,8 @@ flutter:
     - assets/preloader.json
     - assets/checked_done_.json
     - assets/favourite_app_icon.json
+    - assets/motorcycle.json
+    - assets/hamburger_arrow.json
 
 
   # To add assets from package dependencies, first ensure the asset

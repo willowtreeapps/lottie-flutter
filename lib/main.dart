@@ -7,6 +7,8 @@ import 'package:flutter/services.dart' show rootBundle;
 
 const assetNames = const [
   'assets/muzli.json',
+  'assets/hamburger_arrow.json',
+  'assets/motorcycle.json',
   'assets/emoji_shock.json',
   'assets/checked_done_.json',
   'assets/favourite_app_icon.json',
@@ -58,31 +60,45 @@ class _LottieDemoState extends State<LottieDemo> {
         title: new Text('Lottie Demo'),
       ),
       body: new Center(
-        child: new SingleChildScrollView(
-          child: new Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              new DropdownButton(
-                items: assetNames
-                    .map((assetName) => new DropdownMenuItem(
-                          child: new Text(assetName),
-                          value: assetName,
-                        ))
-                    .toList(),
-                hint: new Text('Choose an asset'),
-                value: _assetName,
-                onChanged: (val) => _loadButtonPressed(val),
-              ),
-              new Text(_composition?.bounds?.size?.toString() ?? ''),
-              _composition == null
-                  ? new LimitedBox()
-                  : new Lottie(composition: _composition),
-            ],
-          ),
+        //child: new SingleChildScrollView(
+        child: new Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            new DropdownButton(
+              items: assetNames
+                  .map((assetName) => new DropdownMenuItem(
+                        child: new Text(assetName),
+                        value: assetName,
+                      ))
+                  .toList(),
+              hint: new Text('Choose an asset'),
+              value: _assetName,
+              onChanged: (val) => _loadButtonPressed(val),
+            ),
+            new Text(_composition?.bounds?.size?.toString() ?? ''),
+            _composition == null
+                ? new LimitedBox()
+                : new Lottie(
+                    composition: _composition, size: const Size(400.0, 500.0)),
+          ],
         ),
       ),
+      // child: _composition == null
+      //     ? new DropdownButton(
+      //         items: assetNames
+      //             .map((assetName) => new DropdownMenuItem(
+      //                   child: new Text(assetName),
+      //                   value: assetName,
+      //                 ))
+      //             .toList(),
+      //         hint: new Text('Choose an asset'),
+      //         value: _assetName,
+      //         onChanged: (val) => _loadButtonPressed(val),
+      //       )
+      //     : new Lottie(
+      //         composition: _composition, size: const Size(400.0, 500.0))),
       // floatingActionButton: new FloatingActionButton(
       //   onPressed: _loadButtonPressed,
       //   tooltip: 'Increment',
