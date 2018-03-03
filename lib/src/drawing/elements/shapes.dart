@@ -184,10 +184,6 @@ class ShapeDrawable extends _PolygonDrawable {
 
   ShapeDrawable(String name, Repaint repaint, this._animation)
       : super(name, repaint) {
-    if (name == "MouthAnimPath") {
-      // print(name);
-      // _animation.scene.keyframes.forEach((kf) => print(kf));
-    }
     addAnimation(_animation);
   }
 

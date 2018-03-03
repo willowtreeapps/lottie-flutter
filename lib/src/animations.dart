@@ -1,5 +1,8 @@
 import 'dart:math';
 import 'dart:ui' as ui;
+
+import 'package:flutter/foundation.dart';
+
 import 'package:lottie_flutter/src/mathutils.dart';
 import 'package:lottie_flutter/src/painting.dart' show Mask;
 import 'package:lottie_flutter/src/parsers/parsers.dart';
@@ -9,10 +12,9 @@ import 'package:lottie_flutter/src/keyframes.dart';
 import 'package:flutter/painting.dart' show Color, Offset, Path;
 import 'package:meta/meta.dart';
 
-typedef OnValueChanged();
-
 abstract class BaseKeyframeAnimation<K, A> {
-  final List<OnValueChanged> _listeners = new List();
+  final List<ValueChanged<double>> _listeners =
+      new List<ValueChanged<double>>();
   bool isDiscrete = false;
 
   final Scene<K> scene;
@@ -22,7 +24,7 @@ abstract class BaseKeyframeAnimation<K, A> {
 
   BaseKeyframeAnimation(this.scene);
 
-  void addListener(OnValueChanged onValueChanged) =>
+  void addListener(ValueChanged<double> onValueChanged) =>
       _listeners.add(onValueChanged);
 
   double get startDelayProgress =>
@@ -31,20 +33,21 @@ abstract class BaseKeyframeAnimation<K, A> {
   double get endProgress =>
       scene.isEmpty ? 1.0 : scene.lastKeyframe.endProgress;
 
-  set progress(double progress) {
-    if (progress < startDelayProgress) {
-      progress = startDelayProgress;
-    } else if (progress > endProgress) {
-      progress = endProgress;
+  get progress => _progress;
+
+  set progress(double val) {
+    if (val < startDelayProgress) {
+      val = startDelayProgress;
+    } else if (val > endProgress) {
+      val = endProgress;
     }
 
-    if (progress == _progress) {
+    if (val == _progress) {
       return;
     }
 
-    _progress = progress;
-
-    _listeners.forEach((it) => it());
+    _progress = val;
+    _listeners.forEach((it) => it(progress));
   }
 
   Keyframe<K> get currentKeyframe {
@@ -57,9 +60,7 @@ abstract class BaseKeyframeAnimation<K, A> {
     }
 
     cachedKeyframe = scene.keyframes.lastWhere(
-        (keyframe) =>
-            _progress < keyframe.startProgress &&
-            keyframe.containsProgress(_progress),
+        (keyframe) => keyframe.containsProgress(_progress),
         orElse: () => scene.firstKeyframe);
     return cachedKeyframe;
   }
@@ -76,9 +77,10 @@ abstract class BaseKeyframeAnimation<K, A> {
 
     final progressIntoFrame = _progress - keyframe.startProgress;
     final keyframeProgress = keyframe.endProgress - keyframe.startProgress;
-    final transformValue =
-        min(max(progressIntoFrame / keyframeProgress, 0.0), 1.0);
-    return keyframe.curve.transform(transformValue);
+    final linearProgress = progressIntoFrame / keyframeProgress;
+    final safeValue =
+        min(max(linearProgress, 0.0), 1.0);
+    return keyframe.curve.transform(safeValue);
   }
 
   A get value {
@@ -251,7 +253,7 @@ class SplitDimensionPathKeyframeAnimation extends KeyframeAnimation<Offset> {
   set progress(double progress) {
     xAnimation.progress = progress;
     yAnimation.progress = progress;
-    _listeners.forEach((listener) => listener());
+    _listeners.forEach((listener) => listener(progress));
   }
 
   @override

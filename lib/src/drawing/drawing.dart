@@ -40,7 +40,7 @@ abstract class AnimationDrawable implements Drawable {
     _repaint();
   }
 
-  void onValueChanged() {
+  void onValueChanged(double progress) {
     invalidate();
   }
 

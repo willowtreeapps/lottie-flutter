@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:lottie_flutter/src/animations.dart';
 import 'package:lottie_flutter/src/drawing/elements/groups.dart';
 import 'package:lottie_flutter/src/drawing/drawing.dart';
@@ -9,7 +10,7 @@ import 'package:lottie_flutter/src/values.dart';
 ///
 class TrimPathDrawable extends AnimationDrawable {
   final ShapeTrimPathType _type;
-  final List<OnValueChanged> _listeners = [];
+  final List<ValueChanged<double>> _listeners = [];
   final BaseKeyframeAnimation<dynamic, double> _startAnimation;
   final BaseKeyframeAnimation<dynamic, double> _endAnimation;
   final BaseKeyframeAnimation<dynamic, double> _offsetAnimation;
@@ -31,11 +32,11 @@ class TrimPathDrawable extends AnimationDrawable {
   }
 
   @override
-  void onValueChanged() {
-    _listeners.forEach((listener) => listener());
+  void onValueChanged(double progress) {
+    _listeners.forEach((listener) => listener(offset));
   }
 
-  void addListener(OnValueChanged listener) {
+  void addListener(ValueChanged<double> listener) {
     _listeners.add(listener);
   }
 }

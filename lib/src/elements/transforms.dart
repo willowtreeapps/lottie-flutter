@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:ui' show Offset;
+import 'package:flutter/foundation.dart';
 import 'package:lottie_flutter/src/animatables.dart';
 import 'package:lottie_flutter/src/animations.dart';
 import 'package:lottie_flutter/src/elements/shapes.dart';
@@ -117,6 +118,14 @@ class TransformKeyframeAnimation {
   BaseKeyframeAnimation<dynamic, double> get rotation => _rotation;
   BaseKeyframeAnimation<dynamic, int> get opacity => _opacity;
 
+  set progress (double val) {
+    _anchorPoint.progress = val;
+    _position.progress = val;
+    _scale.progress = val;
+    _rotation.progress = val;
+    _opacity.progress = val;
+  }
+
   Matrix4 get matrix {
     _matrix.setIdentity();
     final position = _position.value;
@@ -139,7 +148,7 @@ class TransformKeyframeAnimation {
   TransformKeyframeAnimation(this._anchorPoint, this._position, this._scale,
       this._rotation, this._opacity);
 
-  void addListener(OnValueChanged onValueChanged) {
+  void addListener(ValueChanged<double> onValueChanged) {
     _anchorPoint.addListener(onValueChanged);
     _position.addListener(onValueChanged);
     _scale.addListener(onValueChanged);

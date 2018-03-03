@@ -92,7 +92,7 @@ class StrokeDrawable extends AnimationDrawable {
     }
   }
 
-  void onValueChanged() {
+  void onValueChanged(double progress) {
     _repaint();
   }
 

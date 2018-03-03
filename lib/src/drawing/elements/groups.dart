@@ -31,8 +31,8 @@ class DrawableGroup extends AnimationDrawable implements PathContent {
       return _pathContents;
     }
 
-    for(var content in _contents) {
-      if(content is PathContent) {
+    for (var content in _contents) {
+      if (content is PathContent) {
         _pathContents.add(content as PathContent);
       }
     }
@@ -94,10 +94,11 @@ class DrawableGroup extends AnimationDrawable implements PathContent {
     Matrix4 matrix = new Matrix4.fromFloat64List(parentMatrix.storage);
 
     int alpha = parentAlpha;
-    if(_transformAnimation != null) {
+    if (_transformAnimation != null) {
       matrix.multiply(_transformAnimation.matrix);
       int transformOpacity = _transformAnimation.opacity.value;
-      alpha = ((transformOpacity / 100.0 * parentAlpha / 255.0) * 255.0).toInt();
+      alpha =
+          ((transformOpacity / 100.0 * parentAlpha / 255.0) * 255.0).toInt();
     }
 
     for (int i = _contents.length - 1; i >= 0; i--) {
@@ -107,26 +108,26 @@ class DrawableGroup extends AnimationDrawable implements PathContent {
 
   @override
   Rect getBounds(Matrix4 parentMatrix) {
-    Matrix4 matrix = new Matrix4.fromFloat64List(parentMatrix.storage); //new Matrix4.identity();
+    Matrix4 matrix = new Matrix4.fromFloat64List(
+        parentMatrix.storage); //new Matrix4.identity();
 
-    if(_transformAnimation != null){
+    if (_transformAnimation != null) {
       matrix.multiply(_transformAnimation.matrix);
     }
 
     Rect bounds = new Rect.fromLTRB(0.0, 0.0, 0.0, 0.0);
     for (int i = _contents.length - 1; i >= 0; i--) {
       AnimationDrawable content = _contents[i];
-        final rect = content.getBounds(matrix);
-        if (bounds.isEmpty) {
-          bounds = rect;
-        } else {
-          bounds = new Rect.fromLTRB(
-              min(bounds.left, rect.left),
-              min(bounds.top, rect.top),
-              max(bounds.right, rect.right),
-              max(bounds.bottom, rect.bottom)
-          );
-        }
+      final rect = content.getBounds(matrix);
+      if (bounds.isEmpty) {
+        bounds = rect;
+      } else {
+        bounds = new Rect.fromLTRB(
+            min(bounds.left, rect.left),
+            min(bounds.top, rect.top),
+            max(bounds.right, rect.right),
+            max(bounds.bottom, rect.bottom));
+      }
     }
 
     return bounds;

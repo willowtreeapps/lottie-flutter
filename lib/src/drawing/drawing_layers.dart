@@ -75,6 +75,12 @@ abstract class BaseLayer implements Drawable {
 
   /// Set animation progress, from 0 to 1
   set progress(double progress) {
+    _transform?.progress = progress;
+    if (_layerModel.timeStretch != null && _layerModel.timeStretch != 0) {
+      progress /= _layerModel.timeStretch;
+    }
+
+    // TODO - mattelayer timestretch?
     _matteLayer?.progress = progress;
     _animations.forEach((animation) => animation.progress = progress);
   }
@@ -114,7 +120,7 @@ abstract class BaseLayer implements Drawable {
     addAnimation(_transform.opacity);
   }
 
-  void onAnimationChanged() {
+  void onAnimationChanged(double progress) {
     invalidateSelf();
   }
 
@@ -128,7 +134,8 @@ abstract class BaseLayer implements Drawable {
         new DoubleKeyframeAnimation(_layerModel.inOutKeyframes);
 
     inOutAnimation.isDiscrete = true;
-    inOutAnimation.addListener(() => _visibility = inOutAnimation.value == 1.0);
+    inOutAnimation
+        .addListener((progress) => _visibility = inOutAnimation.value == 1.0);
     _visibility = inOutAnimation.value == 1.0;
     addAnimation(inOutAnimation);
   }
@@ -442,6 +449,7 @@ class ImageLayer extends BaseLayer {
   }
 
   Image _getImage() {
+    print('Get Image not implemented - TODO');
     //TODO: fetch image from refId
     return null;
   }
@@ -521,10 +529,11 @@ class CompositionLayer extends BaseLayer {
       Canvas canvas, Size size, Matrix4 parentMatrix, int parentAlpha) {
     // TODO: Open issue about SkCanvas::getClipBounds
     // Rect canvasClipBounds = canvas.getClipBounds();
-
+    //canvas.save();
     Rect newClipRect = new Rect.fromLTRB(
         0.0, 0.0, layerModel.preCompWidth, layerModel.preCompHeight);
-    Rect transformedRect = MatrixUtils.transformRect(parentMatrix, newClipRect);
+    // TODO this is causing problems
+    //Rect transformedRect = MatrixUtils.transformRect(parentMatrix, newClipRect);
 
     for (int i = _layers.length - 1; i >= 0; i--) {
       if (!newClipRect.isEmpty) {
@@ -533,6 +542,8 @@ class CompositionLayer extends BaseLayer {
 
       _layers[i].draw(canvas, size, parentMatrix, parentAlpha);
     }
+
+    //canvas.restore();
 
     //if (!originalClipRect.isEmpty()) {
     // TODO: Open issue about Replace option
@@ -571,9 +582,10 @@ class CompositionLayer extends BaseLayer {
   @override
   set progress(double progress) {
     super.progress = progress;
+
     double newProgress = progress - _layerModel.startProgress;
     for (int i = _layers.length - 1; i >= 0; i--) {
-      _layers[i].progress = progress;
+      _layers[i].progress = newProgress;
     }
   }
 
