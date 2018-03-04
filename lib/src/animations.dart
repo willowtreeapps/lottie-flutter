@@ -78,8 +78,7 @@ abstract class BaseKeyframeAnimation<K, A> {
     final progressIntoFrame = _progress - keyframe.startProgress;
     final keyframeProgress = keyframe.endProgress - keyframe.startProgress;
     final linearProgress = progressIntoFrame / keyframeProgress;
-    final safeValue =
-        min(max(linearProgress, 0.0), 1.0);
+    final safeValue = min(max(linearProgress, 0.0), 1.0);
     return keyframe.curve.transform(safeValue);
   }
 
@@ -174,7 +173,10 @@ class GradientColorKeyframeAnimation extends KeyframeAnimation<GradientColor> {
 }
 
 class PointKeyframeAnimation extends KeyframeAnimation<Offset> {
-  PointKeyframeAnimation(Scene<Offset> scene) : super(scene);
+  PointKeyframeAnimation(Scene<Offset> scene) : super(scene) {
+    scene.keyframes?.forEach((kf) => print(
+        '${kf.startValue},${kf.endValue}, ${kf.startFrame}, ${kf.endFrame}, ${kf.curve}'));
+  }
 
   @override
   Offset getValue(Keyframe<Offset> keyframe, double keyframeProgress) {

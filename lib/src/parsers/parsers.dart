@@ -84,23 +84,18 @@ class ColorParser implements Parser<Color> {
       return const Color(0x0);
     }
 
-    bool shouldUse255 = true;
-    List<double> rawColors = [];
-    for (int i = 0; i < 4; i++) {
-      double colorChannel = map[i] is int ? map[i].toDouble() : map[i];
-      if (colorChannel > 1) {
-        shouldUse255 = false;
-      }
-      rawColors.add(colorChannel);
+    double r = map[0].toDouble();
+    double g = map[1].toDouble();
+    double b = map[2].toDouble();
+    double a = map[3].toDouble();
+
+    if (r <= 1 && g <= 1 && b <= 1 && a <= 1) {
+      r *= 255;
+      g *= 255;
+      b *= 255;
+      a *= 255;
     }
-
-    final double multiplier = shouldUse255 ? 255.0 : 1.0;
-    final int alpha = (map[3] * multiplier).toInt();
-    final int red = (map[0] * multiplier).toInt();
-    final int green = (map[1] * multiplier).toInt();
-    final int blue = (map[2] * multiplier).toInt();
-
-    return new Color.fromARGB(alpha, red, green, blue);
+    return new Color.fromARGB(a.toInt(), r.toInt(), g.toInt(), b.toInt());
   }
 }
 

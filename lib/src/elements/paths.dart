@@ -1,5 +1,6 @@
 import 'package:lottie_flutter/src/animatables.dart';
 import 'package:lottie_flutter/src/drawing/drawing.dart';
+import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 import 'package:lottie_flutter/src/drawing/elements/paths.dart';
 import 'package:lottie_flutter/src/drawing/elements/shapes.dart';
 import 'package:lottie_flutter/src/elements/shapes.dart';
@@ -17,8 +18,8 @@ class ShapePath extends Shape {
         super.fromMap(map);
 
   @override
-  AnimationDrawable toDrawable(Repaint repaint) =>
-      new ShapeDrawable(name, repaint, _shapePath.createAnimation());
+  AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>
+      new ShapeDrawable(name, repaint, _shapePath.createAnimation(), layer);
 }
 
 class ShapeTrimPath extends Shape {
@@ -37,13 +38,9 @@ class ShapeTrimPath extends Shape {
         super.fromMap(map);
 
   @override
-  AnimationDrawable toDrawable(Repaint repaint) => new TrimPathDrawable(
-      name,
-      repaint,
-      _type,
-      _start.createAnimation(),
-      _end.createAnimation(),
-      _offset.createAnimation());
+  AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>
+      new TrimPathDrawable(name, repaint, _type, _start.createAnimation(),
+          _end.createAnimation(), _offset.createAnimation(), layer);
 }
 
 class MergePaths extends Shape {
@@ -54,6 +51,6 @@ class MergePaths extends Shape {
         super.fromMap(map);
 
   @override
-  AnimationDrawable toDrawable(Repaint repaint) =>
-      new MergePathsDrawable(name, repaint, _mode);
+  AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>
+      new MergePathsDrawable(name, repaint, _mode, layer);
 }

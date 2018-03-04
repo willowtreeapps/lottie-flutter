@@ -66,8 +66,9 @@ class GammaEvaluator {
     g = _OECF_sRGB(g) * 255.0;
     b = _OECF_sRGB(b) * 255.0;
 
-    return new Color(
-        a.round() << 24 | r.round() << 16 | g.round() << 8 | b.round());
+    return new Color.fromARGB(a.round(), r.round(), g.round(), b.round());
+    // return new Color(
+    //     a.round() << 24 | r.round() << 16 | g.round() << 8 | b.round());
   }
 
   // Opto-electronic conversion function for the sRGB color space

@@ -9,6 +9,8 @@ import 'package:lottie_flutter/src/utils.dart';
 import 'package:lottie_flutter/src/values.dart';
 import 'package:vector_math/vector_math_64.dart';
 
+import '../drawing_layers.dart';
+
 class PathGroup {
   final List<PathContent> _paths = [];
   final TrimPathDrawable _trimPath;
@@ -27,16 +29,18 @@ class StrokeDrawable extends AnimationDrawable {
   final List<BaseKeyframeAnimation<dynamic, double>> _dashPatternAnimations;
 
   StrokeDrawable(
-      String name,
-      StrokeCap strokeCap,
-      StrokeJoin strokeJoin,
-      List<AnimatableDoubleValue> dashPatternValues,
-      this._repaint,
-      this._opacityAnimation,
-      this._widthAnimation,
-      this._dashPatternOffsetAnimation)
+    String name,
+    StrokeCap strokeCap,
+    StrokeJoin strokeJoin,
+    List<AnimatableDoubleValue> dashPatternValues,
+    this._repaint,
+    this._opacityAnimation,
+    this._widthAnimation,
+    this._dashPatternOffsetAnimation,
+    BaseLayer layer,
+  )
       : _dashPatternAnimations = new List(dashPatternValues.length),
-        super(name, _repaint) {
+        super(name, _repaint, layer) {
     _paint
       ..style = PaintingStyle.stroke
       ..strokeCap = strokeCap
@@ -260,9 +264,18 @@ class ShapeStrokeDrawable extends StrokeDrawable {
       BaseKeyframeAnimation<dynamic, int> opacityAnimation,
       BaseKeyframeAnimation<dynamic, double> widthAnimation,
       BaseKeyframeAnimation<dynamic, double> dashPatternOffsetAnimation,
-      this._colorAnimation)
-      : super(name, strokeCap, strokeJoin, dashPatternValues, repaint,
-            opacityAnimation, widthAnimation, dashPatternOffsetAnimation) {
+      this._colorAnimation,
+      BaseLayer layer)
+      : super(
+            name,
+            strokeCap,
+            strokeJoin,
+            dashPatternValues,
+            repaint,
+            opacityAnimation,
+            widthAnimation,
+            dashPatternOffsetAnimation,
+            layer) {
     addAnimation(_colorAnimation);
   }
 
@@ -286,20 +299,30 @@ class GradientStrokeDrawable extends StrokeDrawable {
   final KeyframeAnimation<Offset> _endPointAnimation;
 
   GradientStrokeDrawable(
-      String name,
-      StrokeCap strokeCap,
-      StrokeJoin strokeJoin,
-      List<AnimatableDoubleValue> dashPatternValues,
-      Repaint repaint,
-      BaseKeyframeAnimation<dynamic, int> opacityAnimation,
-      BaseKeyframeAnimation<dynamic, double> widthAnimation,
-      BaseKeyframeAnimation<dynamic, double> dashPatternOffsetAnimation,
-      this._type,
-      this._colorAnimation,
-      this._startPointAnimation,
-      this._endPointAnimation)
-      : super(name, strokeCap, strokeJoin, dashPatternValues, repaint,
-            opacityAnimation, widthAnimation, dashPatternOffsetAnimation) {
+    String name,
+    StrokeCap strokeCap,
+    StrokeJoin strokeJoin,
+    List<AnimatableDoubleValue> dashPatternValues,
+    Repaint repaint,
+    BaseKeyframeAnimation<dynamic, int> opacityAnimation,
+    BaseKeyframeAnimation<dynamic, double> widthAnimation,
+    BaseKeyframeAnimation<dynamic, double> dashPatternOffsetAnimation,
+    this._type,
+    this._colorAnimation,
+    this._startPointAnimation,
+    this._endPointAnimation,
+    BaseLayer layer,
+  )
+      : super(
+            name,
+            strokeCap,
+            strokeJoin,
+            dashPatternValues,
+            repaint,
+            opacityAnimation,
+            widthAnimation,
+            dashPatternOffsetAnimation,
+            layer) {
     addAnimation(_colorAnimation);
     addAnimation(_widthAnimation);
     addAnimation(_dashPatternOffsetAnimation);

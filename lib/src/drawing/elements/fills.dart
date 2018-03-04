@@ -6,15 +6,17 @@ import 'package:lottie_flutter/src/values.dart';
 
 import 'package:vector_math/vector_math_64.dart';
 
+import '../drawing_layers.dart';
+
 abstract class FillDrawable extends AnimationDrawable {
   final Paint _paint = new Paint()..isAntiAlias = true;
   final PathFillType _fillType;
   final List<PathContent> _paths = [];
   final KeyframeAnimation<int> _opacityAnimation;
 
-  FillDrawable(
-      String name, Repaint repaint, this._opacityAnimation, this._fillType)
-      : super(name, repaint) {
+  FillDrawable(String name, Repaint repaint, this._opacityAnimation,
+      this._fillType, BaseLayer layer)
+      : super(name, repaint, layer) {
     if (_opacityAnimation != null) {
       addAnimation(_opacityAnimation);
     }
@@ -51,12 +53,14 @@ class ShapeFillDrawable extends FillDrawable {
   final KeyframeAnimation<Color> _colorAnimation;
 
   ShapeFillDrawable(
-      String name,
-      Repaint repaint,
-      KeyframeAnimation<int> opacityAnimation,
-      PathFillType fillType,
-      this._colorAnimation)
-      : super(name, repaint, opacityAnimation, fillType) {
+    String name,
+    Repaint repaint,
+    KeyframeAnimation<int> opacityAnimation,
+    PathFillType fillType,
+    this._colorAnimation,
+    BaseLayer layer,
+  )
+      : super(name, repaint, opacityAnimation, fillType, layer) {
     if (_colorAnimation != null) {
       addAnimation(_colorAnimation);
     }
@@ -95,8 +99,9 @@ class GradientFillDrawable extends FillDrawable {
     this._gradientColorAnimation,
     this._startPointAnimation,
     this._endPointAnimation,
+    BaseLayer layer,
   )
-      : super(name, repaint, opacityAnimation, fillType) {
+      : super(name, repaint, opacityAnimation, fillType, layer) {
     addAnimation(_gradientColorAnimation);
     addAnimation(_startPointAnimation);
     addAnimation(_endPointAnimation);
@@ -110,8 +115,11 @@ class GradientFillDrawable extends FillDrawable {
     final bounds = path.getBounds();
 
     _paint
-      ..shader = createGradientShader(_gradientColorAnimation.value,
-          _gradientType, _startPointAnimation.value, _endPointAnimation.value,
+      ..shader = createGradientShader(
+          _gradientColorAnimation.value,
+          _gradientType,
+          _startPointAnimation.value,
+          _endPointAnimation.value,
           bounds)
       ..color = _paint.color
           .withAlpha(calculateAlpha(parentAlpha, _opacityAnimation));

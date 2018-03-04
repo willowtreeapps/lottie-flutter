@@ -2,7 +2,6 @@ import 'dart:math';
 import 'dart:ui';
 import 'package:lottie_flutter/src/animations.dart';
 import 'package:lottie_flutter/src/composition.dart';
-import 'package:lottie_flutter/src/drawing/drawing.dart';
 import 'package:lottie_flutter/src/drawing/elements/groups.dart';
 import 'package:lottie_flutter/src/elements/groups.dart';
 import 'package:lottie_flutter/src/layers.dart';
@@ -12,6 +11,8 @@ import 'package:lottie_flutter/src/utils.dart';
 import 'package:flutter/painting.dart';
 
 import 'package:vector_math/vector_math_64.dart';
+
+import './drawing.dart';
 
 BaseLayer layerForModel(
     Layer layer, LottieComposition composition, double scale, Repaint repaint) {
@@ -368,15 +369,15 @@ class SolidLayer extends BaseLayer {
 }
 
 class ShapeLayer extends BaseLayer {
-  final DrawableGroup _contentGroup;
+  DrawableGroup _contentGroup;
 
-  ShapeLayer(Layer layerModel, Repaint repaint)
-      : _contentGroup = new DrawableGroup(
-            layerModel.name,
-            repaint,
-            shapesToAnimationDrawable(repaint, layerModel.shapes),
-            obtainTransformAnimation(layerModel.shapes)),
-        super(layerModel, repaint) {
+  ShapeLayer(Layer layerModel, Repaint repaint) : super(layerModel, repaint) {
+    _contentGroup = new DrawableGroup(
+        layerModel.name,
+        repaint,
+        shapesToAnimationDrawable(repaint, layerModel.shapes, this),
+        obtainTransformAnimation(layerModel.shapes),
+        this);
     _contentGroup.setContents(const [], const []);
   }
 
@@ -529,7 +530,7 @@ class CompositionLayer extends BaseLayer {
       Canvas canvas, Size size, Matrix4 parentMatrix, int parentAlpha) {
     // TODO: Open issue about SkCanvas::getClipBounds
     // Rect canvasClipBounds = canvas.getClipBounds();
-    //canvas.save();
+    canvas.save();
     Rect newClipRect = new Rect.fromLTRB(
         0.0, 0.0, layerModel.preCompWidth, layerModel.preCompHeight);
     // TODO this is causing problems
@@ -543,7 +544,7 @@ class CompositionLayer extends BaseLayer {
       _layers[i].draw(canvas, size, parentMatrix, parentAlpha);
     }
 
-    //canvas.restore();
+    canvas.restore();
 
     //if (!originalClipRect.isEmpty()) {
     // TODO: Open issue about Replace option

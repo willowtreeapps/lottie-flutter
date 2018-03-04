@@ -4,7 +4,6 @@ import 'package:lottie_flutter/src/animations.dart';
 import 'package:lottie_flutter/src/keyframes.dart';
 import 'package:lottie_flutter/src/parsers/parsers.dart';
 
-
 abstract class AnimatableValue<A> {
   BaseKeyframeAnimation<dynamic, A> createAnimation();
   bool get hasAnimation;

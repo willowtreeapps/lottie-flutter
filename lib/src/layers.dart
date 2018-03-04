@@ -137,7 +137,7 @@ class Layer {
       inOutKeyframes.add(new Keyframe(0.0, inFrame, durationFrames, 0.0, 0.0));
     }
 
-    final double outFrame = map['op'] > 0 ? map['op']?.toDouble() : endFrame + 1;
+    final double outFrame = map['op'] > 0 ? map['op']?.toDouble() + 1 : endFrame + 1;
     inOutKeyframes.add(
         new Keyframe(inFrame, outFrame, durationFrames, 1.0, 1.0));
 

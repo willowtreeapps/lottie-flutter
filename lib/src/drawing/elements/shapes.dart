@@ -6,13 +6,16 @@ import 'package:lottie_flutter/src/drawing/elements/paths.dart';
 import 'package:lottie_flutter/src/utils.dart';
 import 'package:lottie_flutter/src/values.dart';
 
+import '../drawing_layers.dart';
+
 abstract class _PolygonDrawable extends AnimationDrawable
     implements PathContent {
   bool _isPathValid = false;
   TrimPathDrawable _trimPathDrawable;
   Path _path = new Path();
 
-  _PolygonDrawable(String name, Repaint repaint) : super(name, repaint);
+  _PolygonDrawable(String name, Repaint repaint, BaseLayer layer)
+      : super(name, repaint, layer);
 
   int _entry = 0;
   Path get path {
@@ -63,8 +66,8 @@ class EllipseDrawable extends _PolygonDrawable {
   final bool _isReversed;
 
   EllipseDrawable(String name, Repaint repaint, this._sizeAnimation,
-      this._positionAnimation, this._isReversed)
-      : super(name, repaint) {
+      this._positionAnimation, this._isReversed, BaseLayer layer)
+      : super(name, repaint, layer) {
     addAnimation(_sizeAnimation);
     addAnimation(_positionAnimation);
   }
@@ -114,8 +117,9 @@ class RectangleDrawable extends _PolygonDrawable {
     this._positionAnimation,
     this._sizeAnimation,
     this._cornerRadiusAnimation,
+    BaseLayer layer,
   )
-      : super(name, repaint);
+      : super(name, repaint, layer);
 
   @override
   void _createPath() {
@@ -182,8 +186,13 @@ class RectangleDrawable extends _PolygonDrawable {
 class ShapeDrawable extends _PolygonDrawable {
   final BaseKeyframeAnimation<dynamic, Path> _animation;
 
-  ShapeDrawable(String name, Repaint repaint, this._animation)
-      : super(name, repaint) {
+  ShapeDrawable(
+    String name,
+    Repaint repaint,
+    this._animation,
+    BaseLayer layer,
+  )
+      : super(name, repaint, layer) {
     addAnimation(_animation);
   }
 

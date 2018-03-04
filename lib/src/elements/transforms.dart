@@ -5,6 +5,7 @@ import 'package:lottie_flutter/src/animatables.dart';
 import 'package:lottie_flutter/src/animations.dart';
 import 'package:lottie_flutter/src/elements/shapes.dart';
 import 'package:lottie_flutter/src/mathutils.dart';
+import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 
 import 'package:lottie_flutter/src/parsers/element_parsers.dart';
 import 'package:vector_math/vector_math_64.dart';
@@ -124,6 +125,21 @@ class TransformKeyframeAnimation {
     _scale.progress = val;
     _rotation.progress = val;
     _opacity.progress = val;
+  }
+
+  void addAnimationsToLayer(BaseLayer layer) {
+    layer.addAnimation(anchorpoint);
+    layer.addAnimation(position);
+    layer.addAnimation(scale);
+    layer.addAnimation(rotation);
+    layer.addAnimation(opacity);
+    // TODO ??
+    // if (startOpacity != null) {
+    //   layer.addAnimation(startOpacity);
+    // }
+    // if (endOpacity != null) {
+    //   layer.addAnimation(endOpacity);
+    // }
   }
 
   Matrix4 get matrix {

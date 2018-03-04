@@ -1,6 +1,7 @@
 import 'dart:ui' show StrokeCap, StrokeJoin;
 import 'package:lottie_flutter/src/animatables.dart';
 import 'package:lottie_flutter/src/drawing/drawing.dart';
+import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 import 'package:lottie_flutter/src/drawing/elements/strokes.dart';
 import 'package:lottie_flutter/src/elements/shapes.dart';
 
@@ -33,16 +34,18 @@ class ShapeStroke extends Stroke {
         super.fromMap(map, scale, durationFrames);
 
   @override
-  AnimationDrawable toDrawable(Repaint repaint) => new ShapeStrokeDrawable(
-      name,
-      _capType,
-      _joinType,
-      _lineDashGroup.lineDashPattern,
-      repaint,
-      _opacity.createAnimation(),
-      _width.createAnimation(),
-      _lineDashGroup?.offset?.createAnimation(),
-      _color.createAnimation());
+  AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>
+      new ShapeStrokeDrawable(
+          name,
+          _capType,
+          _joinType,
+          _lineDashGroup.lineDashPattern,
+          repaint,
+          _opacity.createAnimation(),
+          _width.createAnimation(),
+          _lineDashGroup?.offset?.createAnimation(),
+          _color.createAnimation(),
+          layer);
 }
 
 class GradientStroke extends Stroke {
@@ -59,17 +62,19 @@ class GradientStroke extends Stroke {
         super.fromMap(map, scale, durationFrames);
 
   @override
-  AnimationDrawable toDrawable(Repaint repaint) => new GradientStrokeDrawable(
-      name,
-      _capType,
-      _joinType,
-      _lineDashGroup.lineDashPattern,
-      repaint,
-      _opacity.createAnimation(),
-      _width.createAnimation(),
-      _lineDashGroup.offset.createAnimation(),
-      _type,
-      _gradientColor.createAnimation(),
-      _start.createAnimation(),
-      _end.createAnimation());
+  AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>
+      new GradientStrokeDrawable(
+          name,
+          _capType,
+          _joinType,
+          _lineDashGroup.lineDashPattern,
+          repaint,
+          _opacity.createAnimation(),
+          _width.createAnimation(),
+          _lineDashGroup.offset.createAnimation(),
+          _type,
+          _gradientColor.createAnimation(),
+          _start.createAnimation(),
+          _end.createAnimation(),
+          layer);
 }

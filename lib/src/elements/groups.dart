@@ -5,6 +5,7 @@ import 'package:lottie_flutter/src/elements/paths.dart';
 import 'package:lottie_flutter/src/elements/shapes.dart';
 import 'package:lottie_flutter/src/elements/strokes.dart';
 import 'package:lottie_flutter/src/elements/transforms.dart';
+import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 
 class ShapeGroup extends Shape {
   final List<Shape> _shapes;
@@ -16,11 +17,13 @@ class ShapeGroup extends Shape {
         super.fromMap(map);
 
   @override
-  AnimationDrawable toDrawable(Repaint repaint) => new DrawableGroup(
-      name,
-      repaint,
-      shapesToAnimationDrawable(repaint, _shapes),
-      obtainTransformAnimation(_shapes));
+  AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>
+      new DrawableGroup(
+          name,
+          repaint,
+          shapesToAnimationDrawable(repaint, _shapes, layer),
+          obtainTransformAnimation(_shapes),
+          layer);
 
   static List<Shape> parseRawShapes(
           List rawShapes, double scale, double durationFrames) =>
@@ -55,6 +58,7 @@ Shape shapeFromMap(dynamic rawShape, double scale, double durationFrames) {
       return new PolystarShape.fromMap(rawShape, scale, durationFrames);
     case 'mm':
       return new MergePaths.fromMap(rawShape, scale);
+    // TODO: Implement RepeaterParser
     // case 'rp':
     //   return new RepeaterParser.fromMap(rawShape);
     default:
@@ -64,9 +68,9 @@ Shape shapeFromMap(dynamic rawShape, double scale, double durationFrames) {
 }
 
 List<AnimationDrawable> shapesToAnimationDrawable(
-    Repaint repaint, List<Shape> shapes) {
+    Repaint repaint, List<Shape> shapes, BaseLayer layer) {
   return shapes
-      .map((shape) => shape.toDrawable(repaint))
+      .map((shape) => shape.toDrawable(repaint, layer))
       .where((drawable) => drawable != null)
       .toList();
 }
