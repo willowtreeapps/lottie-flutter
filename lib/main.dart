@@ -88,25 +88,6 @@ class _LottieDemoState extends State<LottieDemo> {
           ],
         ),
       ),
-      // child: _composition == null
-      //     ? new DropdownButton(
-      //         items: assetNames
-      //             .map((assetName) => new DropdownMenuItem(
-      //                   child: new Text(assetName),
-      //                   value: assetName,
-      //                 ))
-      //             .toList(),
-      //         hint: new Text('Choose an asset'),
-      //         value: _assetName,
-      //         onChanged: (val) => _loadButtonPressed(val),
-      //       )
-      //     : new Lottie(
-      //         composition: _composition, size: const Size(400.0, 500.0))),
-      // floatingActionButton: new FloatingActionButton(
-      //   onPressed: _loadButtonPressed,
-      //   tooltip: 'Increment',
-      //   child: new Icon(Icons.add),
-      // ),
     );
   }
 }

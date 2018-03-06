@@ -1,30 +1,29 @@
 import 'dart:ui';
 import 'dart:math';
 import 'package:lottie_flutter/src/animations.dart';
-import 'package:lottie_flutter/src/mathutils.dart';
 import 'package:lottie_flutter/src/values.dart';
 import 'package:flutter/painting.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 /// Prints out the [Matrix4] in the SkMatrix format
 String toShortString(Matrix4 matrix4) {
-    final idx = [0, 4, 12, 1, 5, 13, 3, 7, 15];
-    var stor = matrix4.storage;
-    matrix4.row3;
-    return '['
-        '${stor[idx[0]]},'
-        '${stor[idx[1]]},'
-        '${stor[idx[2]]}'
-        ']['
-        '${stor[idx[3]]},'
-        '${stor[idx[4]]},'
-        '${stor[idx[5]]}'
-        ']['
-        '${stor[idx[6]]},'
-        '${stor[idx[7]]},'
-        '${stor[idx[8]]}'
-        ']';
-  }
+  final idx = [0, 4, 12, 1, 5, 13, 3, 7, 15];
+  var stor = matrix4.storage;
+  matrix4.row3;
+  return '['
+      '${stor[idx[0]]},'
+      '${stor[idx[1]]},'
+      '${stor[idx[2]]}'
+      ']['
+      '${stor[idx[3]]},'
+      '${stor[idx[4]]},'
+      '${stor[idx[5]]}'
+      ']['
+      '${stor[idx[6]]},'
+      '${stor[idx[7]]},'
+      '${stor[idx[8]]}'
+      ']';
+}
 
 /// Parse the color string and return the corresponding Color.
 /// Supported formatS are:
@@ -42,7 +41,8 @@ Color parseColor(String colorString) {
     }
   }
 
-  throw new ArgumentError.value(colorString, "colorString", "Unknown color $colorString");
+  throw new ArgumentError.value(
+      colorString, "colorString", "Unknown color $colorString");
 }
 
 // Use this instead of [Color.lerp] because it interpolates through the gamma color
@@ -215,7 +215,7 @@ Shader _createRadialGradientShader(GradientColor gradient, double x0, double y0,
         double x1, double y1, Rect bounds) =>
     new RadialGradient(
       center: new FractionalOffset(x0, y0),
-      radius: sqrt(hypot(x1 - x0, y1 - y0)),
+      radius: sqrt(pow(x1 - x0, 2) * pow(y1 - y0, 2)),
       colors: gradient.colors,
       stops: gradient.positions,
     )

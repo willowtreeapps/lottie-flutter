@@ -40,7 +40,6 @@ class StrokeDrawable extends AnimationDrawable {
     BaseLayer layer,
   )
       : _dashPatternAnimations = new List(dashPatternValues.length),
-   
         super(name, _repaint, layer) {
     _paint
       ..style = PaintingStyle.stroke
@@ -103,10 +102,10 @@ class StrokeDrawable extends AnimationDrawable {
 
   @override
   void draw(Canvas canvas, Size size, Matrix4 parentMatrix, int parentAlpha) {
-    
     // scaling is handled differently, for better or worse
     _paint
-      ..strokeWidth = _widthAnimation.value * (parentMatrix.entry(1,1) / 1) // calculateScale(parentMatrix)
+      ..strokeWidth = _widthAnimation.value *
+          (parentMatrix.entry(1, 1) / 1) // calculateScale(parentMatrix)
       ..color = _paint.color
           .withAlpha(calculateAlpha(parentAlpha, _opacityAnimation));
     if (_paint.strokeWidth <= 0) {
@@ -227,7 +226,7 @@ class StrokeDrawable extends AnimationDrawable {
       return;
     }
 
-  print('DashPaths not currently supported!');
+    print('DashPaths not currently supported!');
     //TODO: DashPathEffect
     /*
     double scale = calculateScale(parentMatrix);

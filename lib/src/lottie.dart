@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:lottie_flutter/src/composition.dart';
 import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 import 'package:lottie_flutter/src/layers.dart';
-import 'package:lottie_flutter/src/mathutils.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
@@ -53,13 +52,13 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
     super.didUpdateWidget(oldWidget);
     setScaleAndCompositionLayer();
     _animation
+      ..duration = new Duration(milliseconds: widget._composition.duration)
       ..reset()
       ..repeat();
   }
 
   void setScaleAndCompositionLayer() {
     _scale = _calcScale(widget._size, widget._composition);
-    //_scale = .05;
     print('scaling to $_scale');
     _compositionLayer = new CompositionLayer(
         widget._composition,
@@ -76,7 +75,6 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    //_compositionLayer.progress = 0.0;
     return new CustomPaint(
         painter: new LottiePainter(_compositionLayer, scale: _scale),
         size: widget._size);
@@ -102,7 +100,9 @@ class LottiePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final matrix = new Matrix4.identity();
-    preScale(matrix, _scale, _scale);
+    if (_scale != 1.0) {
+      matrix.scale(_scale, _scale);
+    }
 
     _compositionLayer.draw(canvas, size, matrix, _alpha);
   }

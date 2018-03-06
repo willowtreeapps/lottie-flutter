@@ -152,8 +152,7 @@ class Layer {
     }
 
     final double outFrame =
-        (map['op'] > 0 ? map['op'].toDouble() + 1 : endFrame + 1) /
-            timeStretch;
+        (map['op'] > 0 ? map['op'].toDouble() + 1 : endFrame + 1) / timeStretch;
 
     inOutKeyframes
         .add(new Keyframe(inFrame, outFrame, durationFrames, 1.0, 1.0));

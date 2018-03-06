@@ -2,7 +2,6 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 
-import 'package:lottie_flutter/src/mathutils.dart';
 import 'package:lottie_flutter/src/painting.dart' show Mask;
 import 'package:lottie_flutter/src/parsers/parsers.dart';
 import 'package:lottie_flutter/src/utils.dart';
@@ -76,7 +75,8 @@ abstract class BaseKeyframeAnimation<K, A> {
 
     final progressIntoFrame = _progress - keyframe.startProgress;
     final keyframeProgress = keyframe.endProgress - keyframe.startProgress;
-    final linearProgress = (progressIntoFrame / keyframeProgress).clamp(0.0, 1.0);
+    final linearProgress =
+        (progressIntoFrame / keyframeProgress).clamp(0.0, 1.0);
     return keyframe.curve.transform(linearProgress);
   }
 
@@ -127,7 +127,9 @@ class IntegerKeyframeAnimation extends KeyframeAnimation<int> {
   @override
   int getValue(Keyframe<int> keyframe, double keyframeProgress) {
     checkKeyframe(keyframe);
-    return lerpInt(keyframe.startValue, keyframe.endValue, keyframeProgress)
+    return ui
+        .lerpDouble(keyframe.startValue, keyframe.endValue,
+            keyframeProgress) // lerpInt(keyframe.startValue, keyframe.endValue, keyframeProgress)
         .toInt();
   }
 }
@@ -138,7 +140,8 @@ class DoubleKeyframeAnimation extends KeyframeAnimation<double> {
   @override
   double getValue(Keyframe<double> keyframe, double keyframeProgress) {
     checkKeyframe(keyframe);
-    return lerp(keyframe.startValue, keyframe.endValue, keyframeProgress);
+    return ui.lerpDouble(
+        keyframe.startValue, keyframe.endValue, keyframeProgress);
   }
 }
 
@@ -197,8 +200,8 @@ class ScaleKeyframeAnimation extends KeyframeAnimation<Offset> {
     Offset endTransform = keyframe.endValue;
 
     return new Offset(
-        lerp(startTransform.dx, endTransform.dx, keyframeProgress),
-        lerp(startTransform.dy, endTransform.dy, keyframeProgress));
+        ui.lerpDouble(startTransform.dx, endTransform.dx, keyframeProgress),
+        ui.lerpDouble(startTransform.dy, endTransform.dy, keyframeProgress));
   }
 }
 

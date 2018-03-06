@@ -1,6 +1,5 @@
 import 'package:lottie_flutter/src/animatables.dart';
 
-
 enum MaskMode { Add, Subtract, Intersect, Unknown }
 
 class Mask {
@@ -16,13 +15,15 @@ class Mask {
         _path = new AnimatableShapeValue.fromMap(map, scale, durationFrames);
 
   static MaskMode calculateMode(String rawMode) {
-    switch(rawMode) {
-      case 'a': return MaskMode.Add;
-      case 's': return MaskMode.Subtract;
-      case 'i': return MaskMode.Intersect;
-      default: return MaskMode.Unknown;
+    switch (rawMode) {
+      case 'a':
+        return MaskMode.Add;
+      case 's':
+        return MaskMode.Subtract;
+      case 'i':
+        return MaskMode.Intersect;
+      default:
+        return MaskMode.Unknown;
     }
   }
-
 }
-

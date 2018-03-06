@@ -111,7 +111,7 @@ class DrawableGroup extends AnimationDrawable implements PathContent {
 
   @override
   Rect getBounds(Matrix4 parentMatrix) {
-    Matrix4 matrix = parentMatrix.clone(); 
+    Matrix4 matrix = parentMatrix.clone();
 
     if (_transformAnimation != null) {
       matrix.multiply(_transformAnimation.matrix);

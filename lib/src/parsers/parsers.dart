@@ -1,5 +1,4 @@
 import 'dart:ui';
-import 'package:lottie_flutter/src/mathutils.dart';
 
 import 'package:lottie_flutter/src/values.dart';
 
@@ -250,7 +249,8 @@ class GradientColorParser extends Parser<GradientColor> {
       if (positions[i] >= position) {
         double progress =
             (position - lastPosition) / (thisPosition - lastPosition);
-        return (255 * lerp(opacities[i - 1], opacities[i], progress)).toInt();
+        return (255 * lerpDouble(opacities[i - 1], opacities[i], progress))
+            .toInt();
       }
     }
 

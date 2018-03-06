@@ -1,4 +1,5 @@
-import 'package:lottie_flutter/src/mathutils.dart';
+import 'dart:ui' show lerpDouble;
+
 import 'package:lottie_flutter/src/utils.dart';
 import 'package:collection/collection.dart' show IterableEquality;
 import 'package:flutter/painting.dart' as paint show Offset, Color;
@@ -71,9 +72,9 @@ class ShapeData {
     }
 
     _isClosed = shapeData1.isClosed || shapeData2.isClosed;
-    double x = lerp(
+    double x = lerpDouble(
         shapeData1.initialPoint.dx, shapeData2.initialPoint.dx, percentage);
-    double y = lerp(
+    double y = lerpDouble(
         shapeData1.initialPoint.dy, shapeData2.initialPoint.dy, percentage);
     _initialPoint = new paint.Offset(x, y);
 
@@ -81,18 +82,20 @@ class ShapeData {
       CubicCurveData curve1 = shapeData1.curves[i];
       CubicCurveData curve2 = shapeData2.curves[i];
 
-      double x1 =
-          lerp(curve1.controlPoint1.dx, curve2.controlPoint1.dx, percentage);
-      double y1 =
-          lerp(curve1.controlPoint1.dy, curve2.controlPoint1.dy, percentage);
+      double x1 = lerpDouble(
+          curve1.controlPoint1.dx, curve2.controlPoint1.dx, percentage);
+      double y1 = lerpDouble(
+          curve1.controlPoint1.dy, curve2.controlPoint1.dy, percentage);
 
-      double x2 =
-          lerp(curve1.controlPoint2.dx, curve2.controlPoint2.dx, percentage);
-      double y2 =
-          lerp(curve1.controlPoint2.dy, curve2.controlPoint2.dy, percentage);
+      double x2 = lerpDouble(
+          curve1.controlPoint2.dx, curve2.controlPoint2.dx, percentage);
+      double y2 = lerpDouble(
+          curve1.controlPoint2.dy, curve2.controlPoint2.dy, percentage);
 
-      double vertexX = lerp(curve1.vertex.dx, curve2.vertex.dx, percentage);
-      double vertexY = lerp(curve1.vertex.dy, curve2.vertex.dy, percentage);
+      double vertexX =
+          lerpDouble(curve1.vertex.dx, curve2.vertex.dx, percentage);
+      double vertexY =
+          lerpDouble(curve1.vertex.dy, curve2.vertex.dy, percentage);
 
       _curves[i] = new CubicCurveData(new paint.Offset(x1, y1),
           new paint.Offset(x2, y2), new paint.Offset(vertexX, vertexY));
@@ -139,7 +142,7 @@ class GradientColor {
     }
 
     for (int i = 0; i < gc1.colors.length; i++) {
-      positions[i] = lerp(gc1.positions[i], gc2.positions[i], progress);
+      positions[i] = lerpDouble(gc1.positions[i], gc2.positions[i], progress);
       colors[i] =
           GammaEvaluator.evaluate(progress, gc1.colors[i], gc2.colors[i]);
     }

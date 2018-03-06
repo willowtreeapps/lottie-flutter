@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:lottie_flutter/src/animatables.dart';
 import 'package:lottie_flutter/src/animations.dart';
 import 'package:lottie_flutter/src/elements/shapes.dart';
-// import 'package:lottie_flutter/src/mathutils.dart';
 import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 
 import 'package:lottie_flutter/src/parsers/element_parsers.dart';
@@ -72,14 +71,6 @@ class AnimatableTransform extends Shape {
         ? new AnimatableScaleValue.fromMap(rawScale, durationFrames)
         // Somehow some community animations don't have scale in the transform
         : new AnimatableScaleValue();
-    // if (rawScale['a'] == 1) {
-    //   print(rawScale);
-    //   scaleTransform.scene.keyframes.forEach((kf) => print(kf));
-    //   if (map['nm'] != 'EYEPATHTRANSFORM2') {
-    //     print(map['nm']);
-    //     scaleTransform = new AnimatableScaleValue();
-    //   }
-    // }
 
     var rawRotation = map['r'] ?? map['rz'];
     if (rawRotation is Map) {
@@ -154,23 +145,19 @@ class TransformKeyframeAnimation {
     final position = _position.value;
     if (position.dx != 0.0 || position.dy != 0.0) {
       _matrix.translate(position.dx, position.dy);
-      //preTranslate(_matrix, position.dx, position.dy);
     }
     final rotation = _rotation.value;
     if (rotation != 0) {
       _matrix.rotateZ(rotation * (PI / 180.0));
-      //leftRotate(_matrix, rotation * (PI / 180.0));
     }
     final scale = _scale.value;
     if (scale.dx != 1.0 || scale.dy != 1.0) {
       _matrix.scale(scale.dx, scale.dy);
-      //preScale(_matrix, scale.dx, scale.dy);
     }
 
     final anchorPoint = _anchorPoint.value;
     if (anchorPoint.dx != 0.0 || anchorPoint.dy != 0.0) {
       _matrix.translate(-anchorPoint.dx, -anchorPoint.dy);
-      //preTranslate(_matrix, -anchorPoint.dx, -anchorPoint.dy);
     }
     return _matrix;
   }

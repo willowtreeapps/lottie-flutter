@@ -154,8 +154,6 @@ abstract class BaseLayer implements Drawable {
   Rect getBounds(Matrix4 parentMatrix) {
     _bounds.setFrom(parentMatrix);
     _bounds.multiply(_transform.matrix);
-    // print(toShortString(_bounds));
-    // print(toShortString(parentMatrix));
     return calculateBounds(_bounds);
   }
 
