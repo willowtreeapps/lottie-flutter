@@ -135,8 +135,10 @@ abstract class BaseLayer implements Drawable {
         new DoubleKeyframeAnimation(_layerModel.inOutKeyframes);
 
     inOutAnimation.isDiscrete = true;
-    inOutAnimation
-        .addListener((progress) => _visibility = inOutAnimation.value == 1.0);
+    inOutAnimation.addListener((progress) {
+      _visibility = inOutAnimation.value == 1.0;
+    });
+
     _visibility = inOutAnimation.value == 1.0;
     addAnimation(inOutAnimation);
   }
@@ -534,13 +536,12 @@ class CompositionLayer extends BaseLayer {
     Rect newClipRect = new Rect.fromLTRB(
         0.0, 0.0, layerModel.preCompWidth, layerModel.preCompHeight);
     // TODO this is causing problems
-    //Rect transformedRect = MatrixUtils.transformRect(parentMatrix, newClipRect);
+    Rect transformedRect = MatrixUtils.transformRect(parentMatrix, newClipRect);
 
     for (int i = _layers.length - 1; i >= 0; i--) {
       if (!newClipRect.isEmpty) {
         canvas.clipRect(newClipRect);
       }
-
       _layers[i].draw(canvas, size, parentMatrix, parentAlpha);
     }
 

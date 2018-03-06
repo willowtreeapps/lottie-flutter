@@ -42,7 +42,9 @@ abstract class FillDrawable extends AnimationDrawable {
   Path _createPathFromSection(Matrix4 transform) {
     Path path = new Path();
     for (var pathSection in _paths) {
-      addPathToPath(path, pathSection.path, transform);
+      path.addPathWithMatrix(pathSection.path, transform.storage);
+      //path.addPath(pathSection.path, Offset.zero);
+      //addPathToPath(path, pathSection.path, transform);
     }
 
     return path;

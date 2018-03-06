@@ -17,7 +17,6 @@ abstract class _PolygonDrawable extends AnimationDrawable
   _PolygonDrawable(String name, Repaint repaint, BaseLayer layer)
       : super(name, repaint, layer);
 
-  int _entry = 0;
   Path get path {
     if (_isPathValid) {
       return _path;

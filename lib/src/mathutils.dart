@@ -34,8 +34,9 @@ void leftRotate(Matrix4 leftMatrix, double radians)
 
 double hypot(double x, double y) => pow(x, 2) + pow(y, 2);
 
+final _sqrt2 = sqrt(2);
+final Vector4 _sqrt2Vector = new Vector4(0.0, 0.0, _sqrt2, _sqrt2);
 double calculateScale(Matrix4 matrix) {
-  final sqrt2 = sqrt(2);
-  final transform = matrix.transform(new Vector4(0.0, 0.0, sqrt2, sqrt2));
-  return hypot(transform.z - transform.x, transform.w - transform.y) / 2;
+  final transform = matrix.transform(_sqrt2Vector);
+  return hypot(transform.z - transform.x, transform.w - transform.y) / 10;
 }

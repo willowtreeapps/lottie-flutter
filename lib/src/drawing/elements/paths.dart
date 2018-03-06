@@ -25,8 +25,14 @@ class TrimPathDrawable extends AnimationDrawable {
 
   double get offset => _offsetAnimation.value;
 
-  TrimPathDrawable(String name, Repaint repaint, this._type,
-      this._startAnimation, this._endAnimation, this._offsetAnimation, BaseLayer layer)
+  TrimPathDrawable(
+      String name,
+      Repaint repaint,
+      this._type,
+      this._startAnimation,
+      this._endAnimation,
+      this._offsetAnimation,
+      BaseLayer layer)
       : super(name, repaint, layer) {
     addAnimation(_startAnimation);
     addAnimation(_endAnimation);
@@ -65,43 +71,42 @@ class MergePathsDrawable extends AnimationDrawable implements PathContent {
 
   @override
   Path get path {
-    final path = new Path();
+    //final path = new Path();
 
     switch (_mode) {
       case MergePathsMode.Merge:
-        addPaths(path);
-        break;
+        return addPaths();
       case MergePathsMode.Add:
-        opFirstPathWithRest(path, PathOp.union);
-        break;
+        return opFirstPathWithRest(PathOp.union);
       case MergePathsMode.Subtract:
-        opFirstPathWithRest(path, PathOp.reverseDifference);
-        break;
+        return opFirstPathWithRest(PathOp.reverseDifference);
       case MergePathsMode.Intersect:
-        opFirstPathWithRest(path, PathOp.intersect);
-        break;
+        return opFirstPathWithRest(PathOp.intersect);
       case MergePathsMode.ExcludeIntersections:
-        opFirstPathWithRest(path, PathOp.xor);
-        break;
+        return opFirstPathWithRest(PathOp.xor);
+      default:
+        return new Path();
     }
 
-    return path;
+    //return path;
   }
 
-  void addPaths(Path path) {
+  Path addPaths() {
+    final path = new Path();
     for (var pathContent in _pathContents) {
       path.addPath(pathContent.path, const Offset(0.0, 0.0));
     }
+    return path;
   }
 
-  void opFirstPathWithRest(Path path, PathOp op) {
-    var firstPath = new Path();
+  Path opFirstPathWithRest(PathOp op) {
+    var path = new Path();
     final remainderPath = new Path();
 
     for (int i = _pathContents.length - 1; i >= 1; i--) {
       final content = _pathContents[i];
 
-      if(content is DrawableGroup) {
+      if (content is DrawableGroup) {
         List<PathContent> paths = content.paths;
         for (int j = paths.length - 1; j >= 0; j--) {
           Path nextPath = paths[j].path;
@@ -113,19 +118,18 @@ class MergePathsDrawable extends AnimationDrawable implements PathContent {
       }
     }
 
-
     final lastContent = _pathContents[0];
-    if(lastContent is DrawableGroup) {
+    if (lastContent is DrawableGroup) {
       List<PathContent> paths = lastContent.paths;
-      for (int j = paths.length - 1; j >= 0; j--) {
+      for (int j = 0; j < paths.length; j++) {
         Path nextPath = paths[j].path;
-        nextPath.transform(lastContent.transformation.storage);
-        firstPath.addPath(nextPath, const Offset(0.0, 0.0));
+        path.addPathWithMatrix(nextPath, lastContent.transformation.storage);
       }
     } else {
-      firstPath = lastContent.path;
+      path = lastContent.path;
     }
 
-    path.op(op, firstPath, remainderPath);
+    path.op(op, remainderPath);
+    return path;
   }
 }

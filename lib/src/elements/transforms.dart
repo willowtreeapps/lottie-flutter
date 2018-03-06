@@ -49,7 +49,7 @@ class AnimatableTransform extends Shape {
     AnimatableIntegerValue opacityTransform;
 
     var rawAnchorPoint = map['a'];
-    if (map != null) {
+    if (rawAnchorPoint != null) {
       anchorPointTransform =
           new AnimatablePathValue(rawAnchorPoint['k'], scale, durationFrames);
     } else {
@@ -72,6 +72,14 @@ class AnimatableTransform extends Shape {
         ? new AnimatableScaleValue.fromMap(rawScale, durationFrames)
         // Somehow some community animations don't have scale in the transform
         : new AnimatableScaleValue();
+    // if (rawScale['a'] == 1) {
+    //   print(rawScale);
+    //   scaleTransform.scene.keyframes.forEach((kf) => print(kf));
+    //   if (map['nm'] != 'EYEPATHTRANSFORM2') {
+    //     print(map['nm']);
+    //     scaleTransform = new AnimatableScaleValue();
+    //   }
+    // }
 
     var rawRotation = map['r'] ?? map['rz'];
     if (rawRotation is Map) {
@@ -105,8 +113,6 @@ class AnimatableTransform extends Shape {
 }
 
 class TransformKeyframeAnimation {
-  final Matrix4 _matrix = new Matrix4.identity();
-
   final BaseKeyframeAnimation<dynamic, Offset> _anchorPoint;
   final BaseKeyframeAnimation<dynamic, Offset> _position;
   final BaseKeyframeAnimation<dynamic, Offset> _scale;
@@ -119,7 +125,7 @@ class TransformKeyframeAnimation {
   BaseKeyframeAnimation<dynamic, double> get rotation => _rotation;
   BaseKeyframeAnimation<dynamic, int> get opacity => _opacity;
 
-  set progress (double val) {
+  set progress(double val) {
     _anchorPoint.progress = val;
     _position.progress = val;
     _scale.progress = val;
@@ -143,21 +149,29 @@ class TransformKeyframeAnimation {
   }
 
   Matrix4 get matrix {
-    _matrix.setIdentity();
-    final position = _position.value;
-    preTranslate(_matrix, position.dx, position.dy);
+    final _matrix = new Matrix4.identity();
 
+    final position = _position.value;
+    if (position.dx != 0.0 || position.dy != 0.0) {
+      _matrix.translate(position.dx, position.dy);
+      //preTranslate(_matrix, position.dx, position.dy);
+    }
     final rotation = _rotation.value;
     if (rotation != 0) {
-      leftRotate(_matrix, rotation * (PI / 180.0));
+      _matrix.rotateZ(rotation * (PI / 180.0));
+      //leftRotate(_matrix, rotation * (PI / 180.0));
+    }
+    final scale = _scale.value;
+    if (scale.dx != 1.0 || scale.dy != 1.0) {
+      _matrix.scale(scale.dx, scale.dy);
+      //preScale(_matrix, scale.dx, scale.dy);
     }
 
-    final scale = _scale.value;
-    preScale(_matrix, scale.dx, scale.dy);
-
     final anchorPoint = _anchorPoint.value;
-    preTranslate(_matrix, -anchorPoint.dx, -anchorPoint.dy);
-
+    if (anchorPoint.dx != 0.0 || anchorPoint.dy != 0.0) {
+      _matrix.translate(-anchorPoint.dx, -anchorPoint.dy);
+      //preTranslate(_matrix, -anchorPoint.dx, -anchorPoint.dy);
+    }
     return _matrix;
   }
 

@@ -8,14 +8,10 @@ import 'package:lottie_flutter/src/parsers/parsers.dart';
 import 'package:lottie_flutter/src/elements/transforms.dart';
 import 'package:lottie_flutter/src/utils.dart';
 
-
-
-
 enum LayerType { PreComp, Solid, Image, Null, Shape, Text, Unknown }
 enum MatteType { None, Add, Invert, Unknown }
 
 class Layer {
-
   final int _id;
   final int _parentId;
   final double _solidWidth;
@@ -68,7 +64,6 @@ class Layer {
 
   AnimatableTransform get transform => _transform;
 
-
   Layer.empty(this._preCompWidth, this._preCompHeight)
       : _id = -1,
         _parentId = -1,
@@ -86,22 +81,39 @@ class Layer {
         _matteType = MatteType.None,
         _transform = new AnimatableTransform();
 
+  Layer._(
+      this._id,
+      this._parentId,
+      this._solidWidth,
+      this._solidHeight,
+      this._timeStretch,
+      this._startProgress,
+      this._preCompWidth,
+      this._preCompHeight,
+      this._name,
+      this._refId,
+      this._solidColor,
+      this._shapes,
+      this._masks,
+      this._inOutKeyframes,
+      this._type,
+      this._matteType,
+      this._transform);
 
-  Layer._(this._id, this._parentId, this._solidWidth, this._solidHeight,
-      this._timeStretch, this._startProgress, this._preCompWidth,
-      this._preCompHeight, this._name, this._refId,
-      this._solidColor, this._shapes, this._masks, this._inOutKeyframes,
-      this._type, this._matteType, this._transform);
-
-  factory Layer([dynamic map, double preCompWidth, double preCompHeight,
-    double scale, double durationFrames, double endFrame]) {
+  factory Layer(
+      [dynamic map,
+      double preCompWidth,
+      double preCompHeight,
+      double scale,
+      double durationFrames,
+      double endFrame]) {
     if (map == null) {
       return new Layer.empty(preCompWidth, preCompHeight);
     }
 
     final int rawType = map['ty'] ?? LayerType.Unknown.index;
-    final LayerType type = rawType < LayerType.Unknown.index ? LayerType
-        .values[rawType]
+    final LayerType type = rawType < LayerType.Unknown.index
+        ? LayerType.values[rawType]
         : LayerType.Unknown;
 
     double preCompositionWidth = 0.0;
@@ -120,30 +132,35 @@ class Layer {
       solidColor = parseColor(map['sc']);
     }
 
-    AnimatableTransform transform = new AnimatableTransform(map['ks'], scale, durationFrames);
+    AnimatableTransform transform =
+        new AnimatableTransform(map['ks'], scale, durationFrames);
 
     MatteType matteType = MatteType.values[map['tt'] ?? 0];
 
     List<Mask> masks = parseJsonArray(map['masksProperties'],
-            (rawMask) => new Mask.fromMap(rawMask, scale, durationFrames));
+        (rawMask) => new Mask.fromMap(rawMask, scale, durationFrames));
 
     List<Shape> shapes = parseJsonArray(map['shapes'],
-            (rawShape) => shapeFromMap(rawShape, scale, durationFrames));
+        (rawShape) => shapeFromMap(rawShape, scale, durationFrames));
 
     List<Keyframe<double>> inOutKeyframes = [];
 
-    final double inFrame = map['ip']?.toDouble();
+    final timeStretch = map['sr'] == null ? 1.0 : parseMapToDouble(map['sr']);
+    final double inFrame = (map['ip']?.toDouble() ?? 0) / timeStretch;
     if (inFrame > 0) {
       inOutKeyframes.add(new Keyframe(0.0, inFrame, durationFrames, 0.0, 0.0));
     }
 
-    final double outFrame = map['op'] > 0 ? map['op']?.toDouble() + 1 : endFrame + 1;
-    inOutKeyframes.add(
-        new Keyframe(inFrame, outFrame, durationFrames, 1.0, 1.0));
+    final double outFrame =
+        (map['op'] > 0 ? map['op'].toDouble() + 1 : endFrame + 1) /
+            timeStretch;
+
+    inOutKeyframes
+        .add(new Keyframe(inFrame, outFrame, durationFrames, 1.0, 1.0));
 
     if (outFrame <= durationFrames) {
-      Keyframe<double> outKeyframe = new Keyframe(
-          outFrame, endFrame, durationFrames, 0.0, 0.0);
+      Keyframe<double> outKeyframe =
+          new Keyframe(outFrame, endFrame, durationFrames, 0.0, 0.0);
       inOutKeyframes.add(outKeyframe);
     }
 
@@ -154,7 +171,7 @@ class Layer {
         map['parent'],
         solidWidth,
         solidHeight,
-        map['sr'] == null ? 1.0 : parseMapToDouble(map['sr']),
+        timeStretch,
         startProgress,
         preCompositionWidth,
         preCompositionHeight,
@@ -171,8 +188,7 @@ class Layer {
 
   static List<T> parseJsonArray<T>(List jsonArray, T mapItem(dynamic rawItem)) {
     if (jsonArray != null) {
-      return jsonArray.map(mapItem)
-          .toList();
+      return jsonArray.map(mapItem).toList();
     }
 
     return [];
@@ -188,10 +204,4 @@ class Layer {
         '"_inOutKeyframes": $_inOutKeyframes, "_type": $_type, '
         '"_matteType": $_matteType, "_transform": $_transform}';
   }
-
-
 }
-
-
-
-

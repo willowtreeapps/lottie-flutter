@@ -76,12 +76,7 @@ List<AnimationDrawable> shapesToAnimationDrawable(
 }
 
 TransformKeyframeAnimation obtainTransformAnimation(List<Shape> shapes) {
-  if (shapes.isNotEmpty) {
-    final last = shapes.last;
-    if (last is AnimatableTransform) {
-      return last.createAnimation();
-    }
-  }
-
-  return null;
+  return (shapes.firstWhere((sh) => sh is AnimatableTransform,
+          orElse: () => null) as AnimatableTransform)
+      ?.createAnimation();
 }

@@ -1,9 +1,3 @@
-// Use this instead of [Color.lerp] because it interpolates through the gamma color
-// space which looks better to us humans.
-//
-// Writted by Romain Guy and Francois Blavoet.
-// https://androidstudygroup.slack.com/archives/animation/p1476461064000335
-
 import 'dart:ui';
 import 'dart:math';
 import 'package:lottie_flutter/src/animations.dart';
@@ -11,6 +5,26 @@ import 'package:lottie_flutter/src/mathutils.dart';
 import 'package:lottie_flutter/src/values.dart';
 import 'package:flutter/painting.dart';
 import 'package:vector_math/vector_math_64.dart';
+
+/// Prints out the [Matrix4] in the SkMatrix format
+String toShortString(Matrix4 matrix4) {
+    final idx = [0, 4, 12, 1, 5, 13, 3, 7, 15];
+    var stor = matrix4.storage;
+    matrix4.row3;
+    return '['
+        '${stor[idx[0]]},'
+        '${stor[idx[1]]},'
+        '${stor[idx[2]]}'
+        ']['
+        '${stor[idx[3]]},'
+        '${stor[idx[4]]},'
+        '${stor[idx[5]]}'
+        ']['
+        '${stor[idx[6]]},'
+        '${stor[idx[7]]},'
+        '${stor[idx[8]]}'
+        ']';
+  }
 
 /// Parse the color string and return the corresponding Color.
 /// Supported formatS are:
@@ -31,6 +45,11 @@ Color parseColor(String colorString) {
   throw new ArgumentError.value(colorString, "colorString", "Unknown color $colorString");
 }
 
+// Use this instead of [Color.lerp] because it interpolates through the gamma color
+// space which looks better to us humans.
+//
+// Writted by Romain Guy and Francois Blavoet.
+// https://androidstudygroup.slack.com/archives/animation/p1476461064000335
 class GammaEvaluator {
   GammaEvaluator._();
 

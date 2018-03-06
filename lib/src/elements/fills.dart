@@ -24,12 +24,7 @@ class ShapeFill extends Fill {
   ShapeFill.fromMap(dynamic map, double scale, double durationFrames)
       : _color = parseColor(map, durationFrames),
         _fillEnabled = map["fillEnabled"],
-        super.fromMap(map, durationFrames) {
-    // if (_color.scene.hasAnimation) {
-    //   print(
-    //       '${_color.scene.keyframes[0]?.startValue?.value}, ${_color.scene.keyframes[0]?.endValue?.value}');
-    // }
-  }
+        super.fromMap(map, durationFrames);
 
   @override
   AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>

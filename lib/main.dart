@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
 const assetNames = const [
+  'assets/Indicators2.json',
+  'assets/happy_gift.json',
+  'assets/empty_box.json',
   'assets/muzli.json',
   'assets/hamburger_arrow.json',
   'assets/motorcycle.json',

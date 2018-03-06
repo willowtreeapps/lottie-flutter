@@ -46,8 +46,8 @@ class DrawableGroup extends AnimationDrawable implements PathContent {
     return _transformAnimation?.matrix ?? new Matrix4.identity();
   }
 
-  DrawableGroup(
-      String name, Repaint repaint, this._contents, this._transformAnimation, BaseLayer layer)
+  DrawableGroup(String name, Repaint repaint, this._contents,
+      this._transformAnimation, BaseLayer layer)
       : super(name, repaint, layer) {
     List<Content> contentsToRemove = [];
     MergePathsDrawable currentMergePathsContent;
@@ -123,7 +123,8 @@ class DrawableGroup extends AnimationDrawable implements PathContent {
       AnimationDrawable content = _contents[i];
       final rect = content.getBounds(matrix);
       if (bounds.isEmpty) {
-        bounds = rect;
+        bounds =
+            new Rect.fromLTRB(rect.left, rect.top, rect.right, rect.bottom);
       } else {
         bounds = new Rect.fromLTRB(
             min(bounds.left, rect.left),
@@ -132,7 +133,6 @@ class DrawableGroup extends AnimationDrawable implements PathContent {
             max(bounds.bottom, rect.bottom));
       }
     }
-
     return bounds;
   }
 }

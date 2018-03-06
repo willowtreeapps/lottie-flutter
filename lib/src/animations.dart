@@ -77,9 +77,8 @@ abstract class BaseKeyframeAnimation<K, A> {
 
     final progressIntoFrame = _progress - keyframe.startProgress;
     final keyframeProgress = keyframe.endProgress - keyframe.startProgress;
-    final linearProgress = progressIntoFrame / keyframeProgress;
-    final safeValue = min(max(linearProgress, 0.0), 1.0);
-    return keyframe.curve.transform(safeValue);
+    final linearProgress = (progressIntoFrame / keyframeProgress).clamp(0.0, 1.0);
+    return keyframe.curve.transform(linearProgress);
   }
 
   A get value {
@@ -173,10 +172,7 @@ class GradientColorKeyframeAnimation extends KeyframeAnimation<GradientColor> {
 }
 
 class PointKeyframeAnimation extends KeyframeAnimation<Offset> {
-  PointKeyframeAnimation(Scene<Offset> scene) : super(scene) {
-    scene.keyframes?.forEach((kf) => print(
-        '${kf.startValue},${kf.endValue}, ${kf.startFrame}, ${kf.endFrame}, ${kf.curve}'));
-  }
+  PointKeyframeAnimation(Scene<Offset> scene) : super(scene);
 
   @override
   Offset getValue(Keyframe<Offset> keyframe, double keyframeProgress) {
@@ -245,8 +241,8 @@ class PathKeyframeAnimation extends KeyframeAnimation<Offset> {
 }
 
 class SplitDimensionPathKeyframeAnimation extends KeyframeAnimation<Offset> {
-  final KeyframeAnimation<double> xAnimation;
-  final KeyframeAnimation<double> yAnimation;
+  final BaseKeyframeAnimation<double, double> xAnimation;
+  final BaseKeyframeAnimation<double, double> yAnimation;
 
   SplitDimensionPathKeyframeAnimation(this.xAnimation, this.yAnimation)
       : super(new Scene.empty());

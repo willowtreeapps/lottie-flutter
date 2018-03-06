@@ -371,7 +371,7 @@
                       "c": true
                     }
                   },
-                  "nm": "Path 2",
+                  "nm": "EYEPATH 2",
                   "mn": "ADBE Vector Shape - Group"
                 },
                 {
@@ -614,7 +614,7 @@
                     "k": 0,
                     "ix": 5
                   },
-                  "nm": "Transform"
+                  "nm": "EYEPATHTRANSFORM2"
                 }
               ],
               "nm": "Shape 2",

@@ -25,6 +25,8 @@ flutter:
   # this "flutter" section, as in:
   assets:
     - assets/muzli.json
+    - assets/empty_box.json
+    - assets/happy_gift.json
     - assets/walkthrough.json
     - assets/emoji_shock.json
     - assets/preloader.json
@@ -32,6 +34,7 @@ flutter:
     - assets/favourite_app_icon.json
     - assets/motorcycle.json
     - assets/hamburger_arrow.json
+    - assets/Indicators2.json
 
 
   # To add assets from package dependencies, first ensure the asset

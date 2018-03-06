@@ -36,7 +36,7 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
       lowerBound: 0.0,
       upperBound: 1.0,
       vsync: this,
-    )..repeat();
+    )..forward();
 
     _animation.addListener(_handleChange);
   }
@@ -52,10 +52,15 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
   void didUpdateWidget(Lottie oldWidget) {
     super.didUpdateWidget(oldWidget);
     setScaleAndCompositionLayer();
+    _animation
+      ..reset()
+      ..forward();
   }
 
   void setScaleAndCompositionLayer() {
     _scale = _calcScale(widget._size, widget._composition);
+    //_scale = .05;
+    print('scaling to $_scale');
     _compositionLayer = new CompositionLayer(
         widget._composition,
         new Layer.empty(widget._size.width, widget._size.height),

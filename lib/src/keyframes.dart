@@ -116,7 +116,6 @@ class PathKeyframe extends Keyframe<Offset> {
     } else {
       path.lineTo(end.dx, end.dy);
     }
-
     return path;
   }
 }
