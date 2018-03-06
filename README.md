@@ -30,3 +30,18 @@ https://www.lottiefiles.com/share/ZhpGnj
 - [ ] Canvas.getClipBounds   ★
 - [ ] Canvas.clipRect(_, Region.Op) ★
 
+## Lottie Files attribution
+
+The files in this project are from LottieFiles.com
+
+- assets/checked_done_.json by daPulse -> https://www.lottiefiles.com/433-checked-done
+- assets/emoji_shock.json by Pixel Buddha -> https://www.lottiefiles.com/44-emoji-shock
+- assets/empty_box.json by Hoài Lê -> https://www.lottiefiles.com/629-empty-box
+- assets/favourite_app_icon.json by Michael Harvey -> https://www.lottiefiles.com/72-favourite-app-icon
+- assets/hamburger_arrow.json by ??? -> https://www.lottiefiles.com/63-hamburger-arrow-transition
+- assets/happy_gift.json by Jojo Lafrite -> https://www.lottiefiles.com/1368-happy-gift
+- assets/Indicators2.json by by Eddy Gann -> https://www.lottiefiles.com/539-page-indicators-square
+- assets/motorcycle.json by Mohammed Zourob -> https://www.lottiefiles.com/29-motorcycle
+- assets/mulzi.json by ??? -> https://www.lottiefiles.com/113-muzli-beacon
+- assets/preloader.json by ??? -> https://www.lottiefiles.com/51-preloader
+- assets/walkthrough.json taken from Lottie Preview for Android -> https://github.com/airbnb/lottie-android
