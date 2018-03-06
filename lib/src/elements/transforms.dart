@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:lottie_flutter/src/animatables.dart';
 import 'package:lottie_flutter/src/animations.dart';
 import 'package:lottie_flutter/src/elements/shapes.dart';
-import 'package:lottie_flutter/src/mathutils.dart';
+// import 'package:lottie_flutter/src/mathutils.dart';
 import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 
 import 'package:lottie_flutter/src/parsers/element_parsers.dart';

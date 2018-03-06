@@ -12,6 +12,8 @@ import 'package:flutter/painting.dart';
 
 import 'package:vector_math/vector_math_64.dart';
 
+import 'package:meta/meta.dart';
+
 import './drawing.dart';
 
 BaseLayer layerForModel(
@@ -48,7 +50,7 @@ abstract class BaseLayer implements Drawable {
   final Paint _maskPaint = new Paint();
   final Paint _mattePaint = new Paint();
   final Paint _clearPaint = new Paint();
-  final Matrix4 _matrix = new Matrix4.identity();
+  //final Matrix4 _matrix = new Matrix4.identity();
   final Matrix4 _bounds = new Matrix4.identity();
   final MaskKeyframeAnimation _mask;
   final TransformKeyframeAnimation _transform;
@@ -75,15 +77,15 @@ abstract class BaseLayer implements Drawable {
   }
 
   /// Set animation progress, from 0 to 1
-  set progress(double progress) {
-    _transform?.progress = progress;
+  set progress(double val) {
+    _transform?.progress = val;
     if (_layerModel.timeStretch != null && _layerModel.timeStretch != 0) {
-      progress /= _layerModel.timeStretch;
+      val /= _layerModel.timeStretch;
     }
 
     // TODO - mattelayer timestretch?
-    _matteLayer?.progress = progress;
-    _animations.forEach((animation) => animation.progress = progress);
+    _matteLayer?.progress = val;
+    _animations.forEach((animation) => animation.progress = val);
   }
 
   BaseLayer(this._layerModel, this._repaint)
@@ -147,11 +149,14 @@ abstract class BaseLayer implements Drawable {
     _repaint();
   }
 
+  @mustCallSuper
   @override
   Rect getBounds(Matrix4 parentMatrix) {
     _bounds.setFrom(parentMatrix);
     _bounds.multiply(_transform.matrix);
-    return calculateBounds(parentMatrix);
+    // print(toShortString(_bounds));
+    // print(toShortString(parentMatrix));
+    return calculateBounds(_bounds);
   }
 
   @override
@@ -164,36 +169,37 @@ abstract class BaseLayer implements Drawable {
     if (!_visibility) {
       return;
     }
+    var matrix = parentMatrix.clone();
 
     buildParentLayerListIfNeeded();
 
-    _matrix.setFrom(parentMatrix);
+    //_matrix.setFrom(parentMatrix);
 
     for (int i = _parents.length - 1; i >= 0; i--) {
-      _matrix.multiply(_parents[i]._transform.matrix);
+      matrix.multiply(_parents[i]._transform.matrix);
     }
 
     int alpha = calculateAlpha(parentAlpha, _transform.opacity);
 
     if (!hasMatteOnThisLayer && !hasMasksOnThisLayer) {
-      _matrix.multiply(_transform.matrix);
-      drawLayer(canvas, size, _matrix, alpha);
+      matrix.multiply(_transform.matrix);
+      drawLayer(canvas, size, matrix, alpha);
       return;
     }
 
-    Rect rect = getBounds(_matrix);
-    rect = intersectBoundsWithMatte(rect, _matrix);
+    Rect rect = getBounds(matrix);
+    rect = intersectBoundsWithMatte(rect, matrix);
 
-    _matrix.multiply(_transform.matrix);
-    intersectBoundsWithMask(rect, _matrix);
+    matrix.multiply(_transform.matrix);
+    rect = intersectBoundsWithMask(rect, matrix);
 
     Rect canvasBounds = new Rect.fromLTRB(0.0, 0.0, size.width, size.height);
     canvas.saveLayer(canvasBounds, _contentPaint);
     clearCanvas(canvas, canvasBounds);
-    drawLayer(canvas, size, _matrix, alpha);
+    drawLayer(canvas, size, matrix, alpha);
 
     if (hasMasksOnThisLayer) {
-      applyMasks(canvas, canvasBounds, _matrix);
+      applyMasks(canvas, canvasBounds, matrix);
     }
 
     if (hasMatteOnThisLayer) {
@@ -211,8 +217,8 @@ abstract class BaseLayer implements Drawable {
     // IF we don't pad the clear draw, some phones leave a 1px border of the
     // graphics buffer.
     canvas.drawRect(
-        new Rect.fromLTRB(bounds.left - 1, bounds.top - 1, bounds.right - 1,
-            bounds.bottom - 1),
+        new Rect.fromLTRB(bounds.left - 1, bounds.top - 1, bounds.right + 1,
+            bounds.bottom + 1),
         _clearPaint);
   }
 
@@ -226,7 +232,7 @@ abstract class BaseLayer implements Drawable {
       return;
     }
 
-    _parents = new List();
+    _parents = new List<BaseLayer>();
     BaseLayer layer = _parent;
     while (layer != null) {
       _parents.add(layer);
@@ -245,9 +251,9 @@ abstract class BaseLayer implements Drawable {
     return _maxLeftTopMinRightBottom(rect, bounds);
   }
 
-  void intersectBoundsWithMask(Rect rect, Matrix4 matrix) {
+  Rect intersectBoundsWithMask(Rect rect, Matrix4 matrix) {
     if (!hasMasksOnThisLayer) {
-      return;
+      return rect;
     }
 
     final int length = _mask.masks.length;
@@ -258,13 +264,16 @@ abstract class BaseLayer implements Drawable {
       var animation = _mask.animations[i];
 
       _path = animation.value;
-      _path = _path.transform(_matrix.storage);
+      _path = _path.transform(matrix.storage);
 
       switch (mask.mode) {
         case MaskMode.Subtract:
           // If there is a subtract mask, the mask could potentially be the size
           // of the entire canvas so we can't use the mask bounds
-          return;
+          return rect;
+        case MaskMode.Intersect:
+          // TODO
+          return rect;
         case MaskMode.Add:
         default:
           Rect tempMaskBoundRect = _path.getBounds();
@@ -276,6 +285,7 @@ abstract class BaseLayer implements Drawable {
               : _minTopLeftMaxRightBottom(maskBoundRect, tempMaskBoundRect);
       }
     }
+    return _maxLeftTopMinRightBottom(rect, maskBoundRect);
   }
 
   void applyMasks(Canvas canvas, Rect bounds, Matrix4 matrix) {
@@ -288,7 +298,7 @@ abstract class BaseLayer implements Drawable {
       var animation = _mask.animations[i];
 
       _path = animation.value;
-      _path = _path.transform(_matrix.storage);
+      _path = _path.transform(matrix.storage);
 
       switch (mask.mode) {
         case MaskMode.Subtract:
@@ -582,12 +592,15 @@ class CompositionLayer extends BaseLayer {
   }
 
   @override
-  set progress(double progress) {
-    super.progress = progress;
+  set progress(double val) {
+    super.progress = val;
 
-    double newProgress = progress - _layerModel.startProgress;
+    if (layerModel.timeStretch != null && layerModel.timeStretch != 0) {
+      val /= layerModel.timeStretch;
+    }
+    val -= _layerModel.startProgress;
     for (int i = _layers.length - 1; i >= 0; i--) {
-      _layers[i].progress = newProgress;
+      _layers[i].progress = val;
     }
   }
 

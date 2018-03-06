@@ -9,7 +9,11 @@ Lottie is a mobile library that parses [Adobe After Effects](http://www.adobe.co
 
 ### Current status
 
-![Emoji shock](art/emoji_shock.png)
+EMOJI SHOCK NOW WORKS.
+
+Motorcycle isn't fully rendering.
+
+Hamburger Arrow isn't rendering at all.
 
 Compare with:
 https://www.lottiefiles.com/share/ZhpGnj

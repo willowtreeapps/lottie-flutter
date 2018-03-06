@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
@@ -216,7 +215,7 @@ class ShapeKeyframeAnimation extends BaseKeyframeAnimation<ShapeData, Path> {
 
 class PathKeyframeAnimation extends KeyframeAnimation<Offset> {
   PathKeyframe _pathMeasureKeyframe;
-  ui.PathMeasure _pathMeasure;
+  ui.PathMeasure _pathMeasure; // = new ui.PathMeasure();
 
   PathKeyframeAnimation(Scene<Offset> scene) : super(scene);
 
