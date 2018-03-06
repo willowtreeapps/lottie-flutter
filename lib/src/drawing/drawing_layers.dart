@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 import 'package:lottie_flutter/src/animations.dart';
 import 'package:lottie_flutter/src/composition.dart';
+import 'package:lottie_flutter/src/drawing/drawing.dart';
 import 'package:lottie_flutter/src/drawing/elements/groups.dart';
 import 'package:lottie_flutter/src/elements/groups.dart';
 import 'package:lottie_flutter/src/layers.dart';
@@ -14,7 +15,7 @@ import 'package:vector_math/vector_math_64.dart';
 
 import 'package:meta/meta.dart';
 
-import './drawing.dart';
+
 
 BaseLayer layerForModel(
     Layer layer, LottieComposition composition, double scale, Repaint repaint) {

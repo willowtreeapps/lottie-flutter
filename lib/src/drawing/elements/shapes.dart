@@ -6,7 +6,7 @@ import 'package:lottie_flutter/src/drawing/elements/paths.dart';
 import 'package:lottie_flutter/src/utils.dart';
 import 'package:lottie_flutter/src/values.dart';
 
-import '../drawing_layers.dart';
+import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 
 abstract class _PolygonDrawable extends AnimationDrawable
     implements PathContent {

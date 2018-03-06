@@ -6,7 +6,7 @@ import 'package:lottie_flutter/src/values.dart';
 
 import 'package:vector_math/vector_math_64.dart';
 
-import '../drawing_layers.dart';
+import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 
 abstract class FillDrawable extends AnimationDrawable {
   final Paint _paint = new Paint()..isAntiAlias = true;

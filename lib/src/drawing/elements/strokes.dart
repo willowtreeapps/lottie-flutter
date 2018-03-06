@@ -9,7 +9,7 @@ import 'package:lottie_flutter/src/utils.dart';
 import 'package:lottie_flutter/src/values.dart';
 import 'package:vector_math/vector_math_64.dart';
 
-import '../drawing_layers.dart';
+import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 
 class PathGroup {
   final List<PathContent> _paths = [];

@@ -1,8 +1,8 @@
 import 'package:flutter/rendering.dart'
     show Canvas, ColorFilter, Matrix4, Path, Rect, Size;
 
-import '../animations.dart';
-import './drawing_layers.dart';
+import 'package:lottie_flutter/src/animations.dart';
+import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 
 abstract class Content {
   String get name;

@@ -5,7 +5,7 @@ import 'package:lottie_flutter/src/drawing/elements/groups.dart';
 import 'package:lottie_flutter/src/drawing/drawing.dart';
 import 'package:lottie_flutter/src/values.dart';
 
-import '../drawing_layers.dart';
+import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 
 ///
 /// TrimPathDrawable
