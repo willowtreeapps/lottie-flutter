@@ -36,7 +36,7 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
       lowerBound: 0.0,
       upperBound: 1.0,
       vsync: this,
-    )..forward();
+    )..repeat();
 
     _animation.addListener(_handleChange);
   }
@@ -54,7 +54,7 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
     setScaleAndCompositionLayer();
     _animation
       ..reset()
-      ..forward();
+      ..repeat();
   }
 
   void setScaleAndCompositionLayer() {
