@@ -105,8 +105,7 @@ class StrokeDrawable extends AnimationDrawable {
       ..color = _paint.color
           .withAlpha(calculateAlpha(parentAlpha, _opacityAnimation));
     if (_paint.strokeWidth <= 0) {
-      // TODO: review this
-      // Android draws a hairline stroke for 0, After Effects doesn't and Flutter ??
+      // This should be good - no reason to draw something with a width of 0 or less
       return;
     }
 

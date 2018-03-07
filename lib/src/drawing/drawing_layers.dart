@@ -338,9 +338,8 @@ class SolidLayer extends BaseLayer {
     }
 
     int alpha = calculateAlpha(layerModel.solidColor.alpha, _transform.opacity);
-    _paint.color = _paint.color.withAlpha(alpha);
-
-    if (alpha == 0) {
+    if (alpha > 0) {
+      _paint.color = _paint.color.withAlpha(alpha);
       Rect transformRect = calculateTransform(parentMatrix);
       canvas.drawRect(transformRect, _paint);
     }
@@ -446,8 +445,12 @@ class ImageLayer extends BaseLayer {
     _paint.colorFilter = colorFilter;
   }
 
+  bool _getImageWarned = false;
   Image _getImage() {
-    print('Get Image not implemented - TODO');
+    if (!_getImageWarned) {
+      print('Get Image not implemented - TODO');
+      _getImageWarned = true;
+    }
     //TODO: fetch image from refId
     return null;
   }

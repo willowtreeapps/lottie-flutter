@@ -50,7 +50,7 @@ class _LottieDemoState extends State<LottieDemo> {
   @override
   void initState() {
     super.initState();
-    _loadButtonPressed(assetNames[4]);
+    _loadButtonPressed(assetNames[5]);
   }
 
   void _loadButtonPressed(String assetName) {

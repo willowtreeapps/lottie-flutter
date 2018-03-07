@@ -74,7 +74,6 @@ class ShapeFillDrawable extends FillDrawable {
   void draw(Canvas canvas, Size size, Matrix4 parentMatrix, int parentAlpha) {
     int alpha = calculateAlpha(parentAlpha, _opacityAnimation);
     _paint.color = _colorAnimation.value.withAlpha(alpha);
-
     Path path = _createPathFromSection(parentMatrix);
     path.fillType = _fillType;
 

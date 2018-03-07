@@ -70,13 +70,13 @@ class GammaEvaluator {
     double endB = end.blue / 255.0;
 
     // convert from sRGB to linear
-    startR = _EOCF_sRGB(startR);
-    startG = _EOCF_sRGB(startG);
-    startB = _EOCF_sRGB(startB);
+    startR = _eocfSrgb(startR);
+    startG = _eocfSrgb(startG);
+    startB = _eocfSrgb(startB);
 
-    endR = _EOCF_sRGB(endR);
-    endG = _EOCF_sRGB(endG);
-    endB = _EOCF_sRGB(endB);
+    endR = _eocfSrgb(endR);
+    endG = _eocfSrgb(endG);
+    endB = _eocfSrgb(endB);
 
     // compute the interpolated color in linear space
     double a = startA + fraction * (endA - startA);
@@ -86,9 +86,9 @@ class GammaEvaluator {
 
     // convert back to sRGB in the [0..255] range
     a = a * 255.0;
-    r = _OECF_sRGB(r) * 255.0;
-    g = _OECF_sRGB(g) * 255.0;
-    b = _OECF_sRGB(b) * 255.0;
+    r = _oecfSrgb(r) * 255.0;
+    g = _oecfSrgb(g) * 255.0;
+    b = _oecfSrgb(b) * 255.0;
 
     return new Color.fromARGB(a.round(), r.round(), g.round(), b.round());
     // return new Color(
@@ -97,7 +97,7 @@ class GammaEvaluator {
 
   // Opto-electronic conversion function for the sRGB color space
   // Takes a gamma-encoded sRGB value and converts it to a linear sRGB value
-  static double _OECF_sRGB(double linear) {
+  static double _oecfSrgb(double linear) {
     // IEC 61966-2-1:1999
     return linear <= 0.0031308
         ? linear * 12.92
@@ -106,7 +106,7 @@ class GammaEvaluator {
 
   // Electro-optical conversion function for the sRGB color space
   // Takes a linear sRGB value and converts it to a gamma-encoded sRGB value
-  static double _EOCF_sRGB(double srgb) {
+  static double _eocfSrgb(double srgb) {
     // IEC 61966-2-1:1999
     return srgb <= 0.04045 ? srgb / 12.92 : pow((srgb + 0.055) / 1.055, 2.4);
   }
