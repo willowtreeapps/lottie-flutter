@@ -5,23 +5,28 @@ import 'package:lottie_flutter/src/values.dart';
 import 'package:flutter/painting.dart';
 import 'package:vector_math/vector_math_64.dart';
 
+const _skMatrixIdx = const [
+  0, 4, 12, // 1st row
+  1, 5, 13, // 2nd row
+  3, 7, 15 // 3rd row
+];
+
 /// Prints out the [Matrix4] in the SkMatrix format
 String toShortString(Matrix4 matrix4) {
-  final idx = [0, 4, 12, 1, 5, 13, 3, 7, 15];
   var stor = matrix4.storage;
   matrix4.row3;
   return '['
-      '${stor[idx[0]]},'
-      '${stor[idx[1]]},'
-      '${stor[idx[2]]}'
+      '${stor[_skMatrixIdx[0]]},'
+      '${stor[_skMatrixIdx[1]]},'
+      '${stor[_skMatrixIdx[2]]}'
       ']['
-      '${stor[idx[3]]},'
-      '${stor[idx[4]]},'
-      '${stor[idx[5]]}'
+      '${stor[_skMatrixIdx[3]]},'
+      '${stor[_skMatrixIdx[4]]},'
+      '${stor[_skMatrixIdx[5]]}'
       ']['
-      '${stor[idx[6]]},'
-      '${stor[idx[7]]},'
-      '${stor[idx[8]]}'
+      '${stor[_skMatrixIdx[6]]},'
+      '${stor[_skMatrixIdx[7]]},'
+      '${stor[_skMatrixIdx[8]]}'
       ']';
 }
 
@@ -116,7 +121,7 @@ void addPathToPath(Path path, Path other, Matrix4 transform) =>
     //path.addPath(other.transform(transform.storage), const Offset(0.0, 0.0));
     path.addPathWithMatrix(other, transform.storage);
 
-Path applyScaleTrimIfNeeded(
+Path applyScaledTrimPathIfNeeded(
     Path path, double start, double end, double offset) {
   return applyTrimPathIfNeeded(
       path, start / 100.0, end / 100.0, offset / 100.0);
@@ -129,7 +134,6 @@ Path applyTrimPathIfNeeded(Path path, double start, double end, double offset) {
 
   final measure = new PathMeasure(path: path);
   final length = measure.getLength();
-
   if (length < 1.0 || (end - start - 1).abs() < .01) {
     return path;
   }
