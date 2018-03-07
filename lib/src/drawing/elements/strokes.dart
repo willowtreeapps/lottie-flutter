@@ -52,9 +52,7 @@ class StrokeDrawable extends AnimationDrawable {
     dashPatternValues
         .forEach((dashPattern) => addAnimation(dashPattern.createAnimation()));
 
-    if (_dashPatternOffsetAnimation != null) {
-      addAnimation(_dashPatternOffsetAnimation);
-    }
+    addAnimation(_dashPatternOffsetAnimation);
   }
 
   @override
@@ -105,7 +103,7 @@ class StrokeDrawable extends AnimationDrawable {
     // scaling is handled differently, for better or worse
     _paint
       ..strokeWidth = _widthAnimation.value *
-          (parentMatrix.entry(1, 1) / 1) // calculateScale(parentMatrix)
+          parentMatrix.entry(0, 0).abs() // calculateScale(parentMatrix)
       ..color = _paint.color
           .withAlpha(calculateAlpha(parentAlpha, _opacityAnimation));
     if (_paint.strokeWidth <= 0) {
@@ -221,12 +219,15 @@ class StrokeDrawable extends AnimationDrawable {
         outBounds.bottom + width / 2.0 + 1);
   }
 
+  bool _printedDashPatternWarning = false;
   void _applyDashPatternIfNeeded(Matrix4 parentMatrix) {
     if (_dashPatternAnimations.isEmpty) {
       return;
     }
-
-    print('DashPaths not currently supported!');
+    if (!_printedDashPatternWarning) {
+      print('DashPaths not currently supported!');
+      _printedDashPatternWarning = true;
+    }
     //TODO: DashPathEffect
     /*
     double scale = calculateScale(parentMatrix);
@@ -326,8 +327,6 @@ class GradientStrokeDrawable extends StrokeDrawable {
             dashPatternOffsetAnimation,
             layer) {
     addAnimation(_colorAnimation);
-    addAnimation(_widthAnimation);
-    addAnimation(_dashPatternOffsetAnimation);
   }
 
   @override

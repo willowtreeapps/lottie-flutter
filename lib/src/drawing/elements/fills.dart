@@ -17,9 +17,7 @@ abstract class FillDrawable extends AnimationDrawable {
   FillDrawable(String name, Repaint repaint, this._opacityAnimation,
       this._fillType, BaseLayer layer)
       : super(name, repaint, layer) {
-    if (_opacityAnimation != null) {
-      addAnimation(_opacityAnimation);
-    }
+    addAnimation(_opacityAnimation);
   }
 
   @override
@@ -63,9 +61,7 @@ class ShapeFillDrawable extends FillDrawable {
     BaseLayer layer,
   )
       : super(name, repaint, opacityAnimation, fillType, layer) {
-    if (_colorAnimation != null) {
-      addAnimation(_colorAnimation);
-    }
+    addAnimation(_colorAnimation);
   }
 
   @override

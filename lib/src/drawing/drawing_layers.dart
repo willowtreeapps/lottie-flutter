@@ -15,8 +15,6 @@ import 'package:vector_math/vector_math_64.dart';
 
 import 'package:meta/meta.dart';
 
-
-
 BaseLayer layerForModel(
     Layer layer, LottieComposition composition, double scale, Repaint repaint) {
   switch (layer.type) {
@@ -51,8 +49,6 @@ abstract class BaseLayer implements Drawable {
   final Paint _maskPaint = new Paint();
   final Paint _mattePaint = new Paint();
   final Paint _clearPaint = new Paint();
-  //final Matrix4 _matrix = new Matrix4.identity();
-  final Matrix4 _bounds = new Matrix4.identity();
   final MaskKeyframeAnimation _mask;
   final TransformKeyframeAnimation _transform;
   final List<BaseKeyframeAnimation<dynamic, dynamic>> _animations = new List();
@@ -100,7 +96,7 @@ abstract class BaseLayer implements Drawable {
         : BlendMode.dstIn;
 
     _transform.addListener(onAnimationChanged);
-    addAnimationsToLayer();
+    _transform.addAnimationsToLayer(this);
 
     for (var animation in _mask.animations) {
       addAnimation(animation);
@@ -111,17 +107,9 @@ abstract class BaseLayer implements Drawable {
   }
 
   void addAnimation(BaseKeyframeAnimation<dynamic, dynamic> newAnimation) {
-    if (newAnimation is! StaticKeyframeAnimation) {
+    if (newAnimation != null && newAnimation is! StaticKeyframeAnimation) {
       _animations.add(newAnimation);
     }
-  }
-
-  void addAnimationsToLayer() {
-    addAnimation(_transform.anchorpoint);
-    addAnimation(_transform.position);
-    addAnimation(_transform.rotation);
-    addAnimation(_transform.scale);
-    addAnimation(_transform.opacity);
   }
 
   void onAnimationChanged(double progress) {
@@ -153,9 +141,9 @@ abstract class BaseLayer implements Drawable {
   @mustCallSuper
   @override
   Rect getBounds(Matrix4 parentMatrix) {
-    _bounds.setFrom(parentMatrix);
-    _bounds.multiply(_transform.matrix);
-    return calculateBounds(_bounds);
+    final bounds = parentMatrix.clone();
+    bounds.multiply(_transform.matrix);
+    return calculateBounds(bounds);
   }
 
   @override
@@ -171,8 +159,6 @@ abstract class BaseLayer implements Drawable {
     var matrix = parentMatrix.clone();
 
     buildParentLayerListIfNeeded();
-
-    //_matrix.setFrom(parentMatrix);
 
     for (int i = _parents.length - 1; i >= 0; i--) {
       matrix.multiply(_parents[i]._transform.matrix);
@@ -256,7 +242,7 @@ abstract class BaseLayer implements Drawable {
     }
 
     final int length = _mask.masks.length;
-    Rect maskBoundRect = new Rect.fromLTRB(0.0, 0.0, 0.0, 0.0);
+    Rect maskBoundRect = Rect.zero;
 
     for (int i = 0; i < length; i++) {
       var mask = _mask.masks[i];
@@ -451,7 +437,7 @@ class ImageLayer extends BaseLayer {
       return MatrixUtils.transformRect(parentMatrix, bounds);
     }
 
-    return new Rect.fromLTRB(0.0, 0.0, 0.0, 0.0);
+    return Rect.zero;
   }
 
   @override
@@ -478,7 +464,7 @@ class NullLayer extends BaseLayer {
 
   @override
   Rect calculateBounds(Matrix4 parentMatrix) {
-    return new Rect.fromLTRB(0.0, 0.0, 0.0, 0.0);
+    return Rect.zero;
   }
 
   @override
@@ -564,7 +550,7 @@ class CompositionLayer extends BaseLayer {
 
   @override
   Rect calculateBounds(Matrix4 parentMatrix) {
-    Rect layerBounds = new Rect.fromLTRB(0.0, 0.0, 0.0, 0.0);
+    Rect layerBounds = Rect.zero;
     for (int i = _layers.length - 1; i >= 0; i--) {
       BaseLayer content = _layers[i];
       Rect contentBounds = content.getBounds(parentMatrix);

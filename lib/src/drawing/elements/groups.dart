@@ -117,7 +117,7 @@ class DrawableGroup extends AnimationDrawable implements PathContent {
       matrix.multiply(_transformAnimation.matrix);
     }
 
-    Rect bounds = new Rect.fromLTRB(0.0, 0.0, 0.0, 0.0);
+    Rect bounds = Rect.zero;
     for (int i = _contents.length - 1; i >= 0; i--) {
       AnimationDrawable content = _contents[i];
       final rect = content.getBounds(matrix);

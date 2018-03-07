@@ -25,7 +25,7 @@ abstract class _PolygonDrawable extends AnimationDrawable
     _createPath();
 
     if (_trimPathDrawable != null) {
-      applyScaleTrimIfNeeded(_path, _trimPathDrawable.start,
+      _path = applyScaledTrimPathIfNeeded(_path, _trimPathDrawable.start,
           _trimPathDrawable.end, _trimPathDrawable.offset);
     }
 
@@ -97,7 +97,7 @@ class EllipseDrawable extends _PolygonDrawable {
           -halfWidth, 0 - cpH, 0 - cpW, -halfHeight, 0.0, -halfHeight);
     }
 
-    _path.shift(_positionAnimation.value);
+    _path = _path.shift(_positionAnimation.value);
     _path.close();
   }
 }
@@ -118,7 +118,11 @@ class RectangleDrawable extends _PolygonDrawable {
     this._cornerRadiusAnimation,
     BaseLayer layer,
   )
-      : super(name, repaint, layer);
+      : super(name, repaint, layer) {
+    addAnimation(_positionAnimation);
+    addAnimation(_sizeAnimation);
+    addAnimation(_cornerRadiusAnimation);
+  }
 
   @override
   void _createPath() {

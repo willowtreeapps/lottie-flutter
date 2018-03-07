@@ -47,6 +47,12 @@ class _LottieDemoState extends State<LottieDemo> {
   LottieComposition _composition;
   String _assetName;
 
+  @override
+  void initState() {
+    super.initState();
+    _loadButtonPressed('assets/happy_gift.json');
+  }
+
   void _loadButtonPressed(String assetName) {
     loadAsset(assetName).then((composition) {
       setState(() {

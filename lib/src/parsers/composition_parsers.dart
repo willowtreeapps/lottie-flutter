@@ -21,7 +21,7 @@ Rect parseBounds(dynamic map) {
     return new Rect.fromLTRB(0.0, 0.0, scaledWidth, scaledHeight);
   }
 
-  return new Rect.fromLTRB(0.0, 0.0, 0.0, 0.0);
+  return Rect.zero;
 }
 
 Map<String, LottieImageAsset> parseImages(dynamic map) {

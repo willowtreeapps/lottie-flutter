@@ -35,9 +35,10 @@ abstract class AnimationDrawable implements Drawable {
   AnimationDrawable(this._name, this._repaint, this._layer);
 
   void addAnimation(BaseKeyframeAnimation<dynamic, dynamic> animation) {
-    //_animations.add(animation);
-    _layer.addAnimation(animation);
-    animation.addListener(onValueChanged);
+    if (animation != null) {
+      _layer.addAnimation(animation);
+      animation.addListener(onValueChanged);
+    }
   }
 
   void invalidate() {
@@ -56,7 +57,7 @@ abstract class AnimationDrawable implements Drawable {
   void draw(Canvas canvas, Size size, Matrix4 parentMatrix, int parentAlpha) {}
 
   @override
-  Rect getBounds(Matrix4 parentMatrix) => new Rect.fromLTRB(0.0, 0.0, 0.0, 0.0);
+  Rect getBounds(Matrix4 parentMatrix) => Rect.zero;
 
   @override
   void setContents(List<Content> contentsBefore, List<Content> contentsAfter) {}
