@@ -119,8 +119,8 @@ class Layer {
     double preCompositionWidth = 0.0;
     double preCompositionHeight = 0.0;
     if (type == LayerType.PreComp) {
-      preCompositionWidth = parseMapToDouble(map["w"]) * scale;
-      preCompositionHeight = parseMapToDouble(map["h"]) * scale;
+      preCompositionWidth = parseMapToDouble(map['w']) * scale;
+      preCompositionHeight = parseMapToDouble(map['h']) * scale;
     }
 
     double solidWidth = 0.0;

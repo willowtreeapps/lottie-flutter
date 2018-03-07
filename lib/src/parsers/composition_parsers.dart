@@ -25,7 +25,7 @@ Rect parseBounds(dynamic map) {
 }
 
 Map<String, LottieImageAsset> parseImages(dynamic map) {
-  List rawAssets = map["assets"];
+  List rawAssets = map['assets'];
 
   if (rawAssets == null) {
     return const {};
@@ -42,16 +42,16 @@ Map<String, LottieImageAsset> parseImages(dynamic map) {
 
 Map<String, List<Layer>> parsePreComps(dynamic map, double width, double height,
     double scale, double durationFrames, double endFrame) {
-  List rawAssets = map["assets"];
+  List rawAssets = map['assets'];
 
   if (rawAssets == null) {
     return const {};
   }
 
-  return rawAssets.where((rawAsset) => rawAsset["layers"] != null).fold({},
+  return rawAssets.where((rawAsset) => rawAsset['layers'] != null).fold({},
       (preComps, rawAsset) {
     preComps[rawAsset['id']] = parseLayers(
-        rawAsset["layers"], width, height, scale, durationFrames, endFrame);
+        rawAsset['layers'], width, height, scale, durationFrames, endFrame);
     return preComps;
   });
 }

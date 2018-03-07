@@ -23,7 +23,7 @@ class ShapeFill extends Fill {
 
   ShapeFill.fromMap(dynamic map, double scale, double durationFrames)
       : _color = parseColor(map, durationFrames),
-        _fillEnabled = map["fillEnabled"],
+        _fillEnabled = map['fillEnabled'],
         super.fromMap(map, durationFrames);
 
   @override

@@ -99,15 +99,14 @@ class StrokeDrawable extends AnimationDrawable {
   @override
   void draw(Canvas canvas, Size size, Matrix4 parentMatrix, int parentAlpha) {
     // scaling is handled differently, for better or worse
-    _paint
-      ..strokeWidth = _widthAnimation.value *
-          parentMatrix.entry(0, 0).abs() // calculateScale(parentMatrix)
-      ..color = _paint.color
-          .withAlpha(calculateAlpha(parentAlpha, _opacityAnimation));
-    if (_paint.strokeWidth <= 0) {
-      // This should be good - no reason to draw something with a width of 0 or less
+    final strokeWidth = _widthAnimation.value * parentMatrix.entry(0, 0).abs();
+    if (strokeWidth <= 0) {
       return;
     }
+    _paint
+      ..strokeWidth = strokeWidth // calculateScale(parentMatrix)
+      ..color = _paint.color
+          .withAlpha(calculateAlpha(parentAlpha, _opacityAnimation));
 
     _applyDashPatternIfNeeded(parentMatrix);
 

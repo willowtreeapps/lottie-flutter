@@ -62,7 +62,7 @@ Shape shapeFromMap(dynamic rawShape, double scale, double durationFrames) {
     // case 'rp':
     //   return new RepeaterParser.fromMap(rawShape);
     default:
-      print('Unknown shape ${rawShape["ty"]}');
+      print('Unknown shape ${rawShape['ty']}');
       return new UnknownShape();
   }
 }

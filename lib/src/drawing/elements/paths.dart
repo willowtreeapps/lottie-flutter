@@ -100,7 +100,7 @@ class MergePathsDrawable extends AnimationDrawable implements PathContent {
   }
 
   Path opFirstPathWithRest(PathOp op) {
-    var path = new Path();
+    var firstPath = new Path();
     final remainderPath = new Path();
 
     for (int i = _pathContents.length - 1; i >= 1; i--) {
@@ -116,20 +116,25 @@ class MergePathsDrawable extends AnimationDrawable implements PathContent {
       } else {
         remainderPath.addPath(content.path, const Offset(0.0, 0.0));
       }
+      
     }
-
+    
     final lastContent = _pathContents[0];
     if (lastContent is DrawableGroup) {
       List<PathContent> paths = lastContent.paths;
       for (int j = 0; j < paths.length; j++) {
         Path nextPath = paths[j].path;
-        path.addPathWithMatrix(nextPath, lastContent.transformation.storage);
+        firstPath.addPathWithMatrix(nextPath, lastContent.transformation.storage);
       }
     } else {
-      path = lastContent.path;
+      firstPath = lastContent.path;
     }
 
-    path.op(op, remainderPath);
-    return path;
+  // TODO: figure out why this is broken.
+  // this is broken in android as well - just doesn't show up because it's usually disabled. this fixes some stuff for motorcycle.json
+    return firstPath..op(PathOp.union, remainderPath);
+
+    // firstPath.op(op, firstPath, remainderPath);
+    // return firstPath;
   }
 }
