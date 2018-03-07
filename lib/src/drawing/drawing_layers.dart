@@ -95,8 +95,8 @@ abstract class BaseLayer implements Drawable {
         ? BlendMode.dstOut
         : BlendMode.dstIn;
 
-    _transform.addListener(onAnimationChanged);
     _transform.addAnimationsToLayer(this);
+    _transform.addListener(onAnimationChanged);
 
     for (var animation in _mask.animations) {
       addAnimation(animation);
@@ -141,9 +141,9 @@ abstract class BaseLayer implements Drawable {
   @mustCallSuper
   @override
   Rect getBounds(Matrix4 parentMatrix) {
-    final bounds = parentMatrix.clone();
-    bounds.multiply(_transform.matrix);
-    return calculateBounds(bounds);
+    final matrix = parentMatrix.clone();
+    matrix.multiply(_transform.matrix);
+    return calculateBounds(matrix);
   }
 
   @override
@@ -530,8 +530,8 @@ class CompositionLayer extends BaseLayer {
     canvas.save();
     Rect newClipRect = new Rect.fromLTRB(
         0.0, 0.0, layerModel.preCompWidth, layerModel.preCompHeight);
-    // TODO this is causing problems
-    Rect transformedRect = MatrixUtils.transformRect(parentMatrix, newClipRect);
+    // TODO this is causing problems - why?
+    // Rect transformedRect = MatrixUtils.transformRect(parentMatrix, newClipRect);
 
     for (int i = _layers.length - 1; i >= 0; i--) {
       if (!newClipRect.isEmpty) {

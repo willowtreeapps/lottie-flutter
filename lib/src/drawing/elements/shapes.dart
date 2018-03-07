@@ -119,8 +119,8 @@ class RectangleDrawable extends _PolygonDrawable {
     BaseLayer layer,
   )
       : super(name, repaint, layer) {
-    addAnimation(_positionAnimation);
     addAnimation(_sizeAnimation);
+    addAnimation(_positionAnimation);
     addAnimation(_cornerRadiusAnimation);
   }
 

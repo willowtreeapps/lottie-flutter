@@ -148,7 +148,7 @@ class TransformKeyframeAnimation {
     }
     final rotation = _rotation.value;
     if (rotation != 0) {
-      _matrix.rotateZ(rotation * (PI / 180.0));
+      _matrix.rotateZ(rotation * pi / 180.0);
     }
     final scale = _scale.value;
     if (scale.dx != 1.0 || scale.dy != 1.0) {
