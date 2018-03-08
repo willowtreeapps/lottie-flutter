@@ -77,13 +77,13 @@ class MergePathsDrawable extends AnimationDrawable implements PathContent {
       case MergePathsMode.Merge:
         return addPaths();
       case MergePathsMode.Add:
-        return opFirstPathWithRest(PathOp.union);
+        return opFirstPathWithRest(PathOperation.union);
       case MergePathsMode.Subtract:
-        return opFirstPathWithRest(PathOp.reverseDifference);
+        return opFirstPathWithRest(PathOperation.reverseDifference);
       case MergePathsMode.Intersect:
-        return opFirstPathWithRest(PathOp.intersect);
+        return opFirstPathWithRest(PathOperation.intersect);
       case MergePathsMode.ExcludeIntersections:
-        return opFirstPathWithRest(PathOp.xor);
+        return opFirstPathWithRest(PathOperation.xor);
       default:
         return new Path();
     }
@@ -99,7 +99,7 @@ class MergePathsDrawable extends AnimationDrawable implements PathContent {
     return path;
   }
 
-  Path opFirstPathWithRest(PathOp op) {
+  Path opFirstPathWithRest(PathOperation op) {
     var firstPath = new Path();
     final remainderPath = new Path();
 
@@ -124,7 +124,7 @@ class MergePathsDrawable extends AnimationDrawable implements PathContent {
       List<PathContent> paths = lastContent.paths;
       for (int j = 0; j < paths.length; j++) {
         Path nextPath = paths[j].path;
-        firstPath.addPathWithMatrix(nextPath, lastContent.transformation.storage);
+        firstPath.addPath(nextPath, Offset.zero, matrix4: lastContent.transformation.storage);
       }
     } else {
       firstPath = lastContent.path;
@@ -132,7 +132,7 @@ class MergePathsDrawable extends AnimationDrawable implements PathContent {
 
   // TODO: figure out why this is broken.
   // this is broken in android as well - just doesn't show up because it's usually disabled. this fixes some stuff for motorcycle.json
-    return firstPath..op(PathOp.union, remainderPath);
+    return firstPath..combine(PathOperation.union, remainderPath);
 
     // firstPath.op(op, firstPath, remainderPath);
     // return firstPath;

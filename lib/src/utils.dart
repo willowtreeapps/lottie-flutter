@@ -119,7 +119,7 @@ int calculateAlpha(int from, BaseKeyframeAnimation<dynamic, int> opacity) =>
 // Android version: path.add(path, parentMatrix)
 void addPathToPath(Path path, Path other, Matrix4 transform) =>
     //path.addPath(other.transform(transform.storage), const Offset(0.0, 0.0));
-    path.addPathWithMatrix(other, transform.storage);
+    path.addPath(other, Offset.zero, matrix4: transform.storage);
 
 Path applyScaledTrimPathIfNeeded(
     Path path, double start, double end, double offset) {

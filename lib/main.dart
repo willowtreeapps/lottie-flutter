@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 import 'package:lottie_flutter/src/composition.dart';
 import 'package:lottie_flutter/src/lottie.dart';
 import 'package:flutter/material.dart';
