@@ -6,7 +6,7 @@ import 'package:lottie_flutter/src/elements/shapes.dart';
 import 'package:lottie_flutter/src/parsers/element_parsers.dart';
 import 'package:lottie_flutter/src/values.dart';
 import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
-
+import 'package:flutter/widgets.dart' show Animation;
 abstract class Fill extends Shape {
   final PathFillType _type;
   final AnimatableIntegerValue _opacity;
@@ -27,8 +27,8 @@ class ShapeFill extends Fill {
         super.fromMap(map, durationFrames);
 
   @override
-  AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>
-      new ShapeFillDrawable(name, repaint, _opacity?.createAnimation(), _type,
+  AnimationDrawable toDrawable(Animation<double> animation, BaseLayer layer) =>
+      new ShapeFillDrawable(name, animation, _opacity?.createAnimation(), _type,
           _color?.createAnimation(), layer);
 }
 
@@ -46,10 +46,10 @@ class GradientFill extends Fill {
         super.fromMap(map, durationFrames);
 
   @override
-  AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>
+  AnimationDrawable toDrawable(Animation<double> animation, BaseLayer layer) =>
       new GradientFillDrawable(
           name,
-          repaint,
+          animation,
           _opacity.createAnimation(),
           _type,
           _gradientType,

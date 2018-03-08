@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart'
 
 import 'package:lottie_flutter/src/animations.dart';
 import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
+import 'package:flutter/widgets.dart' show Animation;
 
 abstract class Content {
   String get name;
@@ -19,11 +20,9 @@ abstract class Drawable implements Content {
       String layerName, String contentName, ColorFilter colorFilter);
 }
 
-typedef Repaint();
-
 abstract class AnimationDrawable implements Drawable {
   final String _name;
-  final Repaint _repaint;
+  final Animation<double> _animation;
   //final List<BaseKeyframeAnimation<dynamic, dynamic>> _animations = [];
   final BaseLayer _layer;
 
@@ -32,7 +31,7 @@ abstract class AnimationDrawable implements Drawable {
 
   //List<BaseKeyframeAnimation<dynamic, dynamic>> get animations => _animations;
 
-  AnimationDrawable(this._name, this._repaint, this._layer);
+  AnimationDrawable(this._name, this._animation, this._layer);
 
   void addAnimation(BaseKeyframeAnimation<dynamic, dynamic> animation) {
     if (animation != null) {
@@ -42,7 +41,7 @@ abstract class AnimationDrawable implements Drawable {
   }
 
   void invalidate() {
-    _repaint();
+   // _animation();
   }
 
   void onValueChanged(double progress) {

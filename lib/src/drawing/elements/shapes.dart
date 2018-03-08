@@ -7,15 +7,15 @@ import 'package:lottie_flutter/src/utils.dart';
 import 'package:lottie_flutter/src/values.dart';
 
 import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
-
+import 'package:flutter/widgets.dart' show Animation;
 abstract class _PolygonDrawable extends AnimationDrawable
     implements PathContent {
   bool _isPathValid = false;
   TrimPathDrawable _trimPathDrawable;
   Path _path = new Path();
 
-  _PolygonDrawable(String name, Repaint repaint, BaseLayer layer)
-      : super(name, repaint, layer);
+  _PolygonDrawable(String name, Animation<double> animation, BaseLayer layer)
+      : super(name, animation, layer);
 
   Path get path {
     if (_isPathValid) {
@@ -64,9 +64,9 @@ class EllipseDrawable extends _PolygonDrawable {
 
   final bool _isReversed;
 
-  EllipseDrawable(String name, Repaint repaint, this._sizeAnimation,
+  EllipseDrawable(String name, Animation<double> animation, this._sizeAnimation,
       this._positionAnimation, this._isReversed, BaseLayer layer)
-      : super(name, repaint, layer) {
+      : super(name, animation, layer) {
     addAnimation(_sizeAnimation);
     addAnimation(_positionAnimation);
   }
@@ -112,13 +112,13 @@ class RectangleDrawable extends _PolygonDrawable {
 
   RectangleDrawable(
     String name,
-    Repaint repaint,
+    Animation<double> animation,
     this._positionAnimation,
     this._sizeAnimation,
     this._cornerRadiusAnimation,
     BaseLayer layer,
   )
-      : super(name, repaint, layer) {
+      : super(name, animation, layer) {
     addAnimation(_sizeAnimation);
     addAnimation(_positionAnimation);
     addAnimation(_cornerRadiusAnimation);
@@ -191,11 +191,11 @@ class ShapeDrawable extends _PolygonDrawable {
 
   ShapeDrawable(
     String name,
-    Repaint repaint,
+    Animation<double> animation,
     this._animation,
     BaseLayer layer,
   )
-      : super(name, repaint, layer) {
+      : super(name, animation, layer) {
     addAnimation(_animation);
   }
 

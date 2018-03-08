@@ -7,7 +7,7 @@ import 'package:lottie_flutter/src/elements/shapes.dart';
 
 import 'package:lottie_flutter/src/parsers/element_parsers.dart';
 import 'package:lottie_flutter/src/values.dart';
-
+import 'package:flutter/widgets.dart' show Animation;
 abstract class Stroke extends Shape {
   final StrokeCap _capType;
   final StrokeJoin _joinType;
@@ -34,13 +34,13 @@ class ShapeStroke extends Stroke {
         super.fromMap(map, scale, durationFrames);
 
   @override
-  AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>
+  AnimationDrawable toDrawable(Animation<double> animation, BaseLayer layer) =>
       new ShapeStrokeDrawable(
           name,
           _capType,
           _joinType,
           _lineDashGroup.lineDashPattern,
-          repaint,
+          animation,
           _opacity.createAnimation(),
           _width.createAnimation(),
           _lineDashGroup?.offset?.createAnimation(),
@@ -62,13 +62,13 @@ class GradientStroke extends Stroke {
         super.fromMap(map, scale, durationFrames);
 
   @override
-  AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>
+  AnimationDrawable toDrawable(Animation<double> animation, BaseLayer layer) =>
       new GradientStrokeDrawable(
           name,
           _capType,
           _joinType,
           _lineDashGroup.lineDashPattern,
-          repaint,
+          animation,
           _opacity.createAnimation(),
           _width.createAnimation(),
           _lineDashGroup.offset.createAnimation(),

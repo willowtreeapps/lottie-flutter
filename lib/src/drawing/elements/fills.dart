@@ -7,6 +7,7 @@ import 'package:lottie_flutter/src/values.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
+import 'package:flutter/widgets.dart' show Animation;
 
 abstract class FillDrawable extends AnimationDrawable {
   final Paint _paint = new Paint()..isAntiAlias = true;
@@ -14,9 +15,9 @@ abstract class FillDrawable extends AnimationDrawable {
   final List<PathContent> _paths = [];
   final KeyframeAnimation<int> _opacityAnimation;
 
-  FillDrawable(String name, Repaint repaint, this._opacityAnimation,
+  FillDrawable(String name, Animation<double> animation, this._opacityAnimation,
       this._fillType, BaseLayer layer)
-      : super(name, repaint, layer) {
+      : super(name, animation, layer) {
     addAnimation(_opacityAnimation);
   }
 
@@ -54,13 +55,13 @@ class ShapeFillDrawable extends FillDrawable {
 
   ShapeFillDrawable(
     String name,
-    Repaint repaint,
+    Animation<double> animation,
     KeyframeAnimation<int> opacityAnimation,
     PathFillType fillType,
     this._colorAnimation,
     BaseLayer layer,
   )
-      : super(name, repaint, opacityAnimation, fillType, layer) {
+      : super(name, animation, opacityAnimation, fillType, layer) {
     addAnimation(_colorAnimation);
   }
 
@@ -89,7 +90,7 @@ class GradientFillDrawable extends FillDrawable {
 
   GradientFillDrawable(
     String name,
-    Repaint repaint,
+    Animation<double> animation,
     KeyframeAnimation<int> opacityAnimation,
     PathFillType fillType,
     this._gradientType,
@@ -98,7 +99,7 @@ class GradientFillDrawable extends FillDrawable {
     this._endPointAnimation,
     BaseLayer layer,
   )
-      : super(name, repaint, opacityAnimation, fillType, layer) {
+      : super(name, animation, opacityAnimation, fillType, layer) {
     addAnimation(_gradientColorAnimation);
     addAnimation(_startPointAnimation);
     addAnimation(_endPointAnimation);

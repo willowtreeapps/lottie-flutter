@@ -8,6 +8,7 @@ import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 
 import 'package:lottie_flutter/src/parsers/element_parsers.dart';
 import 'package:vector_math/vector_math_64.dart';
+import 'package:flutter/widgets.dart' show Animation;
 
 class AnimatableTransform extends Shape {
   final AnimatablePathValue _anchorPoint;
@@ -89,7 +90,7 @@ class AnimatableTransform extends Shape {
         scaleTransform, rotationTransform, opacityTransform);
   }
 
-  TransformKeyframeAnimation createAnimation() {
+  TransformKeyframeAnimation createAnimation(Animation<double> animation) {
     return new TransformKeyframeAnimation(
         _anchorPoint.createAnimation(),
         _position.createAnimation(),

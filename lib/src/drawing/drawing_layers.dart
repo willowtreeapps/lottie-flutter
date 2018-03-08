@@ -10,24 +10,25 @@ import 'package:lottie_flutter/src/painting.dart';
 import 'package:lottie_flutter/src/elements/transforms.dart';
 import 'package:lottie_flutter/src/utils.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter/widgets.dart' show Animation;
 
 import 'package:vector_math/vector_math_64.dart';
 
 import 'package:meta/meta.dart';
 
 BaseLayer layerForModel(
-    Layer layer, LottieComposition composition, double scale, Repaint repaint) {
+    Layer layer, LottieComposition composition, double scale, Animation<double> animation) {
   switch (layer.type) {
     case LayerType.Shape:
-      return new ShapeLayer(layer, repaint);
+      return new ShapeLayer(layer, animation);
     case LayerType.PreComp:
-      return new CompositionLayer(composition, layer, repaint, scale);
+      return new CompositionLayer(composition, layer, animation, scale);
     case LayerType.Solid:
-      return new SolidLayer(layer, repaint);
+      return new SolidLayer(layer, animation);
     case LayerType.Image:
-      return new ImageLayer(layer, repaint, scale);
+      return new ImageLayer(layer, animation, scale);
     case LayerType.Null:
-      return new NullLayer(layer, repaint);
+      return new NullLayer(layer, animation);
     case LayerType.Text:
     case LayerType.Unknown:
     default: // Do nothing
@@ -43,7 +44,7 @@ abstract class BaseLayer implements Drawable {
   BaseLayer _matteLayer;
   Path _path = new Path();
 
-  final Repaint _repaint;
+  final Animation<double> _animation;
   final Layer _layerModel;
   final Paint _contentPaint = new Paint();
   final Paint _maskPaint = new Paint();
@@ -73,6 +74,9 @@ abstract class BaseLayer implements Drawable {
     }
   }
 
+double _progress;
+  get progress => _progress;
+
   /// Set animation progress, from 0 to 1
   set progress(double val) {
     _transform?.progress = val;
@@ -83,10 +87,11 @@ abstract class BaseLayer implements Drawable {
     // TODO - mattelayer timestretch?
     _matteLayer?.progress = val;
     _animations.forEach((animation) => animation.progress = val);
+    _progress = val;
   }
 
-  BaseLayer(this._layerModel, this._repaint)
-      : _transform = _layerModel.transform.createAnimation(),
+  BaseLayer(this._layerModel, this._animation)
+      : _transform = _layerModel.transform.createAnimation(_animation),
         _mask = new MaskKeyframeAnimation(
             _layerModel.masks == null ? const [] : _layerModel.masks) {
     _clearPaint.blendMode = BlendMode.clear;
@@ -135,7 +140,7 @@ abstract class BaseLayer implements Drawable {
   }
 
   void invalidateSelf() {
-    _repaint();
+    //_animation();
   }
 
   @mustCallSuper
@@ -325,7 +330,7 @@ abstract class BaseLayer implements Drawable {
 class SolidLayer extends BaseLayer {
   final Paint _paint = new Paint();
 
-  SolidLayer(Layer layerModel, Repaint repaint) : super(layerModel, repaint) {
+  SolidLayer(Layer layerModel, Animation<double> animation) : super(layerModel, animation) {
     _paint.color = layerModel.solidColor;
     _paint.style = PaintingStyle.fill;
   }
@@ -367,12 +372,12 @@ class SolidLayer extends BaseLayer {
 class ShapeLayer extends BaseLayer {
   DrawableGroup _contentGroup;
 
-  ShapeLayer(Layer layerModel, Repaint repaint) : super(layerModel, repaint) {
+  ShapeLayer(Layer layerModel, Animation<double> animation) : super(layerModel, animation) {
     _contentGroup = new DrawableGroup(
         layerModel.name,
-        repaint,
-        shapesToAnimationDrawable(repaint, layerModel.shapes, this),
-        obtainTransformAnimation(layerModel.shapes),
+        animation,
+        shapesToAnimationDrawable(animation, layerModel.shapes, this),
+        obtainTransformAnimation(layerModel.shapes, animation),
         this);
     _contentGroup.setContents(const [], const []);
   }
@@ -399,8 +404,8 @@ class ImageLayer extends BaseLayer {
   final Paint _paint = new Paint();
   final double _density;
 
-  ImageLayer(Layer layerModel, Repaint repaint, this._density)
-      : super(layerModel, repaint) {
+  ImageLayer(Layer layerModel, Animation<double> animation, this._density)
+      : super(layerModel, animation) {
     _paint
       ..isAntiAlias = true
       ..filterQuality = FilterQuality.low; // bilinear interpolation
@@ -457,7 +462,7 @@ class ImageLayer extends BaseLayer {
 }
 
 class NullLayer extends BaseLayer {
-  NullLayer(Layer layerModel, Repaint repaint) : super(layerModel, repaint);
+  NullLayer(Layer layerModel, Animation<double> animation) : super(layerModel, animation);
 
   @override
   void addColorFilter(
@@ -483,8 +488,8 @@ class CompositionLayer extends BaseLayer {
   bool _hasMasks;
 
   CompositionLayer(LottieComposition composition, Layer layerModel,
-      Repaint repaint, double scale)
-      : super(layerModel, repaint) {
+      Animation<double> animation, double scale)
+      : super(layerModel, animation) {
     assert(composition != null);
     List<Layer> layerModels =
         composition?.preComps[layerModel.refId] ?? composition?.layers;
@@ -493,7 +498,7 @@ class CompositionLayer extends BaseLayer {
     for (int i = layerModels.length - 1; i >= 0; i--) {
       Layer currentLayerModel = layerModels[i];
       BaseLayer layer =
-          layerForModel(currentLayerModel, composition, scale, repaint);
+          layerForModel(currentLayerModel, composition, scale, animation);
 
       if (layer == null) {
         continue;
