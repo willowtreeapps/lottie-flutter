@@ -9,7 +9,7 @@ import 'package:lottie_flutter/src/values.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
-
+import 'package:flutter/widgets.dart' show Animation;
 class PathGroup {
   final List<PathContent> _paths = [];
   final TrimPathDrawable _trimPath;
@@ -20,7 +20,7 @@ class PathGroup {
 class StrokeDrawable extends AnimationDrawable {
   final List<PathGroup> _pathGroups = [];
   final Paint _paint = new Paint();
-  final Repaint _repaint;
+  final Animation<double> _animation;
   final BaseKeyframeAnimation<dynamic, int> _opacityAnimation;
   final BaseKeyframeAnimation<dynamic, double> _widthAnimation;
   final BaseKeyframeAnimation<dynamic, double> _dashPatternOffsetAnimation;
@@ -31,14 +31,14 @@ class StrokeDrawable extends AnimationDrawable {
     StrokeCap strokeCap,
     StrokeJoin strokeJoin,
     List<AnimatableDoubleValue> dashPatternValues,
-    this._repaint,
+    this._animation,
     this._opacityAnimation,
     this._widthAnimation,
     this._dashPatternOffsetAnimation,
     BaseLayer layer,
   )
       : _dashPatternAnimations = new List(dashPatternValues.length),
-        super(name, _repaint, layer) {
+        super(name, _animation, layer) {
     _paint
       ..style = PaintingStyle.stroke
       ..strokeCap = strokeCap
@@ -92,7 +92,7 @@ class StrokeDrawable extends AnimationDrawable {
   }
 
   void onValueChanged(double progress) {
-    _repaint();
+    //_animation();
   }
 
   @override
@@ -255,7 +255,7 @@ class ShapeStrokeDrawable extends StrokeDrawable {
       StrokeCap strokeCap,
       StrokeJoin strokeJoin,
       List<AnimatableDoubleValue> dashPatternValues,
-      Repaint repaint,
+      Animation<double> animation,
       BaseKeyframeAnimation<dynamic, int> opacityAnimation,
       BaseKeyframeAnimation<dynamic, double> widthAnimation,
       BaseKeyframeAnimation<dynamic, double> dashPatternOffsetAnimation,
@@ -266,7 +266,7 @@ class ShapeStrokeDrawable extends StrokeDrawable {
             strokeCap,
             strokeJoin,
             dashPatternValues,
-            repaint,
+            animation,
             opacityAnimation,
             widthAnimation,
             dashPatternOffsetAnimation,
@@ -298,7 +298,7 @@ class GradientStrokeDrawable extends StrokeDrawable {
     StrokeCap strokeCap,
     StrokeJoin strokeJoin,
     List<AnimatableDoubleValue> dashPatternValues,
-    Repaint repaint,
+    Animation<double> animation,
     BaseKeyframeAnimation<dynamic, int> opacityAnimation,
     BaseKeyframeAnimation<dynamic, double> widthAnimation,
     BaseKeyframeAnimation<dynamic, double> dashPatternOffsetAnimation,
@@ -313,7 +313,7 @@ class GradientStrokeDrawable extends StrokeDrawable {
             strokeCap,
             strokeJoin,
             dashPatternValues,
-            repaint,
+            animation,
             opacityAnimation,
             widthAnimation,
             dashPatternOffsetAnimation,

@@ -6,7 +6,7 @@ import 'package:lottie_flutter/src/drawing/drawing.dart';
 import 'package:lottie_flutter/src/values.dart';
 
 import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
-
+import 'package:flutter/widgets.dart' show Animation;
 ///
 /// TrimPathDrawable
 ///
@@ -27,13 +27,13 @@ class TrimPathDrawable extends AnimationDrawable {
 
   TrimPathDrawable(
       String name,
-      Repaint repaint,
+      Animation<double> animation,
       this._type,
       this._startAnimation,
       this._endAnimation,
       this._offsetAnimation,
       BaseLayer layer)
-      : super(name, repaint, layer) {
+      : super(name, animation, layer) {
     addAnimation(_startAnimation);
     addAnimation(_endAnimation);
     addAnimation(_offsetAnimation);
@@ -53,8 +53,8 @@ class MergePathsDrawable extends AnimationDrawable implements PathContent {
   final MergePathsMode _mode;
   final List<PathContent> _pathContents = [];
 
-  MergePathsDrawable(String name, Repaint repaint, this._mode, BaseLayer layer)
-      : super(name, repaint, layer);
+  MergePathsDrawable(String name, Animation<double> animation, this._mode, BaseLayer layer)
+      : super(name, animation, layer);
 
   void addContentIfNeeded(Content content) {
     if (content is PathContent) {

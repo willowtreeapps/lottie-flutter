@@ -9,6 +9,7 @@ import 'package:lottie_flutter/src/utils.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
+import 'package:flutter/widgets.dart' show Animation;
 
 class DrawableGroup extends AnimationDrawable implements PathContent {
   final List<AnimationDrawable> _contents;
@@ -46,9 +47,9 @@ class DrawableGroup extends AnimationDrawable implements PathContent {
     return _transformAnimation?.matrix ?? new Matrix4.identity();
   }
 
-  DrawableGroup(String name, Repaint repaint, this._contents,
+  DrawableGroup(String name, Animation<double> animation, this._contents,
       this._transformAnimation, BaseLayer layer)
-      : super(name, repaint, layer) {
+      : super(name, animation, layer) {
     List<Content> contentsToRemove = [];
     MergePathsDrawable currentMergePathsContent;
     for (int i = _contents.length - 1; i >= 0; i--) {

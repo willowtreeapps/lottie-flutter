@@ -6,7 +6,7 @@ import 'package:lottie_flutter/src/drawing/elements/shapes.dart';
 import 'package:lottie_flutter/src/elements/shapes.dart';
 import 'package:lottie_flutter/src/parsers/element_parsers.dart';
 import 'package:lottie_flutter/src/values.dart';
-
+import 'package:flutter/widgets.dart' show Animation;
 class ShapePath extends Shape {
   final int _index;
   final AnimatableShapeValue _shapePath;
@@ -18,8 +18,8 @@ class ShapePath extends Shape {
         super.fromMap(map);
 
   @override
-  AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>
-      new ShapeDrawable(name, repaint, _shapePath.createAnimation(), layer);
+  AnimationDrawable toDrawable(Animation<double> animation, BaseLayer layer) =>
+      new ShapeDrawable(name, animation, _shapePath.createAnimation(), layer);
 }
 
 class ShapeTrimPath extends Shape {
@@ -38,8 +38,8 @@ class ShapeTrimPath extends Shape {
         super.fromMap(map);
 
   @override
-  AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>
-      new TrimPathDrawable(name, repaint, _type, _start.createAnimation(),
+  AnimationDrawable toDrawable(Animation<double> animation, BaseLayer layer) =>
+      new TrimPathDrawable(name, animation, _type, _start.createAnimation(),
           _end.createAnimation(), _offset.createAnimation(), layer);
 }
 
@@ -51,6 +51,6 @@ class MergePaths extends Shape {
         super.fromMap(map);
 
   @override
-  AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>
-      new MergePathsDrawable(name, repaint, _mode, layer);
+  AnimationDrawable toDrawable(Animation<double> animation, BaseLayer layer) =>
+      new MergePathsDrawable(name, animation, _mode, layer);
 }

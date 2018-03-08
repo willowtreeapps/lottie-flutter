@@ -22,6 +22,7 @@ class Lottie extends StatefulWidget {
 class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
   CompositionLayer _compositionLayer;
   AnimationController _animation;
+  Animation<double> _rootanim;
   double _scale;
 
   @override
@@ -63,20 +64,21 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
     _compositionLayer = new CompositionLayer(
         widget._composition,
         new Layer.empty(widget._size.width, widget._size.height),
-        () => {},
+        _animation,
         _scale);
   }
 
   void _handleChange() {
-    setState(() {
-      _compositionLayer.progress = _animation.value;
-    });
+      setState(() {
+        _compositionLayer.progress = _animation.value;
+      });
   }
 
   @override
   Widget build(BuildContext context) {
     return new CustomPaint(
-        painter: new LottiePainter(_compositionLayer, scale: _scale),
+        painter:
+            new LottiePainter(_compositionLayer, _animation, scale: _scale),
         size: widget._size);
   }
 
@@ -93,9 +95,11 @@ class LottiePainter extends CustomPainter {
   final double _scale;
   final int _alpha;
 
-  LottiePainter(this._compositionLayer, {double scale: 1.0, int alpha: 255})
+  LottiePainter(this._compositionLayer, Animation<double> animation,
+      {double scale: 1.0, int alpha: 255})
       : _scale = scale,
-        _alpha = alpha;
+        _alpha = alpha,
+        super(repaint: animation);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -108,7 +112,5 @@ class LottiePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
-  }
+  bool shouldRepaint(LottiePainter oldDelegate) => true;
 }

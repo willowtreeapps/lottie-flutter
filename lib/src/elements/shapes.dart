@@ -6,7 +6,7 @@ import 'package:lottie_flutter/src/parsers/element_parsers.dart';
 import 'package:lottie_flutter/src/values.dart';
 
 import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
-
+import 'package:flutter/widgets.dart' show Animation;
 abstract class Shape {
   final String _name;
 
@@ -14,7 +14,7 @@ abstract class Shape {
 
   Shape.fromMap(dynamic map) : _name = parseName(map);
 
-  AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) => null;
+  AnimationDrawable toDrawable(Animation<double> animation, BaseLayer layer) => null;
 }
 
 class CircleShape extends Shape {
@@ -29,8 +29,8 @@ class CircleShape extends Shape {
         super.fromMap(map);
 
   @override
-  AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>
-      new EllipseDrawable(name, repaint, _size.createAnimation(),
+  AnimationDrawable toDrawable(Animation<double> animation, BaseLayer layer) =>
+      new EllipseDrawable(name, animation, _size.createAnimation(),
           _position.createAnimation(), _reversed, layer);
 }
 
@@ -47,8 +47,8 @@ class RectangleShape extends Shape {
         super.fromMap(map);
 
   @override
-  AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>
-      new RectangleDrawable(name, repaint, _position.createAnimation(),
+  AnimationDrawable toDrawable(Animation<double> animation, BaseLayer layer) =>
+      new RectangleDrawable(name, animation, _position.createAnimation(),
           _size.createAnimation(), _cornerRadius.createAnimation(), layer);
 }
 

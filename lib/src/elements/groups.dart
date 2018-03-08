@@ -6,7 +6,7 @@ import 'package:lottie_flutter/src/elements/shapes.dart';
 import 'package:lottie_flutter/src/elements/strokes.dart';
 import 'package:lottie_flutter/src/elements/transforms.dart';
 import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
-
+import 'package:flutter/widgets.dart' show Animation;
 class ShapeGroup extends Shape {
   final List<Shape> _shapes;
 
@@ -17,12 +17,12 @@ class ShapeGroup extends Shape {
         super.fromMap(map);
 
   @override
-  AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>
+  AnimationDrawable toDrawable(Animation<double> animation, BaseLayer layer) =>
       new DrawableGroup(
           name,
-          repaint,
-          shapesToAnimationDrawable(repaint, _shapes, layer),
-          obtainTransformAnimation(_shapes),
+          animation,
+          shapesToAnimationDrawable(animation, _shapes, layer),
+          obtainTransformAnimation(_shapes, animation),
           layer);
 
   static List<Shape> parseRawShapes(
@@ -68,15 +68,15 @@ Shape shapeFromMap(dynamic rawShape, double scale, double durationFrames) {
 }
 
 List<AnimationDrawable> shapesToAnimationDrawable(
-    Repaint repaint, List<Shape> shapes, BaseLayer layer) {
+    Animation<double> animation, List<Shape> shapes, BaseLayer layer) {
   return shapes
-      .map((shape) => shape.toDrawable(repaint, layer))
+      .map((shape) => shape.toDrawable(animation, layer))
       .where((drawable) => drawable != null)
       .toList();
 }
 
-TransformKeyframeAnimation obtainTransformAnimation(List<Shape> shapes) {
+TransformKeyframeAnimation obtainTransformAnimation(List<Shape> shapes, Animation<double> animation) {
   return (shapes.firstWhere((sh) => sh is AnimatableTransform,
           orElse: () => null) as AnimatableTransform)
-      ?.createAnimation();
+      ?.createAnimation(animation);
 }
