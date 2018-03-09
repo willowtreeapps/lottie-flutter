@@ -132,7 +132,7 @@ class MergePathsDrawable extends AnimationDrawable implements PathContent {
 
   // TODO: figure out why this is broken.
   // this is broken in android as well - just doesn't show up because it's usually disabled. this fixes some stuff for motorcycle.json
-    return firstPath..combine(PathOperation.union, remainderPath);
+    return Path.combine(PathOperation.union, firstPath, remainderPath);
 
     // firstPath.op(op, firstPath, remainderPath);
     // return firstPath;

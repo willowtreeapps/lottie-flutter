@@ -218,7 +218,7 @@ class ShapeKeyframeAnimation extends BaseKeyframeAnimation<ShapeData, Path> {
 
 class PathKeyframeAnimation extends KeyframeAnimation<Offset> {
   PathKeyframe _pathMeasureKeyframe;
-  ui.PathMeasure _pathMeasure; // = new ui.PathMeasure();
+  ui.PathMetrics _pathMeasure;
 
   PathKeyframeAnimation(Scene<Offset> scene) : super(scene);
 
@@ -231,13 +231,12 @@ class PathKeyframeAnimation extends KeyframeAnimation<Offset> {
     }
 
     if (_pathMeasureKeyframe != pathKeyframe) {
-      _pathMeasure =
-          new ui.PathMeasure(path: pathKeyframe.path, forceClosed: false);
+      _pathMeasure = pathKeyframe.path.computeMetrics();
       _pathMeasureKeyframe = keyframe;
     }
 
-    var posTan =
-        _pathMeasure.getPosTan(keyframeProgress * _pathMeasure.getLength());
+    var posTan = _pathMeasure
+        .getTangentForOffset(keyframeProgress * _pathMeasure.length);
     return posTan.position;
   }
 }

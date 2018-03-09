@@ -132,8 +132,8 @@ Path applyTrimPathIfNeeded(Path path, double start, double end, double offset) {
     return path;
   }
 
-  final measure = new PathMeasure(path: path);
-  final length = measure.getLength();
+  final measure = path.computeMetrics();
+  final length = measure.length;
   if (length < 1.0 || (end - start - 1).abs() < .01) {
     return path;
   }
@@ -168,13 +168,13 @@ Path applyTrimPathIfNeeded(Path path, double start, double end, double offset) {
     newStart -= length;
   }
 
-  var tempPath = measure.getSegment(newStart, newEnd, true);
+  var tempPath = measure.extractPath(newStart, newEnd, true);
 
   if (newEnd > length) {
-    var tempPath2 = measure.getSegment(0.0, newEnd % length, true);
+    var tempPath2 = measure.extractPath(0.0, newEnd % length, true);
     tempPath.addPath(tempPath2, Offset.zero);
   } else if (newStart < 0) {
-    var tempPath2 = measure.getSegment(length + newStart, length, true);
+    var tempPath2 = measure.extractPath(length + newStart, length, true);
     tempPath.addPath(tempPath2, Offset.zero);
   }
   return tempPath;

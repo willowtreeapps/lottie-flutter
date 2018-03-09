@@ -18,7 +18,6 @@ class PathGroup {
 }
 
 class StrokeDrawable extends AnimationDrawable {
-  final PathMeasure pm = new PathMeasure();
   final List<PathGroup> _pathGroups = [];
   final Paint _paint = new Paint();
   final Repaint _repaint;
@@ -134,10 +133,10 @@ class StrokeDrawable extends AnimationDrawable {
       addPathToPath(path, pathGroup._paths[i].path, parentMatrix);
     }
 
-    pm.setPath(path, false);
-    double totalLength = pm.getLength();
-    while (pm.nextContour()) {
-      totalLength += pm.getLength();
+    var pm = path.computeMetrics();
+    double totalLength = pm.length;
+    while (pm.moveNext()) {
+      totalLength += pm.length;
     }
 
     final trimPath = pathGroup._trimPath;
@@ -150,8 +149,8 @@ class StrokeDrawable extends AnimationDrawable {
       final trimPath = pathGroup._paths[j].path;
       trimPath.transform(parentMatrix.storage);
 
-      pm.setPath(trimPath, false);
-      double length = pm.getLength();
+      pm = trimPath.computeMetrics();
+      double length = pm.length;
 
       if (endLength > totalLength &&
           endLength - totalLength < currentLength + length &&
