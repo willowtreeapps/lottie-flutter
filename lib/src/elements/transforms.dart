@@ -8,9 +8,43 @@ import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 
 import 'package:lottie_flutter/src/parsers/element_parsers.dart';
 import 'package:vector_math/vector_math_64.dart';
-import 'package:flutter/widgets.dart' show Animation;
+import 'package:flutter/widgets.dart' show Animation, Tween;
 
+
+List tryGetKeyframes(dynamic json) {
+  return (json is List &&
+          json?.first is Map &&
+          json?.first?.containsKey('t') == true)
+      ? json
+      : null;
+}
+
+Animation<Offset> _parseAnchorPoint(Map<String, dynamic> map, Animation<double> controller) {
+  if (map == null) {
+      return new Tween<Offset>().animate(controller);
+    }
+
+    List rawKeyframes = tryGetKeyframes(map);
+    if (rawKeyframes != null) {
+      // List<Keyframe<Offset>> keyframes = rawKeyframes
+      //     .map((rawKeyframe) =>
+      //         new PathKeyframe.fromMap(rawKeyframe, scale, durationFrames))
+      //     .toList();
+
+      // Scene scene = new Scene(keyframes);
+
+      // return new AnimatablePathValue._(null, scene);
+    }
+
+    //return new AnimatablePathValue._(Parsers.pointFParser.parse(map, scale));
+}
 class AnimatableTransform extends Shape {
+  final Animation<Offset> _anchorPointAnimation;
+  final Animation<Offset> _positionAnimation;
+  final Animation<Offset> _scaleAnimation;
+  final Animation<double> _rotationAnimation;
+  final Animation<int> _opacityAnimation;
+
   final AnimatablePathValue _anchorPoint;
   final AnimatableValue<Offset> _position;
   final AnimatableScaleValue _scale;
