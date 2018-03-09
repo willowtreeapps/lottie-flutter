@@ -22,7 +22,6 @@ class Lottie extends StatefulWidget {
 class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
   CompositionLayer _compositionLayer;
   AnimationController _animation;
-  Animation<double> _rootanim;
   double _scale;
 
   @override
@@ -64,14 +63,14 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
     _compositionLayer = new CompositionLayer(
         widget._composition,
         new Layer.empty(widget._size.width, widget._size.height),
-        _animation,
+        _animation.view,
         _scale);
   }
 
   void _handleChange() {
-      setState(() {
-        _compositionLayer.progress = _animation.value;
-      });
+    setState(() {
+      _compositionLayer.progress = _animation.value;
+    });
   }
 
   @override
