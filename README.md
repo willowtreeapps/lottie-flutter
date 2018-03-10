@@ -9,17 +9,11 @@ Lottie is a mobile library that parses [Adobe After Effects](http://www.adobe.co
 
 ### Current status
 
-EMOJI SHOCK NOW WORKS.
+Achived rednering parity with lottie-android
 
-Motorcycle isn't fully rendering.
+All samples included render.  Motorcycle has some issues still, but also has issues on lottie-android.
 
-Hamburger Arrow isn't rendering at all.
-
-Compare with:
-https://www.lottiefiles.com/share/ZhpGnj
-
-### Waiting for...
-
+### Waiting for
 
 - [x] PathMeasure ★★★★★ [#10428](https://github.com/flutter/flutter/issues/10428)
 - [x] Path.add(path, matrix) ★★★★★
