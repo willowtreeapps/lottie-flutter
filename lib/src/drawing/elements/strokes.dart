@@ -134,10 +134,7 @@ class StrokeDrawable extends AnimationDrawable {
     }
 
     var pm = path.computeMetrics();
-    double totalLength = pm.length;
-    while (pm.moveNext()) {
-      totalLength += pm.length;
-    }
+    double totalLength = pm.fold(0.0, (len, metric) => len + metric.length);
 
     final trimPath = pathGroup._trimPath;
     final offsetLength = totalLength * trimPath.offset / 360.0;
@@ -150,7 +147,7 @@ class StrokeDrawable extends AnimationDrawable {
       trimPath.transform(parentMatrix.storage);
 
       pm = trimPath.computeMetrics();
-      double length = pm.length;
+      double length = pm.first.length;
 
       if (endLength > totalLength &&
           endLength - totalLength < currentLength + length &&

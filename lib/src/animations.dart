@@ -218,7 +218,7 @@ class ShapeKeyframeAnimation extends BaseKeyframeAnimation<ShapeData, Path> {
 
 class PathKeyframeAnimation extends KeyframeAnimation<Offset> {
   PathKeyframe _pathMeasureKeyframe;
-  ui.PathMetrics _pathMeasure;
+  ui.PathMetric _pathMeasure;
 
   PathKeyframeAnimation(Scene<Offset> scene) : super(scene);
 
@@ -231,7 +231,7 @@ class PathKeyframeAnimation extends KeyframeAnimation<Offset> {
     }
 
     if (_pathMeasureKeyframe != pathKeyframe) {
-      _pathMeasure = pathKeyframe.path.computeMetrics();
+      _pathMeasure = pathKeyframe.path.computeMetrics().first;
       _pathMeasureKeyframe = keyframe;
     }
 

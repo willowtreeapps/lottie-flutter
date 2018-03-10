@@ -132,7 +132,7 @@ Path applyTrimPathIfNeeded(Path path, double start, double end, double offset) {
     return path;
   }
 
-  final measure = path.computeMetrics();
+  final measure = path.computeMetrics().first;
   final length = measure.length;
   if (length < 1.0 || (end - start - 1).abs() < .01) {
     return path;
