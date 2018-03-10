@@ -28,7 +28,6 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    setScaleAndCompositionLayer();
 
     _animation = new AnimationController(
       duration: new Duration(milliseconds: widget._composition.duration),
@@ -37,6 +36,7 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
       vsync: this,
     )..repeat();
 
+    setScaleAndCompositionLayer();
     _animation.addListener(_handleChange);
   }
 
