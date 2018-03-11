@@ -9,10 +9,22 @@ import 'package:meta/meta.dart';
 class Lottie extends StatefulWidget {
   final LottieComposition _composition;
   final Size _size;
+  final AnimationController _controller;
+  final bool _coerceDuration;
 
-  Lottie({Key key, @required LottieComposition composition, Size size})
-      : _composition = composition,
+  Lottie(
+      {Key key,
+      @required LottieComposition composition,
+      Size size,
+      AnimationController controller,
+      bool coerceDuration = true})
+      : assert(controller == null ||
+            (controller.lowerBound >= 0.0 && controller.upperBound <= 1.0)),
+        assert(coerceDuration != null),
+        _composition = composition,
         _size = size ?? composition.bounds.size,
+        _controller = controller,
+        _coerceDuration = coerceDuration,
         super(key: key);
 
   @override
@@ -30,12 +42,20 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
 
     setScaleAndCompositionLayer();
 
-    _animation = new AnimationController(
-      duration: new Duration(milliseconds: widget._composition.duration),
-      lowerBound: 0.0,
-      upperBound: 1.0,
-      vsync: this,
-    )..repeat();
+    if (widget._coerceDuration && widget._controller != null) {
+      widget._controller.duration =
+          new Duration(milliseconds: widget._composition.duration);
+    }
+
+    print(widget._controller);
+    _animation = widget._controller;// ??
+      //   new AnimationController(
+      //     duration: new Duration(milliseconds: widget._composition.duration),
+      //     lowerBound: 0.0,
+      //     upperBound: 1.0,
+      //     vsync: this,
+      //   )
+      // ..repeat();
 
     _animation.addListener(_handleChange);
   }
@@ -50,11 +70,22 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
   @override
   void didUpdateWidget(Lottie oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    if (oldWidget._composition == widget._composition) {
+      return;
+    }
+
     setScaleAndCompositionLayer();
-    _animation
-      ..duration = new Duration(milliseconds: widget._composition.duration)
-      ..reset()
-      ..repeat();
+    if (widget._coerceDuration) {
+      _animation.duration =
+          new Duration(milliseconds: widget._composition.duration);
+    }
+
+    if (widget._controller == null) {
+      _animation
+        ..reset()
+        ..repeat();
+    }
   }
 
   void setScaleAndCompositionLayer() {

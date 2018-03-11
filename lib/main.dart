@@ -44,14 +44,21 @@ class LottieDemo extends StatefulWidget {
   _LottieDemoState createState() => new _LottieDemoState();
 }
 
-class _LottieDemoState extends State<LottieDemo> {
+class _LottieDemoState extends State<LottieDemo>
+    with SingleTickerProviderStateMixin {
   LottieComposition _composition;
   String _assetName;
+  AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
+
     _loadButtonPressed(assetNames[5]);
+    _controller = new AnimationController(
+      duration: new Duration(milliseconds: 1000),
+      vsync: this,
+    );
   }
 
   void _loadButtonPressed(String assetName) {
@@ -59,6 +66,7 @@ class _LottieDemoState extends State<LottieDemo> {
       setState(() {
         _assetName = assetName;
         _composition = composition;
+        _controller.reverse();
       });
     });
   }
@@ -88,10 +96,19 @@ class _LottieDemoState extends State<LottieDemo> {
               onChanged: (val) => _loadButtonPressed(val),
             ),
             new Text(_composition?.bounds?.size?.toString() ?? ''),
+            new RaisedButton(
+              child: const Text('PLAY'),
+              onPressed: () {
+                _controller.forward(from: 0.0);
+              },
+            ),
             _composition == null
                 ? new LimitedBox()
                 : new Lottie(
-                    composition: _composition, size: const Size(400.0, 500.0)),
+                    composition: _composition,
+                    size: const Size(400.0, 500.0),
+                    controller: _controller,
+                  ),
           ],
         ),
       ),
