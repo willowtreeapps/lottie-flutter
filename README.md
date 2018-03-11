@@ -9,20 +9,17 @@ Lottie is a mobile library that parses [Adobe After Effects](http://www.adobe.co
 
 ### Current status
 
-Achived rednering parity with lottie-android
+Achived rednering parity with lottie-android except for dash paths.
 
-All samples included render.  Motorcycle has some issues still, but also has issues on lottie-android.
+All samples included render.  Motorcycle has some issues still, but also has issues on lottie-android (due to using effects that aren't supported).
 
-### Waiting for
+## TODO
 
-- [x] PathMeasure ★★★★★ [#10428](https://github.com/flutter/flutter/issues/10428)
-- [x] Path.add(path, matrix) ★★★★★
-- [x] Path JoinType    ★★★ [#7199](https://github.com/flutter/flutter/issues/7199)
-- [x] Path.computeBounds   ★★
-- [x] Path Operations      ★★
 - [ ] DashPathEffect ★ [#9641](https://github.com/flutter/flutter/issues/9641)
-- [ ] Canvas.getClipBounds   ★
-- [ ] Canvas.clipRect(_, Region.Op) ★
+- [ ] Add support for effects
+- [ ] Improve support for path operation/combinations
+- [ ] Support changing colors/timings the way lottie-android does
+- [ ] Support scaling larger or smaller than the containing widget?
 
 ## Lottie Files attribution
 
