@@ -104,7 +104,9 @@ class _LottieDemoState extends State<LottieDemo>
             ),
             new Slider(
               value: _controller.value,
-              onChanged: (val) => setState(() => _controller.value = val),
+              onChanged: _composition != null
+                  ? (val) => setState(() => _controller.value = val)
+                  : null,
             ),
             new Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               new IconButton(
@@ -125,7 +127,7 @@ class _LottieDemoState extends State<LottieDemo>
               ),
               new IconButton(
                 icon: const Icon(Icons.fast_rewind),
-                onPressed: _controller.value > 0
+                onPressed: _controller.value > 0 && _composition != null
                     ? () => setState(() => _controller.reset())
                     : null,
               ),
@@ -133,7 +135,7 @@ class _LottieDemoState extends State<LottieDemo>
                 icon: _controller.isAnimating
                     ? const Icon(Icons.pause)
                     : const Icon(Icons.play_arrow),
-                onPressed: _controller.isCompleted
+                onPressed: _controller.isCompleted || _composition == null
                     ? null
                     : () {
                         setState(() {
@@ -151,9 +153,11 @@ class _LottieDemoState extends State<LottieDemo>
               ),
               new IconButton(
                 icon: const Icon(Icons.stop),
-                onPressed: () {
-                  _controller.reset();
-                },
+                onPressed: _controller.isAnimating && _composition != null
+                    ? () {
+                        _controller.reset();
+                      }
+                    : null,
               ),
             ]),
           ],
