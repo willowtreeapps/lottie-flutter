@@ -42,30 +42,26 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
 
     setScaleAndCompositionLayer();
 
-    if (widget._coerceDuration && widget._controller != null) {
+    if (widget._coerceDuration && widget._composition != null) {
       widget._controller.duration =
           new Duration(milliseconds: widget._composition.duration);
     }
 
-    print(widget._controller);
-    _animation = widget._controller;// ??
-      //   new AnimationController(
-      //     duration: new Duration(milliseconds: widget._composition.duration),
-      //     lowerBound: 0.0,
-      //     upperBound: 1.0,
-      //     vsync: this,
-      //   )
-      // ..repeat();
+    _animation = widget._controller ??
+        (new AnimationController(
+          duration:
+              new Duration(milliseconds: widget._composition?.duration ?? 1),
+          lowerBound: 0.0,
+          upperBound: 1.0,
+          vsync: this,
+        )..repeat());
 
     _animation.addListener(_handleChange);
   }
 
-  // TODO: should be possible to have a scale > 1.0?
   static double _calcScale(Size size, LottieComposition composition) =>
-      math.min(
-          math.min(size.width / composition.bounds.size.width,
-              size.height / composition.bounds.size.height),
-          1.0);
+      math.min(size.width / composition.bounds.size.width,
+          size.height / composition.bounds.size.height);
 
   @override
   void didUpdateWidget(Lottie oldWidget) {
@@ -76,12 +72,12 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
     }
 
     setScaleAndCompositionLayer();
-    if (widget._coerceDuration) {
+    if (widget._coerceDuration && widget._composition != null) {
       _animation.duration =
           new Duration(milliseconds: widget._composition.duration);
     }
 
-    if (widget._controller == null) {
+    if (widget._controller == null && widget._composition != null) {
       _animation
         ..reset()
         ..repeat();
@@ -89,26 +85,33 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
   }
 
   void setScaleAndCompositionLayer() {
-    _scale = _calcScale(widget._size, widget._composition);
-    print('scaling to $_scale');
-    _compositionLayer = new CompositionLayer(
-        widget._composition,
-        new Layer.empty(widget._size.width, widget._size.height),
-        () => {},
-        _scale);
+    if (widget._composition != null) {
+      _scale = _calcScale(widget._size, widget._composition);
+      print('scaling to $_scale');
+      _compositionLayer = new CompositionLayer(
+          widget._composition,
+          new Layer.empty(widget._size.width, widget._size.height),
+          () => {},
+          _scale);
+    }
   }
 
   void _handleChange() {
     setState(() {
-      _compositionLayer.progress = _animation.value;
+      _compositionLayer?.progress = _animation.value;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return new CustomPaint(
-        painter: new LottiePainter(_compositionLayer, scale: _scale),
-        size: widget._size);
+    return _compositionLayer != null
+        ? new CustomPaint(
+            painter: new LottiePainter(_compositionLayer, scale: _scale),
+            size: widget._size)
+        : new LimitedBox(
+            maxWidth: widget._size.width,
+            maxHeight: widget._size.height,
+          );
   }
 
   @override
