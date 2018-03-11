@@ -3,7 +3,9 @@
 [![Build Status](https://travis-ci.org/dnfield/lottie-flutter.svg?branch=master)](https://travis-ci.org/fabiomsr/lottie-flutter)
 [![Coverage Status](https://coveralls.io/repos/github/dnfield/lottie-flutter/badge.svg)](https://coveralls.io/github/fabiomsr/lottie-flutter)
 
-Lottie-Flutter is based on [Lottie-Android](https://github.com/airbnb/lottie-android)
+Lottie-Flutter is based on [Lottie-Android](https://github.com/airbnb/lottie-android).
+
+Original effort by [Fabiomsr](https://github.com/fabiomsr).
 
 Lottie is a mobile library that parses [Adobe After Effects](http://www.adobe.com/products/aftereffects.html) animations exported as json with [Bodymovin](https://github.com/bodymovin/bodymovin) and renders them natively on mobile!
 
