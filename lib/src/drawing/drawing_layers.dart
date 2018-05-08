@@ -9,6 +9,7 @@ import 'package:lottie_flutter/src/layers.dart';
 import 'package:lottie_flutter/src/painting.dart';
 import 'package:lottie_flutter/src/elements/transforms.dart';
 import 'package:lottie_flutter/src/utils.dart';
+import 'package:lottie_flutter/src/values.dart';
 import 'package:flutter/painting.dart';
 
 import 'package:vector_math/vector_math_64.dart';
@@ -51,7 +52,7 @@ abstract class BaseLayer implements Drawable {
   final Paint _clearPaint = new Paint();
   final MaskKeyframeAnimation _mask;
   final TransformKeyframeAnimation _transform;
-  final List<BaseKeyframeAnimation<dynamic, dynamic>> _animations = new List();
+  final List<BaseKeyframeAnimation<dynamic, dynamic>> _animations = new List<BaseKeyframeAnimation<dynamic, dynamic>>();
 
   Layer get layerModel => _layerModel;
 

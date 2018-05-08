@@ -149,7 +149,7 @@ class Scene<T> {
     }
   }
 
-  static List<Keyframe> parseKeyframes(
+  static List<Keyframe<T>> parseKeyframes<T>(
       dynamic map, Parser parser, double scale, double durationFrames) {
     if (map == null) {
       return const [];
@@ -158,10 +158,10 @@ class Scene<T> {
     var rawKeyframes = tryGetKeyframes(map['k']);
 
     return rawKeyframes
-            ?.map((rawKeyframe) => new Keyframe.fromMap(
+            ?.map<Keyframe<T>>((rawKeyframe) => new Keyframe.fromMap(
                 rawKeyframe, parser, scale, durationFrames))
             ?.toList() ??
-        const [];
+        <Keyframe<T>>[];
   }
 
   //
@@ -188,7 +188,7 @@ class Scene<T> {
 }
 
 class KeyframeGroup<T> {
-  final Scene scene;
+  final Scene<T> scene;
   final T initialValue;
 
   KeyframeGroup(this.initialValue, this.scene);

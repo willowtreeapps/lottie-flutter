@@ -32,3 +32,7 @@ flutter:
     - assets/motorcycle.json
     - assets/hamburger_arrow.json
     - assets/Indicators2.json
+
+environment:
+  sdk: ">=1.19.0"
+  flutter: ">=0.3.6 <2.0.0"

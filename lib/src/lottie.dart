@@ -87,7 +87,7 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
   void setScaleAndCompositionLayer() {
     if (widget._composition != null) {
       _scale = _calcScale(widget._size, widget._composition);
-      print('scaling to $_scale');
+
       _compositionLayer = new CompositionLayer(
           widget._composition,
           new Layer.empty(widget._size.width, widget._size.height),

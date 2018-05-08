@@ -24,13 +24,10 @@ typedef Repaint();
 abstract class AnimationDrawable implements Drawable {
   final String _name;
   final Repaint _repaint;
-  //final List<BaseKeyframeAnimation<dynamic, dynamic>> _animations = [];
   final BaseLayer _layer;
 
   @override
   String get name => _name;
-
-  //List<BaseKeyframeAnimation<dynamic, dynamic>> get animations => _animations;
 
   AnimationDrawable(this._name, this._repaint, this._layer);
 

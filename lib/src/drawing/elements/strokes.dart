@@ -37,7 +37,7 @@ class StrokeDrawable extends AnimationDrawable {
     this._dashPatternOffsetAnimation,
     BaseLayer layer,
   )
-      : _dashPatternAnimations = new List(dashPatternValues.length),
+      : _dashPatternAnimations = new List<BaseKeyframeAnimation<double, double>>(dashPatternValues.length),
         super(name, _repaint, layer) {
     _paint
       ..style = PaintingStyle.stroke

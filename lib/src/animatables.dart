@@ -19,7 +19,7 @@ abstract class BaseAnimatableValue<V, O> implements AnimatableValue<O> {
 
   Scene<V> get scene => _scene;
 
-  BaseAnimatableValue([this._initialValue, Scene scene])
+  BaseAnimatableValue([this._initialValue, Scene<V> scene])
       : _scene = scene ?? new Scene.empty();
 
   BaseAnimatableValue.fromKeyframeGroup(KeyframeGroup keyframeGroup)
@@ -33,7 +33,7 @@ abstract class BaseAnimatableValue<V, O> implements AnimatableValue<O> {
 class AnimatableIntegerValue extends BaseAnimatableValue<int, int> {
   static final AnimatableValueParser _parser = new AnimatableValueParser<int>();
 
-  AnimatableIntegerValue([int initialValue = 100, Scene scene])
+  AnimatableIntegerValue([int initialValue = 100, Scene<int> scene])
       : super(initialValue, scene);
 
   AnimatableIntegerValue.fromMap(dynamic map, double durationFrames)
@@ -173,7 +173,7 @@ class AnimatableShapeValue extends BaseAnimatableValue<ShapeData, Path> {
 //  Path
 //
 class AnimatablePathValue extends BaseAnimatableValue<Offset, Offset> {
-  AnimatablePathValue._([Offset initialValue, Scene scene])
+  AnimatablePathValue._([Offset initialValue, Scene<Offset> scene])
       : super(initialValue == null ? const Offset(0.0, 0.0) : initialValue,
             scene);
 
@@ -186,11 +186,11 @@ class AnimatablePathValue extends BaseAnimatableValue<Offset, Offset> {
     List rawKeyframes = tryGetKeyframes(map);
     if (rawKeyframes != null) {
       List<Keyframe<Offset>> keyframes = rawKeyframes
-          .map((rawKeyframe) =>
+          .map<Keyframe<Offset>>((rawKeyframe) =>
               new PathKeyframe.fromMap(rawKeyframe, scale, durationFrames))
           .toList();
 
-      Scene scene = new Scene(keyframes);
+      Scene<Offset> scene = new Scene<Offset>(keyframes);
 
       return new AnimatablePathValue._(null, scene);
     }
@@ -231,12 +231,12 @@ class AnimatableSplitDimensionValue implements AnimatableValue<Offset> {
 class AnimatableValueParser<T> {
   KeyframeGroup<T> parse(
       dynamic map, Parser<T> parser, double scale, double durationFrames) {
-    Scene scene = _parseKeyframes(map, parser, scale, durationFrames);
+    Scene<T> scene = _parseKeyframes(map, parser, scale, durationFrames);
     T initialValue = _parseInitialValue(map, scene.keyframes, parser, scale);
     return new KeyframeGroup(initialValue, scene);
   }
 
-  Scene _parseKeyframes(
+  Scene<T> _parseKeyframes(
       dynamic map, Parser<T> parser, double scale, double durationFrames) {
     return new Scene.fromMap(map, parser, scale, durationFrames);
   }

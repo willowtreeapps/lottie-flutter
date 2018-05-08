@@ -168,13 +168,13 @@ Path applyTrimPathIfNeeded(Path path, double start, double end, double offset) {
     newStart -= length;
   }
 
-  var tempPath = measure.extractPath(newStart, newEnd, true);
+  var tempPath = measure.extractPath(newStart, newEnd);
 
   if (newEnd > length) {
-    var tempPath2 = measure.extractPath(0.0, newEnd % length, true);
+    var tempPath2 = measure.extractPath(0.0, newEnd % length);
     tempPath.addPath(tempPath2, Offset.zero);
   } else if (newStart < 0) {
-    var tempPath2 = measure.extractPath(length + newStart, length, true);
+    var tempPath2 = measure.extractPath(length + newStart, length);
     tempPath.addPath(tempPath2, Offset.zero);
   }
   return tempPath;
