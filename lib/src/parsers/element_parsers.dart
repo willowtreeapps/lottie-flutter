@@ -136,11 +136,6 @@ LineDashGroup parseLineDash(dynamic map, double scale, double durationFrames) {
             rawDash['v'], scale, durationFrames));
       }
     }
-
-    if (lineDashPattern.length == 1) {
-      // If there is only 1 value then it is assumed to be equal parts on and off.
-      lineDashPattern.add(lineDashPattern[0]);
-    }
   }
 
   return new LineDashGroup(offset, lineDashPattern);

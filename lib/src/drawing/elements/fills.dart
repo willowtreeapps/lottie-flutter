@@ -59,8 +59,7 @@ class ShapeFillDrawable extends FillDrawable {
     PathFillType fillType,
     this._colorAnimation,
     BaseLayer layer,
-  )
-      : super(name, repaint, opacityAnimation, fillType, layer) {
+  ) : super(name, repaint, opacityAnimation, fillType, layer) {
     addAnimation(_colorAnimation);
   }
 
@@ -97,8 +96,7 @@ class GradientFillDrawable extends FillDrawable {
     this._startPointAnimation,
     this._endPointAnimation,
     BaseLayer layer,
-  )
-      : super(name, repaint, opacityAnimation, fillType, layer) {
+  ) : super(name, repaint, opacityAnimation, fillType, layer) {
     addAnimation(_gradientColorAnimation);
     addAnimation(_startPointAnimation);
     addAnimation(_endPointAnimation);

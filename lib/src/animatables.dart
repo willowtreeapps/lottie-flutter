@@ -246,9 +246,7 @@ class AnimatableValueParser<T> {
     if (keyframes.isNotEmpty) {
       return keyframes.first.startValue;
     }
-
-    var rawInitialValue = map == null ? null : map['k'];
-
+    final rawInitialValue = map == null ? null : map['k'];
     return parser.parse(rawInitialValue, scale);
   }
 }

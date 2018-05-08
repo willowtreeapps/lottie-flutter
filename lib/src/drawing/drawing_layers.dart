@@ -52,7 +52,8 @@ abstract class BaseLayer implements Drawable {
   final Paint _clearPaint = new Paint();
   final MaskKeyframeAnimation _mask;
   final TransformKeyframeAnimation _transform;
-  final List<BaseKeyframeAnimation<dynamic, dynamic>> _animations = new List<BaseKeyframeAnimation<dynamic, dynamic>>();
+  final List<BaseKeyframeAnimation<dynamic, dynamic>> _animations =
+      new List<BaseKeyframeAnimation<dynamic, dynamic>>();
 
   Layer get layerModel => _layerModel;
 

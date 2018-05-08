@@ -116,22 +116,22 @@ class MergePathsDrawable extends AnimationDrawable implements PathContent {
       } else {
         remainderPath.addPath(content.path, const Offset(0.0, 0.0));
       }
-      
     }
-    
+
     final lastContent = _pathContents[0];
     if (lastContent is DrawableGroup) {
       List<PathContent> paths = lastContent.paths;
       for (int j = 0; j < paths.length; j++) {
         Path nextPath = paths[j].path;
-        firstPath.addPath(nextPath, Offset.zero, matrix4: lastContent.transformation.storage);
+        firstPath.addPath(nextPath, Offset.zero,
+            matrix4: lastContent.transformation.storage);
       }
     } else {
       firstPath = lastContent.path;
     }
 
-  // TODO: figure out why this is broken.
-  // this is broken in android as well - just doesn't show up because it's usually disabled. this fixes some stuff for motorcycle.json
+    // TODO: figure out why this is broken.
+    // this is broken in android as well - just doesn't show up because it's usually disabled. this fixes some stuff for motorcycle.json
     return Path.combine(PathOperation.union, firstPath, remainderPath);
 
     // firstPath.op(op, firstPath, remainderPath);

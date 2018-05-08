@@ -10,6 +10,8 @@ import 'package:vector_math/vector_math_64.dart';
 
 import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 
+import 'package:path_drawing/path_drawing.dart';
+
 class PathGroup {
   final List<PathContent> _paths = [];
   final TrimPathDrawable _trimPath;
@@ -24,7 +26,7 @@ class StrokeDrawable extends AnimationDrawable {
   final BaseKeyframeAnimation<dynamic, int> _opacityAnimation;
   final BaseKeyframeAnimation<dynamic, double> _widthAnimation;
   final BaseKeyframeAnimation<dynamic, double> _dashPatternOffsetAnimation;
-  final List<BaseKeyframeAnimation<dynamic, double>> _dashPatternAnimations;
+  final List<BaseKeyframeAnimation<double, double>> _dashPatternAnimations;
 
   StrokeDrawable(
     String name,
@@ -36,8 +38,8 @@ class StrokeDrawable extends AnimationDrawable {
     this._widthAnimation,
     this._dashPatternOffsetAnimation,
     BaseLayer layer,
-  )
-      : _dashPatternAnimations = new List<BaseKeyframeAnimation<double, double>>(dashPatternValues.length),
+  )   : _dashPatternAnimations =
+            dashPatternValues?.map((x) => x.createAnimation())?.toList(),
         super(name, _repaint, layer) {
     _paint
       ..style = PaintingStyle.stroke
@@ -107,8 +109,6 @@ class StrokeDrawable extends AnimationDrawable {
       ..color = _paint.color
           .withAlpha(calculateAlpha(parentAlpha, _opacityAnimation));
 
-    _applyDashPatternIfNeeded(parentMatrix);
-
     for (var pathGroup in _pathGroups) {
       if (pathGroup._trimPath != null) {
         _applyTrimPath(canvas, pathGroup, parentMatrix);
@@ -117,6 +117,7 @@ class StrokeDrawable extends AnimationDrawable {
         for (int i = pathGroup._paths.length - 1; i >= 0; i--) {
           addPathToPath(path, pathGroup._paths[i].path, parentMatrix);
         }
+        path = _applyDashPatternIfNeeded(path, parentMatrix);
         canvas.drawPath(path, _paint);
       }
     }
@@ -211,39 +212,38 @@ class StrokeDrawable extends AnimationDrawable {
         outBounds.bottom + width / 2.0 + 1);
   }
 
-  bool _printedDashPatternWarning = false;
-  void _applyDashPatternIfNeeded(Matrix4 parentMatrix) {
+  Path _applyDashPatternIfNeeded(Path path, Matrix4 parentMatrix) {
     if (_dashPatternAnimations.isEmpty) {
-      return;
+      return path;
     }
-    if (!_printedDashPatternWarning) {
-      print('DashPaths not currently supported!');
-      _printedDashPatternWarning = true;
-    }
-    //TODO: DashPathEffect
-    /*
-    double scale = calculateScale(parentMatrix);
+
+    double scale = 1.0; // calculateScale(parentMatrix);
+    List<double> dashPatternValues =
+        new List<double>(_dashPatternAnimations.length);
     for (int i = 0; i < _dashPatternAnimations.length; i++) {
-      dashPatternValues[i] = dashPatternAnimations.get(i).getValue();
+      dashPatternValues[i] = _dashPatternAnimations[i]?.value ?? 0.0;
       // If the value of the dash pattern or gap is too small, the number of individual sections
       // approaches infinity as the value approaches 0.
       // To mitigate this, we essentially put a minimum value on the dash pattern size of 1px
       // and a minimum gap size of 0.01.
       if (i % 2 == 0) {
-        if (dashPatternValues[i] < 1f) {
-          dashPatternValues[i] = 1f;
+        if (dashPatternValues[i] < 1.0) {
+          dashPatternValues[i] = 1.0;
         }
       } else {
-        if (dashPatternValues[i] < 0.1f) {
-          dashPatternValues[i] = 0.1f;
+        if (dashPatternValues[i] < 0.1) {
+          dashPatternValues[i] = 0.1;
         }
       }
       dashPatternValues[i] *= scale;
     }
+    final double offset = _dashPatternOffsetAnimation == null
+        ? 0.0
+        : _dashPatternOffsetAnimation.value;
 
-    final offset = _dashPatternOffsetAnimation == null ? 0.0 : _dashPatternOffsetAnimation.value;
-    _paint.pathEffect = new DashPathEffect(dashPatternValues, offset);
-    */
+    return dashPath(path,
+        dashArray: new CircularIntervalList(dashPatternValues),
+        dashOffset: new DashOffset.absolute(offset));
   }
 }
 
@@ -307,8 +307,7 @@ class GradientStrokeDrawable extends StrokeDrawable {
     this._startPointAnimation,
     this._endPointAnimation,
     BaseLayer layer,
-  )
-      : super(
+  ) : super(
             name,
             strokeCap,
             strokeJoin,

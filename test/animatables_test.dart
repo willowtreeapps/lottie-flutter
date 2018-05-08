@@ -3,7 +3,6 @@ import 'package:lottie_flutter/src/animatables.dart';
 import 'package:test/test.dart';
 
 void main() {
-
   ///
   /// Integer
   ///
@@ -33,14 +32,13 @@ void main() {
     _expect(map, animatableValue, 352, 1);
   });
 
-
   ///
   /// Double
   ///
 }
 
-void _expect<T>(dynamic map, BaseAnimatableValue animatableValue, T initialValue,
-    int keyframesLength) {
+void _expect<T>(dynamic map, BaseAnimatableValue animatableValue,
+    T initialValue, int keyframesLength) {
   expect(animatableValue.initialValue, initialValue);
   expect(animatableValue.scene.keyframes.length, keyframesLength);
 }
