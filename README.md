@@ -17,11 +17,12 @@ All samples included render.  Motorcycle has some issues still, but also has iss
 
 ## TODO
 
-- [ ] DashPathEffect ★ [#9641](https://github.com/flutter/flutter/issues/9641)
+- [x] DashPathEffect ★ [#9641](https://github.com/flutter/flutter/issues/9641)
 - [ ] Add support for effects
 - [ ] Improve support for path operation/combinations
 - [ ] Support changing colors/timings the way lottie-android does
 - [ ] Support scaling larger or smaller than the containing widget?
+- [ ] Make more Dart/Flutter like.  In particular, I'd like to split parsing up.
 
 ## Lottie Files attribution
 
