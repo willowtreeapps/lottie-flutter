@@ -1,12 +1,10 @@
 .DS_Store
-.atom/
-.idea
+.dart_tool/
+
 .packages
 .pub/
+.idea/
+
 build/
-ios/.generated/
-packages
-pubspec.lock
+
 .flutter-plugins
-coverage/
-tool/*

@@ -39,5 +39,5 @@ flutter:
     - assets/Indicators2.json
 
 environment:
-  sdk: ">=1.19.0"
+  sdk: ">=1.19.0 <3.0.0"
   flutter: ">=0.3.6 <2.0.0"
