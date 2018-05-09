@@ -190,15 +190,14 @@ class GradientColorParser extends Parser<GradientColor> {
 
     if (rawGradientColor.length != _colorPoints * 4) {
       print("Unexpected gradient length: ${rawGradientColor.length}"
-          ". Expected ${_colorPoints *
-          4} . This may affect the appearance of the gradient. "
+          ". Expected ${_colorPoints * 4} . This may affect the appearance of the gradient. "
           "Make sure to save your After Effects file before exporting an animation with "
           "gradients.");
     }
 
     for (int i = 0; i < rawGradientColor.length; i += 4) {
       int colorIndex = i ~/ 4;
-      positions[colorIndex] = rawGradientColor[i];
+      positions[colorIndex] = _getDouble(rawGradientColor[i]);
       colors[colorIndex] = new Color.fromARGB(
           255,
           (parseMapToDouble(rawGradientColor[i + 1]) * 255).toInt(),
@@ -210,6 +209,20 @@ class GradientColorParser extends Parser<GradientColor> {
     return gradientColor;
   }
 
+  double _getDouble(dynamic i) {
+    if (i is double) {
+      return i;
+    } else if (i is int) {
+      return i.toDouble();
+    } else if (i is num) {
+      return i.toDouble();
+    } else if (i is String) {
+      return double.tryParse(i);
+    } else {
+      throw new StateError('Could not parse $i (${i.runtimeType})  double.');
+    }
+  }
+  
   // This cheats a little bit.
   // Opacity stops can be at arbitrary intervals independent of color stops.
   // This uses the existing color stops and modifies the opacity at each existing color stop
