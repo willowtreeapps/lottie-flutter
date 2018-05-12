@@ -5,7 +5,7 @@ import 'package:lottie_flutter/lottie_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
-const assetNames = const [
+const List<String> assetNames = const <String>[
   'assets/Indicators2.json',
   'assets/happy_gift.json',
   'assets/empty_box.json',
@@ -31,13 +31,13 @@ class DemoApp extends StatelessWidget {
       theme: new ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: new LottieDemo(),
+      home: const LottieDemo(),
     );
   }
 }
 
 class LottieDemo extends StatefulWidget {
-  LottieDemo({Key key}) : super(key: key);
+  const LottieDemo({Key key}) : super(key: key);
 
   @override
   _LottieDemoState createState() => new _LottieDemoState();
@@ -57,14 +57,14 @@ class _LottieDemoState extends State<LottieDemo>
     _repeat = false;
     //_loadButtonPressed(assetNames[6]);
     _controller = new AnimationController(
-      duration: new Duration(milliseconds: 1),
+      duration: const Duration(milliseconds: 1),
       vsync: this,
     );
     _controller.addListener(() => setState(() {}));
   }
 
   void _loadButtonPressed(String assetName) {
-    loadAsset(assetName).then((composition) {
+    loadAsset(assetName).then((LottieComposition composition) {
       setState(() {
         _assetName = assetName;
         _composition = composition;
@@ -77,24 +77,24 @@ class _LottieDemoState extends State<LottieDemo>
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text('Lottie Demo'),
+        title: const Text('Lottie Demo'),
       ),
       body: new Center(
         child: new Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            new DropdownButton(
+          children: <Widget>[
+            new DropdownButton<String>(
               items: assetNames
-                  .map((assetName) => new DropdownMenuItem(
+                  .map((String assetName) => new DropdownMenuItem<String>(
                         child: new Text(assetName),
                         value: assetName,
                       ))
                   .toList(),
-              hint: new Text('Choose an asset'),
+              hint: const Text('Choose an asset'),
               value: _assetName,
-              onChanged: (val) => _loadButtonPressed(val),
+              onChanged: (String val) => _loadButtonPressed(val),
             ),
             new Text(_composition?.bounds?.size?.toString() ?? ''),
             new Lottie(
@@ -105,61 +105,62 @@ class _LottieDemoState extends State<LottieDemo>
             new Slider(
               value: _controller.value,
               onChanged: _composition != null
-                  ? (val) => setState(() => _controller.value = val)
+                  ? (double val) => setState(() => _controller.value = val)
                   : null,
             ),
-            new Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              new IconButton(
-                icon: const Icon(Icons.repeat),
-                color: _repeat ? Colors.black : Colors.black45,
-                onPressed: () => setState(() {
-                      _repeat = !_repeat;
-                      if (_controller.isAnimating) {
-                        if (_repeat) {
-                          _controller
-                              .forward()
-                              .then((f) => _controller.repeat());
-                        } else {
-                          _controller.forward();
-                        }
-                      }
-                    }),
-              ),
-              new IconButton(
-                icon: const Icon(Icons.fast_rewind),
-                onPressed: _controller.value > 0 && _composition != null
-                    ? () => setState(() => _controller.reset())
-                    : null,
-              ),
-              new IconButton(
-                icon: _controller.isAnimating
-                    ? const Icon(Icons.pause)
-                    : const Icon(Icons.play_arrow),
-                onPressed: _controller.isCompleted || _composition == null
-                    ? null
-                    : () {
-                        setState(() {
+            new Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  new IconButton(
+                    icon: const Icon(Icons.repeat),
+                    color: _repeat ? Colors.black : Colors.black45,
+                    onPressed: () => setState(() {
+                          _repeat = !_repeat;
                           if (_controller.isAnimating) {
-                            _controller.stop();
-                          } else {
                             if (_repeat) {
-                              _controller.repeat();
+                              _controller.forward().then<Null>(
+                                  (Null nul) => _controller.repeat());
                             } else {
                               _controller.forward();
                             }
                           }
-                        });
-                      },
-              ),
-              new IconButton(
-                icon: const Icon(Icons.stop),
-                onPressed: _controller.isAnimating && _composition != null
-                    ? () {
-                        _controller.reset();
-                      }
-                    : null,
-              ),
-            ]),
+                        }),
+                  ),
+                  new IconButton(
+                    icon: const Icon(Icons.fast_rewind),
+                    onPressed: _controller.value > 0 && _composition != null
+                        ? () => setState(() => _controller.reset())
+                        : null,
+                  ),
+                  new IconButton(
+                    icon: _controller.isAnimating
+                        ? const Icon(Icons.pause)
+                        : const Icon(Icons.play_arrow),
+                    onPressed: _controller.isCompleted || _composition == null
+                        ? null
+                        : () {
+                            setState(() {
+                              if (_controller.isAnimating) {
+                                _controller.stop();
+                              } else {
+                                if (_repeat) {
+                                  _controller.repeat();
+                                } else {
+                                  _controller.forward();
+                                }
+                              }
+                            });
+                          },
+                  ),
+                  new IconButton(
+                    icon: const Icon(Icons.stop),
+                    onPressed: _controller.isAnimating && _composition != null
+                        ? () {
+                            _controller.reset();
+                          }
+                        : null,
+                  ),
+                ]),
           ],
         ),
       ),
@@ -170,6 +171,6 @@ class _LottieDemoState extends State<LottieDemo>
 Future<LottieComposition> loadAsset(String assetName) async {
   return await rootBundle
       .loadString(assetName)
-      .then((data) => json.decode(data))
-      .then((map) => new LottieComposition.fromMap(map));
+      .then<Map<String, dynamic>>((String data) => json.decode(data))
+      .then((Map<String, dynamic> map) => new LottieComposition.fromMap(map));
 }

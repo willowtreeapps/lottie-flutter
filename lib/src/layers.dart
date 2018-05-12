@@ -1,104 +1,34 @@
 import 'dart:ui' show Color;
+
 import 'package:lottie_flutter/src/elements/groups.dart';
 import 'package:lottie_flutter/src/elements/shapes.dart';
+import 'package:lottie_flutter/src/elements/transforms.dart';
 import 'package:lottie_flutter/src/keyframes.dart';
 import 'package:lottie_flutter/src/painting.dart';
-
 import 'package:lottie_flutter/src/parsers/parsers.dart';
-import 'package:lottie_flutter/src/elements/transforms.dart';
 import 'package:lottie_flutter/src/utils.dart';
 
 enum LayerType { PreComp, Solid, Image, Null, Shape, Text, Unknown }
 enum MatteType { None, Add, Invert, Unknown }
 
 class Layer {
-  final int _id;
-  final int _parentId;
-  final double _solidWidth;
-  final double _solidHeight;
-  final double _timeStretch;
-  final double _startProgress;
-  final double _preCompWidth;
-  final double _preCompHeight;
-  final String _name;
-  final String _refId;
-  final Color _solidColor;
-  final List<Shape> _shapes;
-  final List<Mask> _masks;
-  final Scene<double> _inOutKeyframes;
-  final LayerType _type;
-  final MatteType _matteType;
-  final AnimatableTransform _transform;
-
-  int get id => _id;
-
-  int get parentId => _parentId;
-
-  double get solidWidth => _solidWidth;
-
-  double get solidHeight => _solidHeight;
-
-  Color get solidColor => _solidColor;
-
-  double get timeStretch => _timeStretch;
-
-  double get startProgress => _startProgress;
-
-  double get preCompWidth => _preCompWidth;
-
-  double get preCompHeight => _preCompHeight;
-
-  String get name => _name;
-
-  String get refId => _refId;
-
-  List<Shape> get shapes => _shapes;
-
-  List<Mask> get masks => _masks;
-
-  Scene<double> get inOutKeyframes => _inOutKeyframes;
-
-  LayerType get type => _type;
-
-  MatteType get matteType => _matteType;
-
-  AnimatableTransform get transform => _transform;
-
-  Layer.empty(this._preCompWidth, this._preCompHeight)
-      : _id = -1,
-        _parentId = -1,
-        _solidWidth = 0.0,
-        _solidHeight = 0.0,
-        _timeStretch = 0.0,
-        _startProgress = 0.0,
-        _name = null,
-        _refId = null,
-        _solidColor = const Color(0x0),
-        _shapes = const [],
-        _masks = const [],
-        _inOutKeyframes = const Scene.empty(),
-        _type = LayerType.PreComp,
-        _matteType = MatteType.None,
-        _transform = new AnimatableTransform();
-
-  Layer._(
-      this._id,
-      this._parentId,
-      this._solidWidth,
-      this._solidHeight,
-      this._timeStretch,
-      this._startProgress,
-      this._preCompWidth,
-      this._preCompHeight,
-      this._name,
-      this._refId,
-      this._solidColor,
-      this._shapes,
-      this._masks,
-      this._inOutKeyframes,
-      this._type,
-      this._matteType,
-      this._transform);
+  final int id;
+  final int parentId;
+  final double solidWidth;
+  final double solidHeight;
+  final double timeStretch;
+  final double startProgress;
+  final double preCompWidth;
+  final double preCompHeight;
+  final String name;
+  final String refId;
+  final Color solidColor;
+  final List<Shape> shapes;
+  final List<Mask> masks;
+  final Scene<double> inOutKeyframes;
+  final LayerType type;
+  final MatteType matteType;
+  final AnimatableTransform transform;
 
   factory Layer(
       [dynamic map,
@@ -132,34 +62,36 @@ class Layer {
       solidColor = parseColor(map['sc']);
     }
 
-    AnimatableTransform transform =
+    final AnimatableTransform transform =
         new AnimatableTransform(map['ks'], scale, durationFrames);
 
-    MatteType matteType = MatteType.values[map['tt'] ?? 0];
+    final MatteType matteType = MatteType.values[map['tt'] ?? 0];
 
-    List<Mask> masks = parseJsonArray(map['masksProperties'],
-        (rawMask) => new Mask.fromMap(rawMask, scale, durationFrames));
+    final List<Mask> masks = parseJsonArray(map['masksProperties'],
+        (dynamic rawMask) => new Mask.fromMap(rawMask, scale, durationFrames));
 
-    List<Shape> shapes = parseJsonArray(map['shapes'],
-        (rawShape) => shapeFromMap(rawShape, scale, durationFrames));
+    final List<Shape> shapes = parseJsonArray(map['shapes'],
+        (dynamic rawShape) => shapeFromMap(rawShape, scale, durationFrames));
 
-    List<Keyframe<double>> inOutKeyframes = [];
+    final List<Keyframe<double>> inOutKeyframes = <Keyframe<double>>[];
 
-    final timeStretch = map['sr'] == null ? 1.0 : parseMapToDouble(map['sr']);
+    final double timeStretch =
+        map['sr'] == null ? 1.0 : parseMapToDouble(map['sr']);
     final double inFrame = (map['ip']?.toDouble() ?? 0) / timeStretch;
     if (inFrame > 0) {
-      inOutKeyframes.add(new Keyframe(0.0, inFrame, durationFrames, 0.0, 0.0));
+      inOutKeyframes
+          .add(new Keyframe<double>(0.0, inFrame, durationFrames, 0.0, 0.0));
     }
 
     final double outFrame =
         (map['op'] > 0 ? map['op'].toDouble() + 1 : endFrame + 1) / timeStretch;
 
     inOutKeyframes
-        .add(new Keyframe(inFrame, outFrame, durationFrames, 1.0, 1.0));
+        .add(new Keyframe<double>(inFrame, outFrame, durationFrames, 1.0, 1.0));
 
     if (outFrame <= durationFrames) {
-      Keyframe<double> outKeyframe =
-          new Keyframe(outFrame, endFrame, durationFrames, 0.0, 0.0);
+      final Keyframe<double> outKeyframe =
+          new Keyframe<double>(outFrame, endFrame, durationFrames, 0.0, 0.0);
       inOutKeyframes.add(outKeyframe);
     }
 
@@ -179,28 +111,65 @@ class Layer {
         solidColor,
         shapes,
         masks,
-        new Scene(inOutKeyframes, false),
+        new Scene<double>(inOutKeyframes, false),
         type,
         matteType,
         transform);
   }
 
-  static List<T> parseJsonArray<T>(List jsonArray, T mapItem(dynamic rawItem)) {
+  Layer.empty(this.preCompWidth, this.preCompHeight)
+      : id = -1,
+        parentId = -1,
+        solidWidth = 0.0,
+        solidHeight = 0.0,
+        timeStretch = 0.0,
+        startProgress = 0.0,
+        name = null,
+        refId = null,
+        solidColor = const Color(0x0),
+        shapes = const <Shape>[],
+        masks = const <Mask>[],
+        inOutKeyframes = new Scene<double>.empty(),
+        type = LayerType.PreComp,
+        matteType = MatteType.None,
+        transform = new AnimatableTransform();
+
+  Layer._(
+      this.id,
+      this.parentId,
+      this.solidWidth,
+      this.solidHeight,
+      this.timeStretch,
+      this.startProgress,
+      this.preCompWidth,
+      this.preCompHeight,
+      this.name,
+      this.refId,
+      this.solidColor,
+      this.shapes,
+      this.masks,
+      this.inOutKeyframes,
+      this.type,
+      this.matteType,
+      this.transform);
+
+  static List<T> parseJsonArray<T>(
+      List<dynamic> jsonArray, T mapItem(dynamic rawItem)) {
     if (jsonArray != null) {
       return jsonArray.map(mapItem).toList();
     }
 
-    return [];
+    return <T>[];
   }
 
   @override
   String toString() {
-    return '{"_id: $_id, "_parentId": $_parentId, "_solidWidth": $_solidWidth, '
-        '"_solidHeight": $_solidHeight, "_timeStretch": $_timeStretch, '
-        '"_startProgress": $_startProgress, "_preCompWidth": $_preCompWidth, '
-        '"_preCompHeight": $_preCompHeight, "_name": $_name, "_refId": $_refId, '
-        '"_solidColor": $_solidColor, "_shapes": $_shapes, "_masks": $_masks, '
-        '"_inOutKeyframes": $_inOutKeyframes, "_type": $_type, '
-        '"_matteType": $_matteType, "_transform": $_transform}';
+    return '{"id: $id, "parentId": $parentId, "solidWidth": $solidWidth, '
+        '"solidHeight": $solidHeight, "timeStretch": $timeStretch, '
+        '"startProgress": $startProgress, "preCompWidth": $preCompWidth, '
+        '"preCompHeight": $preCompHeight, "name": $name, "refId": $refId, '
+        '"solidColor": $solidColor, "shapes": $shapes, "masks": $masks, '
+        '"inOutKeyframes": $inOutKeyframes, "type": $type, '
+        '"matteType": $matteType, "transform": $transform}';
   }
 }

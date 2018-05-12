@@ -8,11 +8,11 @@ import 'package:lottie_flutter/src/parsers/element_parsers.dart';
 import 'package:lottie_flutter/src/values.dart';
 
 class ShapePath extends Shape {
-  final int _index;
+  // final int _index;
   final AnimatableShapeValue _shapePath;
 
   ShapePath.fromMap(dynamic map, double scale, double durationFrames)
-      : _index = map['ind'],
+      : // _index = map['ind'],
         _shapePath =
             new AnimatableShapeValue.fromMap(map['ks'], scale, durationFrames),
         super.fromMap(map);

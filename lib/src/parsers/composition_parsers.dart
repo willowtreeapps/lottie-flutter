@@ -10,14 +10,14 @@ double parseEndFrame(dynamic map) => map['op']?.toDouble() ?? 0.0;
 
 double parseFrameRate(dynamic map) => map['fr']?.toDouble() ?? 0.0;
 
-Rect parseBounds(dynamic map) {
-  double scale = ui.window.devicePixelRatio;
-  int width = map['w'];
-  int height = map['h'];
+Rect parseBounds(Map<String, dynamic> map) {
+  final double scale = ui.window.devicePixelRatio;
+  final int width = map['w'];
+  final int height = map['h'];
 
   if (width != null && height != null) {
-    double scaledWidth = width * scale;
-    double scaledHeight = height * scale;
+    final double scaledWidth = width * scale;
+    final double scaledHeight = height * scale;
     return new Rect.fromLTRB(0.0, 0.0, scaledWidth, scaledHeight);
   }
 
@@ -25,16 +25,17 @@ Rect parseBounds(dynamic map) {
 }
 
 Map<String, LottieImageAsset> parseImages(dynamic map) {
-  List rawAssets = map['assets'];
+  final List<dynamic> rawAssets = map['assets'];
 
   if (rawAssets == null) {
-    return const {};
+    return const <String, LottieImageAsset>{};
   }
 
   return rawAssets
-      .where((rawAsset) => rawAsset.containsKey('p'))
-      .map((rawAsset) => new LottieImageAsset.fromMap(rawAsset))
-      .fold({}, (assets, image) {
+      .where((dynamic rawAsset) => rawAsset.containsKey('p'))
+      .map((dynamic rawAsset) => new LottieImageAsset.fromMap(rawAsset))
+      .fold(<String, LottieImageAsset>{},
+          (Map<String, LottieImageAsset> assets, LottieImageAsset image) {
     assets[image.id] = image;
     return assets;
   });
@@ -42,24 +43,26 @@ Map<String, LottieImageAsset> parseImages(dynamic map) {
 
 Map<String, List<Layer>> parsePreComps(dynamic map, double width, double height,
     double scale, double durationFrames, double endFrame) {
-  List rawAssets = map['assets'];
+  final List<dynamic> rawAssets = map['assets'];
 
   if (rawAssets == null) {
-    return const {};
+    return const <String, List<Layer>>{};
   }
 
-  return rawAssets.where((rawAsset) => rawAsset['layers'] != null).fold({},
-      (preComps, rawAsset) {
+  return rawAssets
+      .where((dynamic rawAsset) => rawAsset['layers'] != null)
+      .fold(<String, List<Layer>>{},
+          (Map<String, List<Layer>> preComps, dynamic rawAsset) {
     preComps[rawAsset['id']] = parseLayers(
         rawAsset['layers'], width, height, scale, durationFrames, endFrame);
     return preComps;
   });
 }
 
-List<Layer> parseLayers(List rawLayers, double width, double height,
+List<Layer> parseLayers(List<dynamic> rawLayers, double width, double height,
     double scale, double durationFrames, double endFrame) {
   return rawLayers
-      .map((rawLayer) => new Layer(
+      .map((dynamic rawLayer) => new Layer(
           rawLayer, width, height, scale, durationFrames ?? 0.0, endFrame))
       .toList();
 }

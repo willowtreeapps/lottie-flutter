@@ -13,14 +13,14 @@ import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 import 'package:path_drawing/path_drawing.dart';
 
 class PathGroup {
-  final List<PathContent> _paths = [];
+  final List<PathContent> _paths = <PathContent>[];
   final TrimPathDrawable _trimPath;
 
   PathGroup(this._trimPath);
 }
 
 class StrokeDrawable extends AnimationDrawable {
-  final List<PathGroup> _pathGroups = [];
+  final List<PathGroup> _pathGroups = <PathGroup>[];
   final Paint _paint = new Paint();
   final Repaint _repaint;
   final BaseKeyframeAnimation<dynamic, int> _opacityAnimation;
@@ -38,8 +38,9 @@ class StrokeDrawable extends AnimationDrawable {
     this._widthAnimation,
     this._dashPatternOffsetAnimation,
     BaseLayer layer,
-  )   : _dashPatternAnimations =
-            dashPatternValues?.map((x) => x.createAnimation())?.toList(),
+  )   : _dashPatternAnimations = dashPatternValues
+            ?.map((AnimatableDoubleValue x) => x.createAnimation())
+            ?.toList(),
         super(name, _repaint, layer) {
     _paint
       ..style = PaintingStyle.stroke
@@ -49,8 +50,9 @@ class StrokeDrawable extends AnimationDrawable {
     addAnimation(_opacityAnimation);
     addAnimation(_widthAnimation);
 
-    dashPatternValues
-        .forEach((dashPattern) => addAnimation(dashPattern.createAnimation()));
+    for (AnimatableDoubleValue dashPattern in dashPatternValues) {
+      addAnimation(dashPattern.createAnimation());
+    }
     addAnimation(_dashPatternOffsetAnimation);
   }
 
@@ -58,7 +60,7 @@ class StrokeDrawable extends AnimationDrawable {
   void setContents(List<Content> contentsBefore, List<Content> contentsAfter) {
     TrimPathDrawable trimPathDrawableBefore;
     for (int i = contentsBefore.length - 1; i >= 0; i--) {
-      Content content = contentsBefore[i];
+      final Content content = contentsBefore[i];
       if (content is TrimPathDrawable &&
           content.type == ShapeTrimPathType.Individually) {
         trimPathDrawableBefore = content;
@@ -72,7 +74,7 @@ class StrokeDrawable extends AnimationDrawable {
     PathGroup currentPathGroup;
 
     for (int i = contentsAfter.length - 1; i >= 0; i--) {
-      Content content = contentsAfter[i];
+      final Content content = contentsAfter[i];
       if (content is TrimPathDrawable &&
           content.type == ShapeTrimPathType.Individually) {
         if (currentPathGroup != null) {
@@ -93,6 +95,7 @@ class StrokeDrawable extends AnimationDrawable {
     }
   }
 
+  @override
   void onValueChanged(double progress) {
     _repaint();
   }
@@ -100,7 +103,8 @@ class StrokeDrawable extends AnimationDrawable {
   @override
   void draw(Canvas canvas, Size size, Matrix4 parentMatrix, int parentAlpha) {
     // scaling is handled differently, for better or worse
-    final strokeWidth = _widthAnimation.value * parentMatrix.entry(0, 0).abs();
+    final double strokeWidth =
+        _widthAnimation.value * parentMatrix.entry(0, 0).abs();
     if (strokeWidth <= 0) {
       return;
     }
@@ -109,7 +113,7 @@ class StrokeDrawable extends AnimationDrawable {
       ..color = _paint.color
           .withAlpha(calculateAlpha(parentAlpha, _opacityAnimation));
 
-    for (var pathGroup in _pathGroups) {
+    for (PathGroup pathGroup in _pathGroups) {
       if (pathGroup._trimPath != null) {
         _applyTrimPath(canvas, pathGroup, parentMatrix);
       } else {
@@ -129,26 +133,28 @@ class StrokeDrawable extends AnimationDrawable {
       return;
     }
 
-    final path = new Path();
+    final Path path = new Path();
     for (int i = pathGroup._paths.length - 1; i >= 0; i--) {
       addPathToPath(path, pathGroup._paths[i].path, parentMatrix);
     }
 
-    var pm = path.computeMetrics();
-    double totalLength = pm.fold(0.0, (len, metric) => len + metric.length);
+    PathMetrics pm = path.computeMetrics();
+    final double totalLength =
+        pm.fold(0.0, (double len, PathMetric metric) => len + metric.length);
 
-    final trimPath = pathGroup._trimPath;
-    final offsetLength = totalLength * trimPath.offset / 360.0;
-    final startLength = totalLength * trimPath.start / 100.0 + offsetLength;
-    final endLength = totalLength * trimPath.end / 100.0 + offsetLength;
+    final TrimPathDrawable trimPath = pathGroup._trimPath;
+    final double offsetLength = totalLength * trimPath.offset / 360.0;
+    final double startLength =
+        totalLength * trimPath.start / 100.0 + offsetLength;
+    final double endLength = totalLength * trimPath.end / 100.0 + offsetLength;
 
-    var currentLength = 0.0;
+    double currentLength = 0.0;
     for (int j = pathGroup._paths.length - 1; j >= 0; j--) {
-      final trimPath = pathGroup._paths[j].path;
+      final Path trimPath = pathGroup._paths[j].path;
       trimPath.transform(parentMatrix.storage);
 
       pm = trimPath.computeMetrics();
-      double length = pm.first.length;
+      final double length = pm.first.length;
 
       if (endLength > totalLength &&
           endLength - totalLength < currentLength + length &&
@@ -169,14 +175,14 @@ class StrokeDrawable extends AnimationDrawable {
         continue;
       }
 
-      var start = startLength < currentLength
+      final double start = startLength < currentLength
           ? 0.0
           : (startLength - currentLength) / length;
-      var end = endLength > currentLength + length
+      final double end = endLength > currentLength + length
           ? 1.0
           : (endLength - currentLength) / length;
 
-      final path = applyTrimPathIfNeeded(trimPath, start, end, 0.0);
+      final Path path = applyTrimPathIfNeeded(trimPath, start, end, 0.0);
       canvas.drawPath(path, _paint);
       currentLength += length;
     }
@@ -186,25 +192,25 @@ class StrokeDrawable extends AnimationDrawable {
   /// around to the beginning.
   void _drawSegment(Canvas canvas, Path path, double length, double startLength,
       double endLength, double totalLength) {
-    var start =
+    final double start =
         startLength > totalLength ? (startLength - totalLength) / length : 0.0;
-    var end = min((endLength - totalLength) / length, 1);
-    Path trimPath = applyTrimPathIfNeeded(path, start, end, 0.0);
+    final double end = min((endLength - totalLength) / length, 1.0);
+    final Path trimPath = applyTrimPathIfNeeded(path, start, end, 0.0);
     canvas.drawPath(trimPath, _paint);
   }
 
   @override
   Rect getBounds(Matrix4 parentMatrix) {
-    final path = new Path();
-    for (var pathGroup in _pathGroups) {
-      for (var pathContent in pathGroup._paths) {
+    final Path path = new Path();
+    for (PathGroup pathGroup in _pathGroups) {
+      for (PathContent pathContent in pathGroup._paths) {
         addPathToPath(path, pathContent.path, parentMatrix);
       }
     }
 
-    Rect outBounds = path.getBounds();
+    final Rect outBounds = path.getBounds();
 
-    final width = _widthAnimation.value;
+    final double width = _widthAnimation.value;
     return new Rect.fromLTRB(
         outBounds.left - width / 2.0 - 1,
         outBounds.top - width / 2.0 - 1,
@@ -217,8 +223,8 @@ class StrokeDrawable extends AnimationDrawable {
       return path;
     }
 
-    double scale = 1.0; // calculateScale(parentMatrix);
-    List<double> dashPatternValues =
+    const double scale = 1.0; // calculateScale(parentMatrix);
+    final List<double> dashPatternValues =
         new List<double>(_dashPatternAnimations.length);
     for (int i = 0; i < _dashPatternAnimations.length; i++) {
       dashPatternValues[i] = _dashPatternAnimations[i]?.value ?? 0.0;
@@ -242,7 +248,7 @@ class StrokeDrawable extends AnimationDrawable {
         : _dashPatternOffsetAnimation.value;
 
     return dashPath(path,
-        dashArray: new CircularIntervalList(dashPatternValues),
+        dashArray: new CircularIntervalList<double>(dashPatternValues),
         dashOffset: new DashOffset.absolute(offset));
   }
 }
@@ -322,7 +328,7 @@ class GradientStrokeDrawable extends StrokeDrawable {
 
   @override
   void draw(Canvas canvas, Size size, Matrix4 parentMatrix, int parentAlpha) {
-    final bounds = getBounds(parentMatrix);
+    final Rect bounds = getBounds(parentMatrix);
     _paint.shader = createGradientShader(_colorAnimation.value, _type,
         _startPointAnimation.value, _endPointAnimation.value, bounds);
 

@@ -27,11 +27,11 @@ abstract class Stroke extends Shape {
 class ShapeStroke extends Stroke {
   final AnimatableColorValue _color;
 
-  AnimatableColorValue get color => _color;
-
   ShapeStroke.fromMap(dynamic map, double scale, double durationFrames)
       : _color = parseColor(map, durationFrames),
         super.fromMap(map, scale, durationFrames);
+
+  AnimatableColorValue get color => _color;
 
   @override
   AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>

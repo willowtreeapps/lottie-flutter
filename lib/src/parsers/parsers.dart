@@ -63,7 +63,7 @@ class PointFParser implements Parser<Offset> {
           parseMapToDouble(json['y']) * scale);
     }
 
-    throw new ArgumentError.value(json, "json", "Unable to parse point");
+    throw new ArgumentError.value(json, 'json', 'Unable to parse point');
   }
 }
 
@@ -78,6 +78,7 @@ class ScaleParser implements Parser<Offset> {
 class ColorParser implements Parser<Color> {
   const ColorParser();
 
+  @override
   Color parse(dynamic map, double scale) {
     if (map == null || map.length != 4) {
       return const Color(0x0);
@@ -103,13 +104,13 @@ class ShapeDataParser implements Parser<ShapeData> {
 
   @override
   ShapeData parse(dynamic json, double scale) {
-    Map pointsData;
+    Map<String, dynamic> pointsData;
 
-    if (json is List) {
-      if (json[0] is Map && json[0].containsKey('v')) {
+    if (json is List<dynamic>) {
+      if (json[0] is Map<String, dynamic> && json[0].containsKey('v')) {
         pointsData = json[0];
       }
-    } else if (json is Map && json.containsKey('v')) {
+    } else if (json is Map<String, dynamic> && json.containsKey('v')) {
       pointsData = json;
     }
 
@@ -117,45 +118,46 @@ class ShapeDataParser implements Parser<ShapeData> {
       return null;
     }
 
-    List points = pointsData['v'];
-    List inTangents = pointsData['i'];
-    List outTangents = pointsData['o'];
-    bool closed = pointsData['c'] ?? false;
+    final List<dynamic> points = pointsData['v'];
+    final List<dynamic> inTangents = pointsData['i'];
+    final List<dynamic> outTangents = pointsData['o'];
+    final bool closed = pointsData['c'] ?? false;
 
     if (points == null ||
         points.length != inTangents?.length ||
         points.length != outTangents?.length) {
       throw new StateError(
-          "Unable to process points array or tangets. $pointsData");
+          'Unable to process points array or tangets. $pointsData');
     } else if (points.isEmpty) {
-      return new ShapeData(const [], Offset.zero, false);
+      return new ShapeData(const <CubicCurveData>[], Offset.zero, false);
     }
 
-    Offset initialPoint = _vertexAtIndex(0, points, scale);
-    List<CubicCurveData> curves =
+    final Offset initialPoint = _vertexAtIndex(0, points, scale);
+    final List<CubicCurveData> curves =
         new List<CubicCurveData>(closed ? points.length : points.length - 1);
 
     for (int i = 1; i < points.length; i++) {
-      Offset vertex = _vertexAtIndex(i, points, scale);
-      Offset previousVertex = _vertexAtIndex(i - 1, points, scale);
-      Offset cp1 = _vertexAtIndex(i - 1, outTangents, scale);
-      Offset cp2 = _vertexAtIndex(i, inTangents, scale);
-      Offset shapeCp1 = (previousVertex + cp1);
-      Offset shapeCp2 = (vertex + cp2);
-      Offset scaleVertex = vertex;
+      final Offset vertex = _vertexAtIndex(i, points, scale);
+      final Offset previousVertex = _vertexAtIndex(i - 1, points, scale);
+      final Offset cp1 = _vertexAtIndex(i - 1, outTangents, scale);
+      final Offset cp2 = _vertexAtIndex(i, inTangents, scale);
+      final Offset shapeCp1 = previousVertex + cp1;
+      final Offset shapeCp2 = vertex + cp2;
+      final Offset scaleVertex = vertex;
 
       curves[i - 1] = new CubicCurveData(shapeCp1, shapeCp2, scaleVertex);
     }
 
     if (closed) {
-      Offset vertex = _vertexAtIndex(0, points, scale);
-      Offset previousVertex = _vertexAtIndex(points.length - 1, points, scale);
-      Offset cp1 = _vertexAtIndex(points.length - 1, outTangents, scale);
-      Offset cp2 = _vertexAtIndex(0, inTangents, scale);
+      final Offset vertex = _vertexAtIndex(0, points, scale);
+      final Offset previousVertex =
+          _vertexAtIndex(points.length - 1, points, scale);
+      final Offset cp1 = _vertexAtIndex(points.length - 1, outTangents, scale);
+      final Offset cp2 = _vertexAtIndex(0, inTangents, scale);
 
-      Offset shape1 = (previousVertex + cp1);
-      Offset shape2 = (vertex + cp2);
-      Offset scaleVertex = vertex;
+      final Offset shape1 = previousVertex + cp1;
+      final Offset shape2 = vertex + cp2;
+      final Offset scaleVertex = vertex;
       curves[curves.length - 1] =
           new CubicCurveData(shape1, shape2, scaleVertex);
     }
@@ -163,7 +165,7 @@ class ShapeDataParser implements Parser<ShapeData> {
     return new ShapeData(curves, initialPoint, closed);
   }
 
-  Offset _vertexAtIndex(int index, List points, double scale) {
+  Offset _vertexAtIndex(int index, List<dynamic> points, double scale) {
     return new Offset(parseMapToDouble(points[index][0] * scale),
         parseMapToDouble(points[index][1] * scale));
   }
@@ -183,20 +185,20 @@ class GradientColorParser extends Parser<GradientColor> {
   // [ ..., position, opacity, ... ]
   @override
   GradientColor parse(dynamic map, double scale) {
-    List rawGradientColor = map as List;
-    final List<double> positions = new List(_colorPoints);
-    final List<Color> colors = new List(_colorPoints);
+    final List<dynamic> rawGradientColor = map; // as List<dynamic>;
+    final List<double> positions = new List<double>(_colorPoints);
+    final List<Color> colors = new List<Color>(_colorPoints);
     final GradientColor gradientColor = new GradientColor(positions, colors);
 
     if (rawGradientColor.length != _colorPoints * 4) {
-      print("Unexpected gradient length: ${rawGradientColor.length}"
-          ". Expected ${_colorPoints * 4} . This may affect the appearance of the gradient. "
-          "Make sure to save your After Effects file before exporting an animation with "
-          "gradients.");
+      print('Unexpected gradient length: ${rawGradientColor.length}'
+          '. Expected ${_colorPoints * 4} . This may affect the appearance of the gradient. '
+          'Make sure to save your After Effects file before exporting an animation with '
+          'gradients.');
     }
 
     for (int i = 0; i < rawGradientColor.length; i += 4) {
-      int colorIndex = i ~/ 4;
+      final int colorIndex = i ~/ 4;
       positions[colorIndex] = _getDouble(rawGradientColor[i]);
       colors[colorIndex] = new Color.fromARGB(
           255,
@@ -222,7 +224,7 @@ class GradientColorParser extends Parser<GradientColor> {
       throw new StateError('Could not parse $i (${i.runtimeType})  double.');
     }
   }
-  
+
   // This cheats a little bit.
   // Opacity stops can be at arbitrary intervals independent of color stops.
   // This uses the existing color stops and modifies the opacity at each existing color stop
@@ -231,7 +233,7 @@ class GradientColorParser extends Parser<GradientColor> {
   // This should be a good approximation is nearly all cases. However, if there are many more
   // opacity stops than color stops, information will be lost.
   void _addOpacityStopsToGradientIfNeeded(
-      GradientColor gradientColor, List rawGradientColor) {
+      GradientColor gradientColor, List<dynamic> rawGradientColor) {
     final int startIndex = _colorPoints * 4;
     if (rawGradientColor.length <= startIndex) {
       return;
@@ -248,7 +250,7 @@ class GradientColorParser extends Parser<GradientColor> {
 
     for (int i = 0; i < gradientColor.length; i++) {
       final Color color = gradientColor.colors[i];
-      Color colorWithAlpha = color.withAlpha(_getOpacityAtPosition(
+      final Color colorWithAlpha = color.withAlpha(_getOpacityAtPosition(
           gradientColor.positions[i], positions, opacities));
       gradientColor.colors[i] = colorWithAlpha;
     }
@@ -257,10 +259,10 @@ class GradientColorParser extends Parser<GradientColor> {
   int _getOpacityAtPosition(
       double position, List<double> positions, List<double> opacities) {
     for (int i = 1; i < positions.length; i++) {
-      double lastPosition = positions[i - 1];
-      double thisPosition = positions[i];
+      final double lastPosition = positions[i - 1];
+      final double thisPosition = positions[i];
       if (positions[i] >= position) {
-        double progress =
+        final double progress =
             (position - lastPosition) / (thisPosition - lastPosition);
         return (255 * lerpDouble(opacities[i - 1], opacities[i], progress))
             .toInt();
@@ -275,17 +277,17 @@ class PathParser implements Parser<Path> {
   const PathParser();
 
   @override
-  Path parse(map, double scale) {
+  Path parse(dynamic map, double scale) {
     return new Path();
   }
 
   Path parseFromShape(ShapeData shapeData) {
-    Path path = new Path();
-    Offset initialPoint = shapeData.initialPoint;
+    final Path path = new Path();
+    final Offset initialPoint = shapeData.initialPoint;
     Offset currentPoint = new Offset(initialPoint.dx, initialPoint.dy);
     path.moveTo(initialPoint.dx, initialPoint.dy);
 
-    for (var curve in shapeData.curves) {
+    for (CubicCurveData curve in shapeData.curves) {
       if (curve.controlPoint1 == currentPoint &&
           curve.controlPoint2 == curve.vertex) {
         path.lineTo(curve.vertex.dx, curve.vertex.dy);

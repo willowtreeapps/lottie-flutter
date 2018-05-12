@@ -17,6 +17,7 @@ abstract class _PolygonDrawable extends AnimationDrawable
   _PolygonDrawable(String name, Repaint repaint, BaseLayer layer)
       : super(name, repaint, layer);
 
+  @override
   Path get path {
     if (_isPathValid) {
       return _path;
@@ -41,7 +42,7 @@ abstract class _PolygonDrawable extends AnimationDrawable
 
   @override
   void setContents(List<Content> contentsBefore, List<Content> contentsAfter) {
-    for (var content in contentsBefore) {
+    for (Content content in contentsBefore) {
       if (content is TrimPathDrawable &&
           content.type == ShapeTrimPathType.Simultaneously) {
         _trimPathDrawable = content;
@@ -73,13 +74,13 @@ class EllipseDrawable extends _PolygonDrawable {
 
   @override
   void _createPath() {
-    final size = _sizeAnimation.value;
-    final halfWidth = size.dx / 2.0;
-    final halfHeight = size.dy / 2.0;
+    final Offset size = _sizeAnimation.value;
+    final double halfWidth = size.dx / 2.0;
+    final double halfHeight = size.dy / 2.0;
     //TODO: handle bounds
 
-    final cpW = halfWidth * CONTROL_POINT_PERCENTAGE;
-    final cpH = halfHeight * CONTROL_POINT_PERCENTAGE;
+    final double cpW = halfWidth * CONTROL_POINT_PERCENTAGE;
+    final double cpH = halfHeight * CONTROL_POINT_PERCENTAGE;
 
     _path.reset();
     if (_isReversed) {
@@ -125,19 +126,19 @@ class RectangleDrawable extends _PolygonDrawable {
 
   @override
   void _createPath() {
-    final size = _sizeAnimation.value;
-    final position = _positionAnimation.value;
-    final halfWidth = size.dx / 2.0;
-    final halfHeight = size.dy / 2.0;
-    var radius = _cornerRadiusAnimation?.value ?? 0.0;
-    radius = min(radius, min(halfWidth, halfHeight));
+    final Offset size = _sizeAnimation.value;
+    final Offset position = _positionAnimation.value;
+    final double halfWidth = size.dx / 2.0;
+    final double halfHeight = size.dy / 2.0;
+    final double radius =
+        min(_cornerRadiusAnimation?.value ?? 0.0, min(halfWidth, halfHeight));
 
     _path.reset();
     _path.moveTo(position.dx + halfWidth, position.dy - halfHeight + radius);
     _path.lineTo(position.dx + halfWidth, position.dy + halfHeight - radius);
 
     if (radius > 0) {
-      final rect = new Rect.fromLTRB(
+      final Rect rect = new Rect.fromLTRB(
           position.dx + halfWidth - 2 * radius,
           position.dy + halfHeight - 2 * radius,
           position.dx + halfWidth,
@@ -148,7 +149,7 @@ class RectangleDrawable extends _PolygonDrawable {
     _path.lineTo(position.dx - halfWidth + radius, position.dy + halfHeight);
 
     if (radius > 0) {
-      final rect = new Rect.fromLTRB(
+      final Rect rect = new Rect.fromLTRB(
           position.dx - halfWidth,
           position.dy + halfHeight - 2 * radius,
           position.dx - halfWidth + 2 * radius,
@@ -159,7 +160,7 @@ class RectangleDrawable extends _PolygonDrawable {
     _path.lineTo(position.dx - halfWidth, position.dy - halfHeight + radius);
 
     if (radius > 0) {
-      final rect = new Rect.fromLTRB(
+      final Rect rect = new Rect.fromLTRB(
           position.dx - halfWidth,
           position.dy - halfHeight,
           position.dx - halfWidth + 2 * radius,
@@ -170,7 +171,7 @@ class RectangleDrawable extends _PolygonDrawable {
     _path.lineTo(position.dx + halfWidth - radius, position.dy - halfHeight);
 
     if (radius > 0) {
-      final rect = new Rect.fromLTRB(
+      final Rect rect = new Rect.fromLTRB(
           position.dx + halfWidth - 2 * radius,
           position.dy - halfHeight,
           position.dx + halfWidth,

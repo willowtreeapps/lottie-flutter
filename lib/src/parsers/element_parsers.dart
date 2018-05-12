@@ -19,10 +19,10 @@ AnimatableDoubleValue parseWidth(
     new AnimatableDoubleValue.fromMap(map['w'], scale, durationFrames);
 
 AnimatableGradientColorValue parseGradient(dynamic map, double durationFrames) {
-  Map rawColor = map['g'];
+  Map<String, dynamic> rawColor = map['g'];
 
   if (rawColor != null && rawColor.containsKey('k')) {
-    int points = rawColor['p'];
+    final int points = rawColor['p'];
     rawColor = rawColor['k'];
     if (points != null) {
       rawColor['p'] = points;
@@ -55,7 +55,7 @@ AnimatablePointValue parseSize(
 bool parseReversed(dynamic map) => map['d'] == 3;
 
 AnimatableDoubleValue parseinnerRadius(
-        dynamic map, scale, double durationFrames) =>
+        dynamic map, double scale, double durationFrames) =>
     map['ir'] == null
         ? null
         : new AnimatableDoubleValue.fromMap(map['ir'], scale, durationFrames);
@@ -65,7 +65,7 @@ AnimatableDoubleValue parseInnerRoundness(dynamic map, double durationFrames) =>
         ? null
         : new AnimatableDoubleValue.fromMap(map['is'], 1.0, durationFrames);
 
-parseCapType(dynamic map) => StrokeCap.values[map['lc'] - 1];
+StrokeCap parseCapType(dynamic map) => StrokeCap.values[map['lc'] - 1];
 
 StrokeJoin parseJoinType(dynamic map) => StrokeJoin.values[map['lj'] - 1];
 
@@ -78,7 +78,7 @@ PathFillType parseFillType(dynamic map) => map['r'] == null || map['r'] == 1
     : PathFillType.evenOdd;
 
 ShapeTrimPathType parseShapeTrimPathType(dynamic map) {
-  int rawType = map['m'] ?? 1;
+  final int rawType = map['m'] ?? 1;
   switch (rawType) {
     case 1:
       return ShapeTrimPathType.Simultaneously;
@@ -86,12 +86,12 @@ ShapeTrimPathType parseShapeTrimPathType(dynamic map) {
       return ShapeTrimPathType.Individually;
     default:
       throw new ArgumentError.value(
-          rawType, "ShapeTrimPathType", "Unknow trim Path");
+          rawType, 'ShapeTrimPathType', 'Unknow trim Path');
   }
 }
 
 PolystarShapeType parserPolystarShapeType(dynamic map) {
-  int rawType = map['sy'];
+  final int rawType = map['sy'];
   switch (rawType) {
     case 1:
       return PolystarShapeType.Star;
@@ -103,7 +103,7 @@ PolystarShapeType parserPolystarShapeType(dynamic map) {
 }
 
 MergePathsMode parseMergePathsMode(dynamic map) {
-  int rawMode = map['mm'] ?? 1;
+  final int rawMode = map['mm'] ?? 1;
   switch (rawMode) {
     case 1:
       return MergePathsMode.Merge;
@@ -122,11 +122,11 @@ MergePathsMode parseMergePathsMode(dynamic map) {
 
 LineDashGroup parseLineDash(dynamic map, double scale, double durationFrames) {
   AnimatableDoubleValue offset;
-  final lineDashPattern = new List<AnimatableDoubleValue>();
+  final List<AnimatableDoubleValue> lineDashPattern = <AnimatableDoubleValue>[];
 
   if (map.containsKey('d')) {
-    List rawDashes = map['d'];
-    for (var rawDash in rawDashes) {
+    final List<dynamic> rawDashes = map['d'];
+    for (dynamic rawDash in rawDashes) {
       final String n = rawDash['n'];
       if (n == 'o') {
         offset = new AnimatableDoubleValue.fromMap(
@@ -143,7 +143,7 @@ LineDashGroup parseLineDash(dynamic map, double scale, double durationFrames) {
 
 AnimatableValue<Offset> parsePathOrSplitDimensionPath(
     dynamic map, double scale, double durationFrames) {
-  final rawPosition = map['p'];
+  final Map<String, dynamic> rawPosition = map['p'];
   return rawPosition.containsKey('k')
       ? new AnimatablePathValue(rawPosition['k'], scale, durationFrames)
       : new AnimatableSplitDimensionValue(
@@ -155,12 +155,8 @@ AnimatableValue<Offset> parsePathOrSplitDimensionPath(
 }
 
 class LineDashGroup {
-  final AnimatableDoubleValue _offset;
-  final List<AnimatableDoubleValue> _lineDashPattern;
+  final AnimatableDoubleValue offset;
+  final List<AnimatableDoubleValue> lineDashPattern;
 
-  AnimatableDoubleValue get offset => _offset;
-
-  List<AnimatableDoubleValue> get lineDashPattern => _lineDashPattern;
-
-  LineDashGroup(this._offset, this._lineDashPattern);
+  LineDashGroup(this.offset, this.lineDashPattern);
 }

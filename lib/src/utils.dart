@@ -1,11 +1,13 @@
-import 'dart:ui';
 import 'dart:math';
+import 'dart:typed_data';
+import 'dart:ui';
+
+import 'package:flutter/painting.dart';
 import 'package:lottie_flutter/src/animations.dart';
 import 'package:lottie_flutter/src/values.dart';
-import 'package:flutter/painting.dart';
 import 'package:vector_math/vector_math_64.dart';
 
-const _skMatrixIdx = const [
+const List<int> _skMatrixIdx = const <int>[
   0, 4, 12, // 1st row
   1, 5, 13, // 2nd row
   3, 7, 15 // 3rd row
@@ -13,7 +15,7 @@ const _skMatrixIdx = const [
 
 /// Prints out the [Matrix4] in the SkMatrix format
 String toShortString(Matrix4 matrix4) {
-  var stor = matrix4.storage;
+  final Float64List stor = matrix4.storage;
   matrix4.row3;
   return '['
       '${stor[_skMatrixIdx[0]]},'
@@ -35,8 +37,7 @@ String toShortString(Matrix4 matrix4) {
 /// #RRGGBB and #AARRGGBB
 Color parseColor(String colorString) {
   if (colorString[0] == '#') {
-    int color = int.parse(colorString.substring(1),
-        radix: 16, onError: (source) => null);
+    int color = int.tryParse(colorString.substring(1), radix: 16);
     if (colorString.length == 7) {
       return new Color(color |= 0x00000000ff000000);
     }
@@ -47,7 +48,7 @@ Color parseColor(String colorString) {
   }
 
   throw new ArgumentError.value(
-      colorString, "colorString", "Unknown color $colorString");
+      colorString, 'colorString', 'Unknown color $colorString');
 }
 
 // Use this instead of [Color.lerp] because it interpolates through the gamma color
@@ -59,12 +60,12 @@ class GammaEvaluator {
   GammaEvaluator._();
 
   static Color evaluate(double fraction, Color start, Color end) {
-    double startA = start.alpha / 255.0;
+    final double startA = start.alpha / 255.0;
     double startR = start.red / 255.0;
     double startG = start.green / 255.0;
     double startB = start.blue / 255.0;
 
-    double endA = end.alpha / 255.0;
+    final double endA = end.alpha / 255.0;
     double endR = end.red / 255.0;
     double endG = end.green / 255.0;
     double endB = end.blue / 255.0;
@@ -132,16 +133,16 @@ Path applyTrimPathIfNeeded(Path path, double start, double end, double offset) {
     return path;
   }
 
-  final measure = path.computeMetrics().first;
-  final length = measure.length;
+  final PathMetric measure = path.computeMetrics().first;
+  final double length = measure.length;
   if (length < 1.0 || (end - start - 1).abs() < .01) {
     return path;
   }
 
   start *= length;
   end *= length;
-  var newStart = min(start, end);
-  var newEnd = max(start, end);
+  double newStart = min(start, end);
+  double newEnd = max(start, end);
 
   offset *= length;
   newStart += offset;
@@ -168,13 +169,13 @@ Path applyTrimPathIfNeeded(Path path, double start, double end, double offset) {
     newStart -= length;
   }
 
-  var tempPath = measure.extractPath(newStart, newEnd);
+  final Path tempPath = measure.extractPath(newStart, newEnd);
 
   if (newEnd > length) {
-    var tempPath2 = measure.extractPath(0.0, newEnd % length);
+    final Path tempPath2 = measure.extractPath(0.0, newEnd % length);
     tempPath.addPath(tempPath2, Offset.zero);
   } else if (newStart < 0) {
-    var tempPath2 = measure.extractPath(length + newStart, length);
+    final Path tempPath2 = measure.extractPath(length + newStart, length);
     tempPath.addPath(tempPath2, Offset.zero);
   }
   return tempPath;
@@ -195,10 +196,10 @@ int _floorDiv(int x, int y) {
 
 Shader createGradientShader(GradientColor gradient, GradientType type,
     Offset startPoint, Offset endPoint, Rect bounds) {
-  double x0 = bounds.left + bounds.width / 2 + startPoint.dx;
-  double y0 = bounds.top + bounds.height / 2 + startPoint.dy;
-  double x1 = bounds.left + bounds.width / 2 + endPoint.dx;
-  double y1 = bounds.top + bounds.height / 2 + endPoint.dy;
+  final double x0 = bounds.left + bounds.width / 2 + startPoint.dx;
+  final double y0 = bounds.top + bounds.height / 2 + startPoint.dy;
+  final double x1 = bounds.left + bounds.width / 2 + endPoint.dx;
+  final double y1 = bounds.top + bounds.height / 2 + endPoint.dy;
 
   return type == GradientType.Linear
       ? _createLinearGradientShader(gradient, x0, y0, x1, y1, bounds)

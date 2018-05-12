@@ -19,17 +19,17 @@ abstract class Drawable implements Content {
       String layerName, String contentName, ColorFilter colorFilter);
 }
 
-typedef Repaint();
+typedef void Repaint();
 
 abstract class AnimationDrawable implements Drawable {
   final String _name;
   final Repaint _repaint;
   final BaseLayer _layer;
 
+  AnimationDrawable(this._name, this._repaint, this._layer);
+
   @override
   String get name => _name;
-
-  AnimationDrawable(this._name, this._repaint, this._layer);
 
   void addAnimation(BaseKeyframeAnimation<dynamic, dynamic> animation) {
     if (animation != null) {

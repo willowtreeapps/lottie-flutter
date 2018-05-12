@@ -91,7 +91,7 @@ class _LottieState extends State<Lottie> with SingleTickerProviderStateMixin {
       _compositionLayer = new CompositionLayer(
           widget._composition,
           new Layer.empty(widget._size.width, widget._size.height),
-          () => {},
+          () => null,
           _scale);
     }
   }
@@ -133,7 +133,7 @@ class LottiePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final matrix = new Matrix4.identity();
+    final Matrix4 matrix = new Matrix4.identity();
     if (_scale != 1.0) {
       matrix.scale(_scale, _scale);
     }

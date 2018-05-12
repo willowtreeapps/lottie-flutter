@@ -11,19 +11,19 @@ abstract class Fill extends Shape {
   final PathFillType _type;
   final AnimatableIntegerValue _opacity;
 
-  Fill.fromMap(map, double durationFrames)
+  Fill.fromMap(Map<String, dynamic> map, double durationFrames)
       : _opacity = parseOpacity(map, durationFrames),
         _type = parseFillType(map),
         super.fromMap(map);
 }
 
 class ShapeFill extends Fill {
-  final bool _fillEnabled;
+  // final bool _fillEnabled;
   final AnimatableColorValue _color;
 
   ShapeFill.fromMap(dynamic map, double scale, double durationFrames)
       : _color = parseColor(map, durationFrames),
-        _fillEnabled = map['fillEnabled'],
+        // _fillEnabled = map['fillEnabled'],
         super.fromMap(map, durationFrames);
 
   @override

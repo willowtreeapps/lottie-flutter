@@ -1,8 +1,9 @@
+import 'dart:ui' as ui;
+
 import 'package:lottie_flutter/src/images.dart';
 import 'package:lottie_flutter/src/layers.dart';
 import 'package:lottie_flutter/src/parsers/composition_parsers.dart';
 import 'package:flutter/painting.dart';
-import 'dart:ui' as ui;
 
 class LottieComposition {
   Map<String, List<Layer>> _preComps;
@@ -14,8 +15,21 @@ class LottieComposition {
   final double _frameRate;
   final double _dpScale;
 
+  LottieComposition.fromMap(Map<String, dynamic> map)
+      : _bounds = parseBounds(map),
+        _startFrame = parseStartFrame(map),
+        _endFrame = parseEndFrame(map),
+        _frameRate = parseFrameRate(map),
+        _dpScale = ui.window.devicePixelRatio {
+    _images = parseImages(map);
+    _preComps = parsePreComps(map, _bounds.width, _bounds.height, _dpScale,
+        durationFrames, _endFrame);
+    _layers = parseLayers(map['layers'], _bounds.width, _bounds.height,
+        _dpScale, durationFrames, _endFrame);
+  }
+
   int get duration {
-    double frameDuration = _endFrame - _startFrame;
+    final double frameDuration = _endFrame - _startFrame;
     return (frameDuration / _frameRate * 1000).toInt();
   }
 
@@ -28,19 +42,6 @@ class LottieComposition {
   List<Layer> get layers => _layers;
 
   Rect get bounds => _bounds;
-
-  LottieComposition.fromMap(dynamic map)
-      : _bounds = parseBounds(map),
-        _startFrame = parseStartFrame(map),
-        _endFrame = parseEndFrame(map),
-        _frameRate = parseFrameRate(map),
-        _dpScale = ui.window.devicePixelRatio {
-    _images = parseImages(map);
-    _preComps = parsePreComps(map, _bounds.width, _bounds.height, _dpScale,
-        durationFrames, _endFrame);
-    _layers = parseLayers(map['layers'], _bounds.width, _bounds.height,
-        _dpScale, durationFrames, _endFrame);
-  }
 
   @override
   String toString() {

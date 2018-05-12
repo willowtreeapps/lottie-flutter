@@ -12,18 +12,10 @@ import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 ///
 class TrimPathDrawable extends AnimationDrawable {
   final ShapeTrimPathType _type;
-  final List<ValueChanged<double>> _listeners = [];
+  final List<ValueChanged<double>> _listeners = <ValueChanged<double>>[];
   final BaseKeyframeAnimation<dynamic, double> _startAnimation;
   final BaseKeyframeAnimation<dynamic, double> _endAnimation;
   final BaseKeyframeAnimation<dynamic, double> _offsetAnimation;
-
-  ShapeTrimPathType get type => _type;
-
-  double get start => _startAnimation.value;
-
-  double get end => _endAnimation.value;
-
-  double get offset => _offsetAnimation.value;
 
   TrimPathDrawable(
       String name,
@@ -39,9 +31,19 @@ class TrimPathDrawable extends AnimationDrawable {
     addAnimation(_offsetAnimation);
   }
 
+  ShapeTrimPathType get type => _type;
+
+  double get start => _startAnimation.value;
+
+  double get end => _endAnimation.value;
+
+  double get offset => _offsetAnimation.value;
+
   @override
   void onValueChanged(double progress) {
-    _listeners.forEach((listener) => listener(offset));
+    for (ValueChanged<double> listener in _listeners) {
+      listener(offset);
+    }
   }
 
   void addListener(ValueChanged<double> listener) {
@@ -51,7 +53,7 @@ class TrimPathDrawable extends AnimationDrawable {
 
 class MergePathsDrawable extends AnimationDrawable implements PathContent {
   final MergePathsMode _mode;
-  final List<PathContent> _pathContents = [];
+  final List<PathContent> _pathContents = <PathContent>[];
 
   MergePathsDrawable(String name, Repaint repaint, this._mode, BaseLayer layer)
       : super(name, repaint, layer);
@@ -64,7 +66,7 @@ class MergePathsDrawable extends AnimationDrawable implements PathContent {
 
   @override
   void setContents(List<Content> contentsBefore, List<Content> contentsAfter) {
-    for (var pathContent in _pathContents) {
+    for (PathContent pathContent in _pathContents) {
       pathContent.setContents(contentsBefore, contentsAfter);
     }
   }
@@ -92,24 +94,24 @@ class MergePathsDrawable extends AnimationDrawable implements PathContent {
   }
 
   Path addPaths() {
-    final path = new Path();
-    for (var pathContent in _pathContents) {
+    final Path path = new Path();
+    for (PathContent pathContent in _pathContents) {
       path.addPath(pathContent.path, const Offset(0.0, 0.0));
     }
     return path;
   }
 
   Path opFirstPathWithRest(PathOperation op) {
-    var firstPath = new Path();
-    final remainderPath = new Path();
+    Path firstPath = new Path();
+    final Path remainderPath = new Path();
 
     for (int i = _pathContents.length - 1; i >= 1; i--) {
-      final content = _pathContents[i];
+      final PathContent content = _pathContents[i];
 
       if (content is DrawableGroup) {
-        List<PathContent> paths = content.paths;
+        final List<PathContent> paths = content.paths;
         for (int j = paths.length - 1; j >= 0; j--) {
-          Path nextPath = paths[j].path;
+          final Path nextPath = paths[j].path;
           nextPath.transform(content.transformation.storage);
           remainderPath.addPath(nextPath, const Offset(0.0, 0.0));
         }
@@ -118,11 +120,11 @@ class MergePathsDrawable extends AnimationDrawable implements PathContent {
       }
     }
 
-    final lastContent = _pathContents[0];
+    final PathContent lastContent = _pathContents[0];
     if (lastContent is DrawableGroup) {
-      List<PathContent> paths = lastContent.paths;
+      final List<PathContent> paths = lastContent.paths;
       for (int j = 0; j < paths.length; j++) {
-        Path nextPath = paths[j].path;
+        final Path nextPath = paths[j].path;
         firstPath.addPath(nextPath, Offset.zero,
             matrix4: lastContent.transformation.storage);
       }

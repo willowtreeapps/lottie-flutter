@@ -10,25 +10,11 @@ import 'package:lottie_flutter/src/parsers/element_parsers.dart';
 import 'package:vector_math/vector_math_64.dart';
 
 class AnimatableTransform extends Shape {
-  final AnimatablePathValue _anchorPoint;
-  final AnimatableValue<Offset> _position;
-  final AnimatableScaleValue _scale;
-  final AnimatableDoubleValue _rotation;
-  final AnimatableIntegerValue _opacity;
-
-  AnimatablePathValue get anchorPoint => _anchorPoint;
-
-  AnimatableValue<Offset> get position => _position;
-
-  AnimatableScaleValue get scale => _scale;
-
-  AnimatableDoubleValue get rotation => _rotation;
-
-  AnimatableIntegerValue get opacity => _opacity;
-
-  AnimatableTransform._(this._anchorPoint, this._position, this._scale,
-      this._rotation, this._opacity)
-      : super.fromMap({});
+  final AnimatablePathValue anchorPoint;
+  final AnimatableValue<Offset> position;
+  final AnimatableScaleValue scale;
+  final AnimatableDoubleValue rotation;
+  final AnimatableIntegerValue opacity;
 
   factory AnimatableTransform(
       [dynamic map, double scale, double durationFrames]) {
@@ -47,7 +33,7 @@ class AnimatableTransform extends Shape {
     AnimatableDoubleValue rotationTransform;
     AnimatableIntegerValue opacityTransform;
 
-    var rawAnchorPoint = map['a'];
+    final Map<String, dynamic> rawAnchorPoint = map['a'];
     if (rawAnchorPoint != null) {
       anchorPointTransform =
           new AnimatablePathValue(rawAnchorPoint['k'], scale, durationFrames);
@@ -55,33 +41,33 @@ class AnimatableTransform extends Shape {
       // Cameras don't have an anchor point property. Although we don't support
       // then, at least we won't crash
       print(
-          "Layer has no transform property. You may be using an unsupported layer"
-          "type such as a camera");
+          'Layer has no transform property. You may be using an unsupported layer'
+          'type such as a camera');
       anchorPointTransform = new AnimatablePathValue(null, scale);
     }
 
     positionTransform =
         parsePathOrSplitDimensionPath(map, scale, durationFrames);
     if (positionTransform == null) {
-      _throwMissingTransform("position");
+      _throwMissingTransform('position');
     }
 
-    var rawScale = map['s'];
-    scaleTransform = rawScale is Map
+    final dynamic rawScale = map['s'];
+    scaleTransform = rawScale is Map<String, dynamic>
         ? new AnimatableScaleValue.fromMap(rawScale, durationFrames)
         // Somehow some community animations don't have scale in the transform
         : new AnimatableScaleValue();
 
-    var rawRotation = map['r'] ?? map['rz'];
-    if (rawRotation is Map) {
+    final dynamic rawRotation = map['r'] ?? map['rz'];
+    if (rawRotation is Map<String, dynamic>) {
       rotationTransform =
           new AnimatableDoubleValue.fromMap(rawRotation, 1.0, durationFrames);
     } else {
-      _throwMissingTransform("rotation");
+      _throwMissingTransform('rotation');
     }
 
-    var rawOpacity = map['o'];
-    opacityTransform = rawOpacity is Map
+    final dynamic rawOpacity = map['o'];
+    opacityTransform = rawOpacity is Map<String, dynamic>
         ? new AnimatableIntegerValue.fromMap(rawOpacity, durationFrames)
         : new AnimatableIntegerValue(100);
 
@@ -89,43 +75,44 @@ class AnimatableTransform extends Shape {
         scaleTransform, rotationTransform, opacityTransform);
   }
 
+  AnimatableTransform._(
+      this.anchorPoint, this.position, this.scale, this.rotation, this.opacity)
+      : super.fromMap(<String, dynamic>{});
+
   TransformKeyframeAnimation createAnimation() {
     return new TransformKeyframeAnimation(
-        _anchorPoint.createAnimation(),
-        _position.createAnimation(),
-        _scale.createAnimation(),
-        _rotation.createAnimation(),
-        _opacity.createAnimation());
+        anchorPoint.createAnimation(),
+        position.createAnimation(),
+        scale.createAnimation(),
+        rotation.createAnimation(),
+        opacity.createAnimation());
   }
 
   static void _throwMissingTransform(String missingProperty) {
-    throw new ArgumentError("Missing trasnform $missingProperty");
+    throw new ArgumentError('Missing trasnform $missingProperty');
   }
 }
 
 class TransformKeyframeAnimation {
-  final BaseKeyframeAnimation<dynamic, Offset> _anchorPoint;
-  final BaseKeyframeAnimation<dynamic, Offset> _position;
-  final BaseKeyframeAnimation<dynamic, Offset> _scale;
-  final BaseKeyframeAnimation<dynamic, double> _rotation;
-  final BaseKeyframeAnimation<dynamic, int> _opacity;
+  final BaseKeyframeAnimation<dynamic, Offset> anchorPoint;
+  final BaseKeyframeAnimation<dynamic, Offset> position;
+  final BaseKeyframeAnimation<dynamic, Offset> scale;
+  final BaseKeyframeAnimation<dynamic, double> rotation;
+  final BaseKeyframeAnimation<dynamic, int> opacity;
 
-  BaseKeyframeAnimation<dynamic, Offset> get anchorpoint => _anchorPoint;
-  BaseKeyframeAnimation<dynamic, Offset> get position => _position;
-  BaseKeyframeAnimation<dynamic, Offset> get scale => _scale;
-  BaseKeyframeAnimation<dynamic, double> get rotation => _rotation;
-  BaseKeyframeAnimation<dynamic, int> get opacity => _opacity;
+  TransformKeyframeAnimation(
+      this.anchorPoint, this.position, this.scale, this.rotation, this.opacity);
 
   set progress(double val) {
-    _anchorPoint.progress = val;
-    _position.progress = val;
-    _scale.progress = val;
-    _rotation.progress = val;
-    _opacity.progress = val;
+    anchorPoint.progress = val;
+    position.progress = val;
+    scale.progress = val;
+    rotation.progress = val;
+    opacity.progress = val;
   }
 
   void addAnimationsToLayer(BaseLayer layer) {
-    layer.addAnimation(anchorpoint);
+    layer.addAnimation(anchorPoint);
     layer.addAnimation(position);
     layer.addAnimation(scale);
     layer.addAnimation(rotation);
@@ -140,36 +127,33 @@ class TransformKeyframeAnimation {
   }
 
   Matrix4 get matrix {
-    final _matrix = new Matrix4.identity();
+    final Matrix4 _matrix = new Matrix4.identity();
 
-    final position = _position.value;
-    if (position.dx != 0.0 || position.dy != 0.0) {
-      _matrix.translate(position.dx, position.dy);
+    final Offset positionValue = position.value;
+    if (positionValue.dx != 0.0 || positionValue.dy != 0.0) {
+      _matrix.translate(positionValue.dx, positionValue.dy);
     }
-    final rotation = _rotation.value;
-    if (rotation != 0) {
-      _matrix.rotateZ(rotation * pi / 180.0);
+    final double rotationValue = rotation.value;
+    if (rotationValue != 0) {
+      _matrix.rotateZ(rotationValue * pi / 180.0);
     }
-    final scale = _scale.value;
-    if (scale.dx != 1.0 || scale.dy != 1.0) {
-      _matrix.scale(scale.dx, scale.dy);
+    final Offset scaleValue = scale.value;
+    if (scaleValue.dx != 1.0 || scaleValue.dy != 1.0) {
+      _matrix.scale(scaleValue.dx, scaleValue.dy);
     }
 
-    final anchorPoint = _anchorPoint.value;
-    if (anchorPoint.dx != 0.0 || anchorPoint.dy != 0.0) {
-      _matrix.translate(-anchorPoint.dx, -anchorPoint.dy);
+    final Offset anchorPointValue = anchorPoint.value;
+    if (anchorPointValue.dx != 0.0 || anchorPointValue.dy != 0.0) {
+      _matrix.translate(-anchorPointValue.dx, -anchorPointValue.dy);
     }
     return _matrix;
   }
 
-  TransformKeyframeAnimation(this._anchorPoint, this._position, this._scale,
-      this._rotation, this._opacity);
-
   void addListener(ValueChanged<double> onValueChanged) {
-    _anchorPoint.addListener(onValueChanged);
-    _position.addListener(onValueChanged);
-    _scale.addListener(onValueChanged);
-    _rotation.addListener(onValueChanged);
-    _opacity.addListener(onValueChanged);
+    anchorPoint.addListener(onValueChanged);
+    position.addListener(onValueChanged);
+    scale.addListener(onValueChanged);
+    rotation.addListener(onValueChanged);
+    opacity.addListener(onValueChanged);
   }
 }

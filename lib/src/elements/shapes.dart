@@ -1,18 +1,16 @@
 import 'dart:ui';
 import 'package:lottie_flutter/src/animatables.dart';
 import 'package:lottie_flutter/src/drawing/drawing.dart';
+import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 import 'package:lottie_flutter/src/drawing/elements/shapes.dart';
 import 'package:lottie_flutter/src/parsers/element_parsers.dart';
-import 'package:lottie_flutter/src/values.dart';
-
-import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 
 abstract class Shape {
   final String _name;
 
-  String get name => _name;
-
   Shape.fromMap(dynamic map) : _name = parseName(map);
+
+  String get name => _name;
 
   AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) => null;
 }
@@ -53,31 +51,31 @@ class RectangleShape extends Shape {
 }
 
 class PolystarShape extends Shape {
-  final PolystarShapeType _type;
-  final AnimatableDoubleValue _points;
+  // final PolystarShapeType _type;
+  // final AnimatableDoubleValue _points;
   final AnimatableValue<Offset> _position;
-  final AnimatableDoubleValue _rotation;
-  final AnimatableDoubleValue _innerRadius;
-  final AnimatableDoubleValue _outerRadius;
-  final AnimatableDoubleValue _innerRoundness;
-  final AnimatableDoubleValue _outerRoundness;
+  // final AnimatableDoubleValue _rotation;
+  // final AnimatableDoubleValue _innerRadius;
+  // final AnimatableDoubleValue _outerRadius;
+  // final AnimatableDoubleValue _innerRoundness;
+  // final AnimatableDoubleValue _outerRoundness;
 
   PolystarShape.fromMap(dynamic map, double scale, double durationFrames)
-      : _type = parserPolystarShapeType(map),
+      : // _type = parserPolystarShapeType(map),
         _position = parsePathOrSplitDimensionPath(map, scale, durationFrames),
-        _points =
-            new AnimatableDoubleValue.fromMap(map['pt'], 1.0, durationFrames),
-        _rotation =
-            new AnimatableDoubleValue.fromMap(map['r'], 1.0, durationFrames),
-        _outerRadius =
-            new AnimatableDoubleValue.fromMap(map['or'], scale, durationFrames),
-        _outerRoundness =
-            new AnimatableDoubleValue.fromMap(map['os'], 1.0, durationFrames),
-        _innerRadius = parseinnerRadius(map, scale, durationFrames),
-        _innerRoundness = parseInnerRoundness(map, durationFrames),
+        // _points =
+        //     new AnimatableDoubleValue.fromMap(map['pt'], 1.0, durationFrames),
+        // _rotation =
+        //     new AnimatableDoubleValue.fromMap(map['r'], 1.0, durationFrames),
+        // _outerRadius =
+        //     new AnimatableDoubleValue.fromMap(map['or'], scale, durationFrames),
+        // _outerRoundness =
+        //     new AnimatableDoubleValue.fromMap(map['os'], 1.0, durationFrames),
+        // _innerRadius = parseinnerRadius(map, scale, durationFrames),
+        // _innerRoundness = parseInnerRoundness(map, durationFrames),
         super.fromMap(map);
 }
 
 class UnknownShape extends Shape {
-  UnknownShape() : super.fromMap({});
+  UnknownShape() : super.fromMap(<String, dynamic>{});
 }

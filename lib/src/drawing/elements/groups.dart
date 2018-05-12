@@ -12,14 +12,36 @@ import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 
 class DrawableGroup extends AnimationDrawable implements PathContent {
   final List<AnimationDrawable> _contents;
-  List<PathContent> _pathContents = [];
+  final List<PathContent> _pathContents = <PathContent>[];
   final TransformKeyframeAnimation _transformAnimation;
+
+  DrawableGroup(String name, Repaint repaint, this._contents,
+      this._transformAnimation, BaseLayer layer)
+      : super(name, repaint, layer) {
+    final List<Content> contentsToRemove = <Content>[];
+    MergePathsDrawable currentMergePathsContent;
+    for (int i = _contents.length - 1; i >= 0; i--) {
+      final Content content = _contents[i];
+      if (content is MergePathsDrawable) {
+        currentMergePathsContent = content;
+      }
+      if (currentMergePathsContent != null &&
+          content != currentMergePathsContent) {
+        currentMergePathsContent.addContentIfNeeded(content);
+        contentsToRemove.add(content);
+      }
+    }
+
+    _transformAnimation?.addAnimationsToLayer(layer);
+    _contents.removeWhere(
+        (AnimationDrawable content) => contentsToRemove.contains(content));
+  }
 
   @override
   Path get path {
-    Path path = new Path();
+    final Path path = new Path();
     for (int i = _contents.length - 1; i >= 0; i--) {
-      Content content = _contents[i];
+      final Content content = _contents[i];
       if (content is PathContent) {
         addPathToPath(path, content.path, transformation);
       }
@@ -33,9 +55,9 @@ class DrawableGroup extends AnimationDrawable implements PathContent {
       return _pathContents;
     }
 
-    for (var content in _contents) {
+    for (Content content in _contents) {
       if (content is PathContent) {
-        _pathContents.add(content as PathContent);
+        _pathContents.add(content);
       }
     }
 
@@ -46,35 +68,14 @@ class DrawableGroup extends AnimationDrawable implements PathContent {
     return _transformAnimation?.matrix ?? new Matrix4.identity();
   }
 
-  DrawableGroup(String name, Repaint repaint, this._contents,
-      this._transformAnimation, BaseLayer layer)
-      : super(name, repaint, layer) {
-    List<Content> contentsToRemove = [];
-    MergePathsDrawable currentMergePathsContent;
-    for (int i = _contents.length - 1; i >= 0; i--) {
-      Content content = _contents[i];
-      if (content is MergePathsDrawable) {
-        currentMergePathsContent = content;
-      }
-      if (currentMergePathsContent != null &&
-          content != currentMergePathsContent) {
-        currentMergePathsContent.addContentIfNeeded(content);
-        contentsToRemove.add(content);
-      }
-    }
-
-    _transformAnimation?.addAnimationsToLayer(layer);
-    _contents.removeWhere((content) => contentsToRemove.contains(content));
-  }
-
   @override
   void setContents(List<Content> contentsBefore, List<Content> contentsAfter) {
     // Do nothing with contents after.
     final List<Content> myContentsBefore = <Content>[];
-    contentsBefore.forEach((content) => myContentsBefore.add(content));
+    contentsBefore.forEach(myContentsBefore.add);
 
     for (int i = _contents.length - 1; i >= 0; i--) {
-      Content content = _contents[i];
+      final Content content = _contents[i];
       content.setContents(myContentsBefore, _contents.sublist(0, i));
       myContentsBefore.add(content);
     }
@@ -83,7 +84,7 @@ class DrawableGroup extends AnimationDrawable implements PathContent {
   @override
   void addColorFilter(
       String layerName, String contentName, ColorFilter colorFilter) {
-    for (var content in _contents) {
+    for (AnimationDrawable content in _contents) {
       if (contentName == null || contentName == content.name) {
         content.addColorFilter(layerName, null, colorFilter);
       } else {
@@ -94,12 +95,12 @@ class DrawableGroup extends AnimationDrawable implements PathContent {
 
   @override
   void draw(Canvas canvas, Size size, Matrix4 parentMatrix, int parentAlpha) {
-    Matrix4 matrix = parentMatrix.clone();
+    final Matrix4 matrix = parentMatrix.clone();
 
     int alpha = parentAlpha;
     if (_transformAnimation != null) {
       matrix.multiply(_transformAnimation.matrix);
-      int transformOpacity = _transformAnimation.opacity.value;
+      final int transformOpacity = _transformAnimation.opacity.value;
       alpha =
           ((transformOpacity / 100.0 * parentAlpha / 255.0) * 255.0).toInt();
     }
@@ -111,7 +112,7 @@ class DrawableGroup extends AnimationDrawable implements PathContent {
 
   @override
   Rect getBounds(Matrix4 parentMatrix) {
-    Matrix4 matrix = parentMatrix.clone();
+    final Matrix4 matrix = parentMatrix.clone();
 
     if (_transformAnimation != null) {
       matrix.multiply(_transformAnimation.matrix);
@@ -119,8 +120,8 @@ class DrawableGroup extends AnimationDrawable implements PathContent {
 
     Rect bounds = Rect.zero;
     for (int i = _contents.length - 1; i >= 0; i--) {
-      AnimationDrawable content = _contents[i];
-      final rect = content.getBounds(matrix);
+      final AnimationDrawable content = _contents[i];
+      final Rect rect = content.getBounds(matrix);
       if (bounds.isEmpty) {
         bounds =
             new Rect.fromLTRB(rect.left, rect.top, rect.right, rect.bottom);

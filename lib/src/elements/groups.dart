@@ -10,12 +10,12 @@ import 'package:lottie_flutter/src/drawing/drawing_layers.dart';
 class ShapeGroup extends Shape {
   final List<Shape> _shapes;
 
-  List<Shape> get shapes => _shapes;
-
   ShapeGroup.fromMap(dynamic map, double scale, double durationFrames)
       : _shapes = parseRawShapes(map['it'], scale, durationFrames),
         super.fromMap(map);
 
+  List<Shape> get shapes => _shapes;
+  
   @override
   AnimationDrawable toDrawable(Repaint repaint, BaseLayer layer) =>
       new DrawableGroup(
@@ -25,14 +25,16 @@ class ShapeGroup extends Shape {
           obtainTransformAnimation(_shapes),
           layer);
 
-  static List<Shape> parseRawShapes(
-          List rawShapes, double scale, double durationFrames) =>
+  static List<Shape> parseRawShapes(List<dynamic> rawShapes,
+          double scale, double durationFrames) =>
       rawShapes
-          .map((rawShape) => shapeFromMap(rawShape, scale, durationFrames))
+          .map((dynamic rawShape) =>
+              shapeFromMap(rawShape, scale, durationFrames))
           .toList();
 }
 
-Shape shapeFromMap(dynamic rawShape, double scale, double durationFrames) {
+Shape shapeFromMap(
+    Map<String, dynamic> rawShape, double scale, double durationFrames) {
   switch (rawShape['ty']) {
     case 'gr':
       return new ShapeGroup.fromMap(rawShape, scale, durationFrames);
@@ -70,13 +72,13 @@ Shape shapeFromMap(dynamic rawShape, double scale, double durationFrames) {
 List<AnimationDrawable> shapesToAnimationDrawable(
     Repaint repaint, List<Shape> shapes, BaseLayer layer) {
   return shapes
-      .map((shape) => shape.toDrawable(repaint, layer))
-      .where((drawable) => drawable != null)
+      .map((Shape shape) => shape.toDrawable(repaint, layer))
+      .where((AnimationDrawable drawable) => drawable != null)
       .toList();
 }
 
 TransformKeyframeAnimation obtainTransformAnimation(List<Shape> shapes) {
-  return (shapes.firstWhere((sh) => sh is AnimatableTransform,
-          orElse: () => null) as AnimatableTransform)
-      ?.createAnimation();
+  final AnimatableTransform transform = shapes
+      .firstWhere((Shape sh) => sh is AnimatableTransform, orElse: () => null);
+  return transform?.createAnimation();
 }
