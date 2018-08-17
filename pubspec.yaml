@@ -15,8 +15,8 @@ dependencies:
     sdk: flutter
 
 dev_dependencies:
-  test: ">=0.12.34 <1.0.0" 
-  inflection: any
+  test: any 
+  # inflection: any
   flutter_test:
     sdk: flutter
 
